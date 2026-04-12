@@ -1,0 +1,67 @@
+name: CI - PlatformIO build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [ "leonardo", "leonardo_hid", "pro_micro", "pro_micro_hid" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Cache platformio and pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+            ~/.platformio/packages
+          key: ${{ runner.os }}-platformio-${{ hashFiles('platformio.ini') }}-v1
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U platformio
+
+      - name: PlatformIO version
+        run: platformio --version
+
+      - name: Build (env = ${{ matrix.env }})
+        run: |
+          set -e
+          echo "Using environment: ${{ matrix.env }}"
+          platformio run -e ${{ matrix.env }}
+
+      - name: PlatformIO check (static analysis)
+        run: |
+          platformio check -e ${{ matrix.env }} || true
+
+      - name: Show firmware size (optional)
+        run: |
+          platformio run -e ${{ matrix.env }} -t size || true
+
+      - name: Upload compiled firmware artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.env }}
+          path: .pio/build/${{ matrix.env }}/firmware.hex
+
+      - name: List .pio/build directory
+        run: ls -la .pio/build || true
+
