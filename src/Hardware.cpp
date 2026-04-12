@@ -33,54 +33,70 @@ void initHardware() {
 #endif
 }
 
+// Helper: read available data into String for up to timeout ms
+static String readResponse(Stream* s, unsigned long timeout_ms) {
+  String resp;
+  unsigned long start = millis();
+  while (millis() - start < timeout_ms) {
+    while (s->available()) {
+      char c = (char)s->read();
+      resp += c;
+    }
+    if (resp.length() > 0) return resp;
+    delay(5);
+  }
+  return resp;
+}
+
 void configureBleName(const char* name) {
   if (!BLE_SERIAL) return;
 
-  // HM-10 usually responds to AT commands at 9600 when not connected. Make a simple attempt.
-  // Send an "AT" first to wake it and check response.
-  const unsigned long timeout = 800;
+  // Flush any pending bytes
   while (BLE_SERIAL->available()) BLE_SERIAL->read();
 
+  // Wake module with AT
   BLE_SERIAL->print("AT\r\n");
-  unsigned long start = millis();
-  bool ok = false;
-  // read any response for a short window
-  while (millis() - start < timeout) {
-    while (BLE_SERIAL->available()) {
-      int c = BLE_SERIAL->read();
-      (void)c;
-      ok = true;
-    }
-  }
-
-  // Now send AT+NAME<name>
-  // HM-10 expects: AT+NAMEyourname (no quotes)
-  String cmd = String("AT+NAME") + String(name) + "\r\n";
-  BLE_SERIAL->print(cmd);
-
-  // wait for response
-  start = millis();
-  String resp;
-  while (millis() - start < 1200) {
-    while (BLE_SERIAL->available()) {
-      char c = (char)BLE_SERIAL->read();
-      resp += c;
-    }
-    if (resp.length() > 0) break;
-  }
+  String wake = readResponse(BLE_SERIAL, 300);
 
   if (Serial) {
-    Serial.print(F("configureBleName: sent '"));
-    Serial.print(cmd);
-    Serial.print(F("' response: "));
-    Serial.println(resp);
+    Serial.print(F("configureBleName: wake response: "));
+    Serial.println(wake);
   }
 
-  // If BLE_SERIAL is the same physical HM-10 connection and also connected to host, echo response
-  if (BLE_SERIAL && BLE_SERIAL != &Serial) {
-    // print a short status to BLE serial as well (but avoid flooding)
-    if (resp.length() > 0) {
-      BLE_SERIAL->print(F("OK"));
+  // Try two common syntaxes for HM-10 variants
+  String cmd1 = String("AT+NAME") + String(name) + "\r\n";   // AT+NAMEname
+  String cmd2 = String("AT+NAME=") + String(name) + "\r\n";  // AT+NAME=name
+
+  // Attempt cmd1
+  BLE_SERIAL->print(cmd1);
+  String resp1 = readResponse(BLE_SERIAL, 800);
+  if (Serial) {
+    Serial.print(F("configureBleName: sent '")); Serial.print(cmd1); Serial.print(F("' response: ")); Serial.println(resp1);
+  }
+
+  bool ok = false;
+  if (resp1.length() > 0) ok = true;
+
+  // If not ok, try cmd2
+  if (!ok) {
+    BLE_SERIAL->print(cmd2);
+    String resp2 = readResponse(BLE_SERIAL, 800);
+    if (Serial) {
+      Serial.print(F("configureBleName: sent '")); Serial.print(cmd2); Serial.print(F("' response: ")); Serial.println(resp2);
     }
+    if (resp2.length() > 0) ok = true;
+  }
+
+  // Query the name to verify (some modules respond to AT+NAME?)
+  BLE_SERIAL->print(String("AT+NAME?\r\n"));
+  String verify = readResponse(BLE_SERIAL, 800);
+  if (Serial) {
+    Serial.print(F("configureBleName: verify response: ")); Serial.println(verify);
+  }
+
+  // Optionally echo short status back on BLE serial
+  if (BLE_SERIAL && BLE_SERIAL != &Serial) {
+    if (ok) BLE_SERIAL->print(F("OK\r\n"));
+    else BLE_SERIAL->print(F("ERR\r\n"));
   }
 }
