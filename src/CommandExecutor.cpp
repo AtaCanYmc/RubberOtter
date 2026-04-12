@@ -31,6 +31,27 @@ void execute_command(const char* payload, uint8_t seq) {
     return;
   }
 
+  // Allow runtime BLE name change: ble name "My Device"
+  if (strncmp(s, "ble name ", 9) == 0) {
+    char* p = s + 9;
+    while (*p && isspace((unsigned char)*p)) p++;
+    if (*p == '"') {
+      p++;
+      char nameBuf[64]; size_t ni = 0;
+      while (*p && *p != '"' && ni < sizeof(nameBuf)-1) {
+        nameBuf[ni++] = *p++;
+      }
+      nameBuf[ni] = '\0';
+      if (ni > 0) {
+        configureBleName(nameBuf);
+        sendAck(seq, true, 0);
+        return;
+      }
+    }
+    sendAck(seq, false, 1);
+    return;
+  }
+
   if (strncmp(s, "type \"", 6) == 0) {
     char* p = s + 6;
     char outBuf[PAYLOAD_MAX+1]; size_t oi=0;

@@ -11,6 +11,7 @@
 extern Stream* BLE_SERIAL;
 
 void initHardware();
+void configureBleName(const char* name); // send AT+NAME to BLE module (HM-10)
 
 constexpr uint8_t VIB_PIN = 2;
 
@@ -20,4 +21,3 @@ inline void vibrate_pulse_hw(uint16_t ms) {
   delay(ms);
   digitalWrite(VIB_PIN, LOW);
 }
-
