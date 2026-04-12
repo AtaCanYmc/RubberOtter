@@ -369,14 +369,16 @@ void execute_single_command(char* cmd) {
   char* s = trim_inplace(cmd);
   if (!*s) return;
 
-  // Show help
-  if (strcmp(s, "help") == 0 || strcmp(s, "?") == 0) {
+  // Show help (case-insensitive)
+  if (iequals(s, "help") || iequals(s, "?")) {
     sendHelp();
     return;
   }
-  // help <command>
-  if (strncmp(s, "help ", 5) == 0) {
-    char* q = s + 5;
+  // help <command> (case-insensitive)
+  if (startsWithIgnoreCase(s, "help ")) {
+    // find rest after first space
+    char* q = s + 4;
+    while (*q && isspace((unsigned char)*q)) q++;
     char tmp[32];
     strncpy(tmp, q, sizeof(tmp)-1);
     tmp[sizeof(tmp)-1] = '\0';
