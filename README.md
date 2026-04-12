@@ -1,10 +1,37 @@
 Rubber Otter — Arduino tarafı
 
-Bu dosya projedeki Arduino tarafı (Pro Micro + HM-10 + vibrasyon motoru) için hızlı kılavuz ve referans içerir.
+Bu dosya projedeki Arduino tarafı (ATmega32U4 tabanlı kartlar — Pro Micro / Leonardo + HM-10 + vibrasyon motoru) için hızlı kılavuz ve referans içerir.
+
+Önemli not (board/env):
+- Bu repo artık PlatformIO için varsayılan environment olarak `leonardo` (Arduino Leonardo) kullanacak şekilde yapılandırılmıştır (platformio.ini içinde `default_envs = leonardo`).
+- Neden? Bazı PlatformIO kurulumlarında ATmega32U4 tabanlı kartlar `leonardo` olarak tanımlanır; eğer sizde Pro Micro tanınıyorsa `pro_micro` envini kullanabilirsiniz.
+- Eğer fiziksel kartınız Pro Micro ise ve PlatformIO sizin sistemde `pro_micro` olarak tanıyorsa, `platformio.ini` içindeki `default_envs` değerini `pro_micro` olarak değiştirebilir veya doğrudan şu komutla build/upload yapabilirsiniz:
+
+  - Derleme (leonardo env ile):
+
+```bash
+platformio run -e leonardo
+```
+
+  - Derleme (pro_micro env ile):
+
+```bash
+platformio run -e pro_micro
+```
+
+  - Yükleme:
+
+```bash
+platformio run -e leonardo -t upload
+# veya
+platformio run -e pro_micro -t upload
+```
+
+- Arduino IDE kullanıyorsanız: `RubberOtter.ino` dosyasını açıp hedef kartı (Pro Micro / Leonardo) seçin. USB HID (Keyboard) özellikleri için kartın ATmega32U4 tabanlı olması gerekir.
 
 Özet
 - Rubber Otter: BLE (HM-10) üzerinden gelen komutları USB HID (Keyboard + optionally Consumer) olarak gönderir.
-- Donanım: Arduino Pro Micro (ATmega32U4), HM-10 (BLE), vibrasyon motoru sürücüsü (MOSFET).
+- Donanım: Arduino Pro Micro veya Leonardo (ATmega32U4), HM-10 (BLE), vibrasyon motoru sürücüsü (MOSFET).
 
 Hızlı başlangıç
 1. `RubberOtter.ino` dosyasını Arduino IDE veya PlatformIO ile açın.

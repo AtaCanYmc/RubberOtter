@@ -3,7 +3,7 @@
 #include "Hardware.h"
 #include "Utils.h"
 #include "CommandExecutor.h"
-#include <cstring>
+#include <string.h>
 
 static uint8_t ringBuf[RING_BUF_SIZE];
 static uint16_t ringHead = 0, ringTail = 0;

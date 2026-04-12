@@ -1,8 +1,12 @@
 #include "InputHelpers.h"
 #include "Hardware.h"
-#include <Keyboard.h>
 #ifdef USE_HID_PROJECT
 #include <HID-Project.h>
+#else
+#include <Keyboard.h>
+#endif
+#ifdef USE_HID_PROJECT
+// HID-Project provides Consumer and improved APIs
 #endif
 #include <ctype.h>
 #include <string.h>
@@ -60,7 +64,7 @@ void sendHelpFor(const char* cmd) {
   while (*p && isspace((unsigned char)*p)) p++;
   while (*p && !isspace((unsigned char)*p) && i < sizeof(token)-1) { char c = *p++; token[i++] = (char)tolower((unsigned char)c); }
   token[i] = '\0';
-  #define P(x) do { Serial.println(F(x)); if (BLE_SERIAL) BLE_SERIAL.println(F(x)); } while(0)
+  #define P(x) do { Serial.println(F(x)); if (BLE_SERIAL) BLE_SERIAL->println(F(x)); } while(0)
   if (strcmp(token, "type") == 0) { P("type \"...\"  — Send literal text. Supports escapes: \\n -> newline, \\t -> tab, \\\" -> quote. Example: type \"Hello\\nWorld\""); P("Max length per payload is limited; for long text, consider chunking or macros."); }
   else if (strcmp(token, "delay") == 0) { P("delay N  — Pause execution for N milliseconds. Example: delay 250"); }
   else if (strcmp(token, "enter") == 0) { P("enter  — Sends the Enter/Return key."); }
@@ -73,7 +77,7 @@ void sendHelpFor(const char* cmd) {
   else if (strcmp(token, "media") == 0) { P("media <cmd>  — Multimedia commands (requires HID-Project). Supported: play_pause, volume_up, volume_down, next"); }
   else if (strcmp(token, "macro") == 0) { P("macro define mX { ... }  — Save macro to slot m0..m5. Example: macro define m0 { type \"Hi\" && enter }"); P("macro run mX  — Run macro slot m0..m5. Example: macro run m0"); }
   else if (strcmp(token, "framing") == 0 || strcmp(token, "packet") == 0) { P("Framing: STX(0x02) VERSION(0x01) SEQ(1) LEN(2 BE) PAYLOAD CHECKSUM(1 XOR) ETX(0x03)"); P("ACK: STX VERSION SEQ STATUS(1=OK) CODE ETX. Host must retry on timeout."); }
-  else { Serial.print(F("No detailed help for: ")); Serial.println(token); if (BLE_SERIAL) { BLE_SERIAL.print(F("No detailed help for: ")); BLE_SERIAL.println(token); } delay(2); sendHelp(); }
+  else { Serial.print(F("No detailed help for: ")); Serial.println(token); if (BLE_SERIAL) { BLE_SERIAL->print(F("No detailed help for: ")); BLE_SERIAL->println(token); } delay(2); sendHelp(); }
   #undef P
 }
 
@@ -143,4 +147,3 @@ void consumer_command(const char* cmd) {
   (void)cmd;
 #endif
 }
-
