@@ -1,0 +1,50 @@
+# Editor/IDE
+.vscode/
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Arduino / PlatformIO
+*.pio/
+.pioenvs/
+.pio/
+*.elf
+*.hex
+*.bin
+*.o
+*.eep
+*.map
+*.a
+
+# Arduino build folders
+build/
+cmake-build-debug/
+
+# Arduino temp files
+*.tmp
+*.bak
+*~
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Node/Electron (in case desktop code in repo)
+node_modules/
+dist/
+
+# Serial/USB device special files (don't accidentally commit)
+/dev/
+
+# README or docs artifacts
+*.pdf
+
+# Secrets (be careful not to commit credentials)
+.env
+secrets.json
+
