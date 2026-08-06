@@ -11,23 +11,51 @@ A modern, responsive **Progressive Web Application (PWA)** built with **Vite, Re
 
 ## 📐 Control Flow & Architecture
 
-```
-[ Smartphone / Browser (PWA) ]
-              │
-      Web Bluetooth API (GATT)
-              │
-              ▼
-[ HM-10 BLE Module (Service: 0xffe0, Char: 0xffe1) ]
-              │
-    Serial UART @ 9600 Baud (TX->RX1, RX->TX1)
-              │
-              ▼
-[ Arduino Pro Micro (ATmega32U4) ]
-              │
-        USB HID Driver (<Keyboard.h> & <Mouse.h>)
-              │
-              ▼
-[ Target Host PC (USB Keyboard & Mouse Device) ]
+```mermaid
+graph TD
+    subgraph Frontend["PWA Web Application (RubberOtterWeb)"]
+        UI["Web App UI (Vite + React + Tailwind)"]
+        BT_MGR["BluetoothManager / MockBleDriver"]
+        ENC["Packet Encoder (0x11 - 0x85)"]
+        
+        UI -->|"User Action (Click/Touch)"| ENC
+        ENC -->|"Encode Bytes [0x80, dx, dy]"| BT_MGR
+    end
+
+    subgraph Transport["Wireless & Serial Transport"]
+        GATT["Web Bluetooth API (navigator.bluetooth)"]
+        BLE["HM-10 BLE Module (Service: 0xffe0, Char: 0xffe1)"]
+        UART["Serial1 UART @ 9600 Baud (TX1/RX1)"]
+        
+        BT_MGR -->|"GATT Write Characteristic"| GATT
+        GATT -->|"BLE Wireless Signal"| BLE
+        BLE -->|"Hardware Serial Payload"| UART
+    end
+
+    subgraph Backend["Arduino Firmware (ATmega32U4)"]
+        ARDUINO["Arduino Pro Micro Microcontroller"]
+        DECODER["Command Decoder Loop (switch-case)"]
+        HID_LIB["USB HID Stack (<Keyboard.h> & <Mouse.h>)"]
+        JIGGLER["Background Mouse Jiggler (millis timer)"]
+
+        UART -->|"Serial1.read()"| ARDUINO
+        ARDUINO --> DECODER
+        DECODER -->|"HID Action"| HID_LIB
+        JIGGLER -.->|"Periodic Micro-movement"| HID_LIB
+    end
+
+    subgraph Target["Target Host PC"]
+        USB["USB Port (CDC HID Device)"]
+        HOST["Target PC OS (Windows / Mac / Linux)"]
+
+        HID_LIB -->|"USB HID Signal"| USB
+        USB -->|"Emulated Keypress & Mouse Move"| HOST
+    end
+
+    style Frontend fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
+    style Transport fill:#070a12,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
+    style Backend fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
+    style Target fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
 ```
 
 ---
@@ -96,18 +124,46 @@ npm run build
 
 ## 🔌 Hardware Wiring Diagram
 
-```
-+------------------------+             +--------------------------+
-|  HM-10 BLE Module      |             | Arduino Pro Micro (32U4) |
-+------------------------+             +--------------------------+
-| TX                     | ----------->| Pin 0 (RX1)              |
-| RX                     | <-----------| Pin 1 (TX1) [Voltage Div]|
-| VCC (3.3V / 5V)        | ----------->| VCC                      |
-| GND                    | ----------->| GND                      |
-+------------------------+             +--------------------------+
-                                                    | (Micro-USB)
-                                                    v
-                                       Target PC (USB HID Device)
+```mermaid
+graph LR
+    subgraph HM10["HM-10 BLE Module"]
+        HM_TX["TX Pin"]
+        HM_RX["RX Pin"]
+        HM_VCC["VCC (3.3V / 5V)"]
+        HM_GND["GND"]
+    end
+
+    subgraph Divider["Voltage Divider (5V -> 3.3V Logic)"]
+        R1["Resistor 1kΩ"]
+        R2["Resistor 2kΩ / GND"]
+        HM_RX <--- R1
+        R1 <--- R2
+    end
+
+    subgraph Micro["Arduino Pro Micro (ATmega32U4)"]
+        ARD_RX1["Pin 0 (RX1)"]
+        ARD_TX1["Pin 1 (TX1)"]
+        ARD_VCC["VCC (5V)"]
+        ARD_GND["GND"]
+        ARD_USB["Micro-USB Port"]
+    end
+
+    subgraph PC["Target Host PC"]
+        HOST_USB["USB Type-A / Type-C Port"]
+    end
+
+    HM_TX -->|"UART Serial Direct"| ARD_RX1
+    ARD_TX1 -->|"5V TX Signal"| R1
+    ARD_VCC -->|"Power Line"| HM_VCC
+    ARD_GND -->|"Common Ground"| HM_GND
+    R2 -->|"Ground Connection"| ARD_GND
+
+    ARD_USB ===|"USB HID Cable"| HOST_USB
+
+    style HM10 fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
+    style Divider fill:#312e81,stroke:#a5b4fc,stroke-width:2px,color:#f8fafc
+    style Micro fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
+    style PC fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
 ```
 
 ---
