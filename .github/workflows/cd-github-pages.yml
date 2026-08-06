@@ -1,0 +1,50 @@
+name: CD - Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy PWA to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node & Install Dependencies
+        uses: ./.github/actions/setup-project
+
+      - name: Build Vite PWA Production Bundle
+        run: npm run build
+
+      - name: Setup GitHub Pages Environment
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact (dist)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy Artifact to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
