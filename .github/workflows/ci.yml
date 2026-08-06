@@ -25,7 +25,7 @@ jobs:
           python-version: '3.x'
 
       - name: Cache platformio and pip
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.platformio
