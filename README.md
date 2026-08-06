@@ -1,281 +1,315 @@
-# Rubber Otter — Firmware (Arduino)
+# 🦦 Rubber Otter — Modular Bluetooth HID Firmware
 
-This repository contains the Arduino firmware for Rubber Otter: a small HID-enabled device (ATmega32U4-based) that receives framed commands over a serial link (typically BLE / HM-10) and emits USB HID events (keyboard and optional media keys) and other side effects (vibration motor, macros saved in EEPROM).
+[![CI Pipeline](https://github.com/USERNAME/RubberOtter/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/RubberOtter/actions/workflows/ci.yml)
+[![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-orange.svg)](https://platformio.org/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Target MCU](https://img.shields.io/badge/MCU-ATmega32U4%20%7C%20Leonardo%20%7C%20Pro%20Micro-cyan.svg)](https://www.microchip.com/en-us/product/ATmega32u4)
 
-This README explains the full system, wiring, command set, framing protocol, build instructions (PlatformIO and Arduino IDE), CLion tips (External Tools), continuous integration (GitHub Actions) and a simple host test script to send framed commands and wait for ACKs.
+A modular, production-grade **Arduino & PlatformIO C++ firmware** for ATmega32U4 microcontrollers (Arduino Leonardo / Pro Micro). Rubber Otter receives binary framed commands over a wireless serial link (HM-10 BLE module) and executes **USB HID Mouse & Keyboard emulation**, media key controls, non-blocking Mouse Jiggler tasks, vibration haptics, and EEPROM macro persistence.
 
-Table of contents
-- Project overview and architecture
-- Wiring and hardware notes
-- Frame protocol (host ↔ device)
-- Supported commands (syntax + examples)
-- Macros and EEPROM behavior
-- Build & upload (PlatformIO + Arduino IDE)
-- CLion: Terminal vs External Tool setup
-- Continuous Integration (GitHub Actions)
-- Quick test: `scripts/send_packet.py` (usage example)
-- Troubleshooting and tips
+---
 
+## 📌 Table of Contents
 
-## Project overview and architecture
+- [📐 System Architecture](#-system-architecture)
+- [🔌 Hardware Wiring & Safety](#-hardware-wiring--safety)
+- [📦 Protocol Framing Specification](#-protocol-framing-specification)
+- [⌨️ Command Set Reference](#%EF%B8%8F-command-set-reference)
+- [💾 EEPROM Macro Storage](#-eeprom-macro-storage)
+- [🛠️ Build & Upload Instructions](#%EF%B8%8F-build--upload-instructions)
+- [💻 CLion IDE Integration](#-clion-ide-integration)
+- [🚀 Continuous Integration (CI)](#-continuous-integration-ci)
+- [🐍 Quick Test Helper (`scripts/send_packet.py`)](#-quick-test-helper-scriptssend_packetpy)
+- [❓ Troubleshooting & Security](#-troubleshooting--security)
 
-Rubber Otter runs on an ATmega32U4-based microcontroller (Arduino Leonardo or Pro Micro are supported). The firmware listens on a serial Stream (by default `Serial1` — hardware UART connected to an HM-10 BLE module). Each incoming framed packet is parsed by the Packet Parser module and passed to the Command Executor which executes a defined set of commands (typing text, pressing keys, controlling modifiers, vibrate motor, macro define/run, etc.).
+---
 
-Key modules (in `src/`):
-- `Hardware.*` — hardware initialization and pin definitions (BLE serial pointer, vibration pin, optional SoftwareSerial).
-- `Protocol.h` — framing constants (STX/ETX, version) and buffer limits.
-- `PacketParser.*` — safe ring buffer and framed packet parsing.
-- `CommandExecutor.*` — implements the supported command set and issues HID calls.
-- `InputHelpers.*` — helper functions for typing, modifiers, media keys and help text.
-- `MacroStore.*` — EEPROM-backed macro store (m0..m5).
-- `Utils.*` — general helpers and ACK building.
-- `RubberOtter.ino` — minimal `setup()` / `loop()` that wires the modules together.
+## 📐 System Architecture
 
-The code is organized to follow single responsibility principles: parsing, execution, hardware, macro storage are separate modules so they are easier to test and maintain.
+```mermaid
+graph TD
+    subgraph Host["Host Controller / PWA App"]
+        CLIENT["Web Bluetooth / Serial Client"]
+        FRAMER["Frame Encoder (STX/ETX + XOR Checksum)"]
+        CLIENT -->|"Generate Payload"| FRAMER
+    end
 
+    subgraph Transport["Wireless Link"]
+        BLE["HM-10 BLE Module (GATT 0xffe0)"]
+        UART["Serial1 UART @ 9600 Baud (Pin 0 RX / Pin 1 TX)"]
+        FRAMER -->|"BLE Transmission"| BLE
+        BLE -->|"Hardware Serial payload"| UART
+    end
 
-## Wiring and hardware notes
+    subgraph Firmware["Rubber Otter Firmware (ATmega32U4)"]
+        RING["Ring Buffer (512 Bytes)"]
+        PARSER["Packet Parser (State Machine)"]
+        EXEC["Command Executor"]
+        EEPROM_STORE["EEPROM Macro Store (m0..m5)"]
+        HID_STACK["USB HID Stack (<Keyboard.h> / <Mouse.h>)"]
+        VIB["Vibration Driver (Pin 2)"]
 
-Recommended board: Arduino Leonardo or Pro Micro (ATmega32U4). Important wiring notes:
-- HM-10 BLE module: power and logic levels must be 3.3V.
-  - HM-10 VCC -> 3.3V
-  - HM-10 GND -> GND
-  - HM-10 TX -> MCU RX (Serial1 RX if using hardware UART). On Leonardo the hardware serial pins are different from Pro Micro — PlatformIO envs are provided for both.
-  - HM-10 RX <- MCU TX (use a level shifter or voltage divider if the MCU/board operates at 5V)
-- Vibration motor
-  - Use a MOSFET (N-channel) or transistor to switch the motor. Do NOT drive the motor directly from the MCU pin.
-  - Place a flyback diode or TVS across the motor to protect from inductive spikes.
-  - Default vibration control pin: `VIB_PIN = 2` (see `Hardware.h`).
+        UART -->|"Hardware Interrupt"| RING
+        RING --> PARSER
+        PARSER -->|"Valid Frame Payload"| EXEC
+        EXEC <--->|"Read / Write Macros"| EEPROM_STORE
+        EXEC -->|"Execute HID Events"| HID_STACK
+        EXEC -->|"Haptic Pulse"| VIB
+    end
 
-Pins and serial options
-- Default BLE serial: `Serial1` (hardware). If you prefer `SoftwareSerial`, define `USE_SOFTSERIAL` in `platformio.ini` or compile flags and the code will use the SoftwareSerial pins defined in `Hardware.cpp`.
+    subgraph Target["Target Host Computer"]
+        USB_PORT["USB Port (CDC HID Device)"]
+        OS["Target OS (Windows / macOS / Linux)"]
 
-Safety
-- Never power the HM-10 with 5V. Use 3.3V only.
-- Protect HM-10 RX from 5V signals.
-- Keep motor switching components separate from MCU pin (use MOSFET + gate resistor and pull-down).
+        HID_STACK -->|"USB HID Protocol"| USB_PORT
+        USB_PORT -->|"Emulated Keypress & Mouse Movement"| OS
+    end
 
+    style Host fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
+    style Transport fill:#070a12,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
+    style Firmware fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
+    style Target fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
+```
 
-## Frame protocol (host → device) and ACK (device → host)
+### Modular Code Architecture (`src/`)
 
-All communication uses a small fixed framing format so the device can re-synchronize and the host can detect failures.
+- [`src/Hardware.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/Hardware.h) / `Hardware.cpp`: Hardware pin setup (`VIB_PIN = 2`), hardware UART (`Serial1`), optional `SoftwareSerial`, and AT+NAME BLE configuration routines.
+- [`src/Protocol.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/Protocol.h): Framing constants (`STX = 0x02`, `ETX = 0x03`, `VERSION = 0x01`), ring buffer sizes (`512`), and payload limits (`384`).
+- [`src/PacketParser.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/PacketParser.h) / `PacketParser.cpp`: Non-blocking ring buffer stream parser with state recovery and single-byte fallback handling.
+- [`src/CommandExecutor.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/CommandExecutor.h) / `CommandExecutor.cpp`: Command parsing, argument extraction, chaining (`&&` / `;`), mouse movements, and HID execution.
+- [`src/InputHelpers.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/InputHelpers.h) / `InputHelpers.cpp`: Text typing with escape characters, modifier holds, fallback media keys, mouse routines, and Mouse Jiggler polling.
+- [`src/MacroStore.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/MacroStore.h) / `MacroStore.cpp`: Non-volatile EEPROM storage routines for slots `m0` through `m5`.
+- [`src/Utils.h`](file:///Users/atacan/CLionProjects/RubberOtter/src/Utils.h) / `Utils.cpp`: String trimming, case-insensitive comparison, integer parsing, and ACK generation.
+- [`src/RubberOtter.ino`](file:///Users/atacan/CLionProjects/RubberOtter/src/RubberOtter.ino): Main sketch entry point with `setup()` and non-blocking `loop()`.
 
-Transmit frame (host → device):
-- STX: 0x02 (1 byte)
-- VERSION: 0x01 (1 byte)
-- SEQ: 1 byte sequence number (0..255) chosen by host to match ACKs
-- LEN: 2 bytes, big-endian (payload length in bytes)
-- PAYLOAD: ASCII command string (not null-terminated)
-- CHECKSUM: 1 byte — XOR of all payload bytes
-- ETX: 0x03 (1 byte)
+---
 
-Notes:
-- Payload length must be ≤ payload limit defined in `Protocol.h` (e.g. 384 bytes). Because BLE MTU is often ~20 bytes the host should chunk frames appropriately or rely on a serial link that handles streaming. PacketParser uses an internal ring buffer to reassemble stream fragments.
-- Host must retry if ACK not received within a timeout.
+## 🔌 Hardware Wiring & Safety
 
-ACK frame (device → host):
-- STX: 0x02
-- VERSION: 0x01
-- SEQ: same sequence byte sent by host
-- STATUS: 1 byte — 1 = OK, 0 = ERROR
-- CODE: 1 byte — error / result code (0 for success; non-zero for specific errors)
-- ETX: 0x03
+```mermaid
+graph LR
+    subgraph HM10["HM-10 BLE Module"]
+        HM_TX["TX Pin"]
+        HM_RX["RX Pin"]
+        HM_VCC["VCC (3.3V)"]
+        HM_GND["GND"]
+    end
 
-Possible device error codes (examples used in code):
-- 1: generic parse/invalid syntax
-- 2: payload length exceeds maximum
-- 3: checksum mismatch
+    subgraph Divider["Voltage Divider (5V -> 3.3V Logic)"]
+        R1["Resistor 1kΩ"]
+        R2["Resistor 2kΩ / GND"]
+        HM_RX <--- R1
+        R1 <--- R2
+    end
 
-Host behavior recommendation: send frame, wait for ACK for up to ~500–1000 ms, on timeout retry 2–3 times then escalate.
+    subgraph Micro["Arduino Pro Micro / Leonardo (32U4)"]
+        ARD_RX1["Pin 0 (RX1)"]
+        ARD_TX1["Pin 1 (TX1)"]
+        ARD_VCC["VCC (5V / 3.3V)"]
+        ARD_GND["GND"]
+        ARD_VIB["Pin 2 (VIB_PIN)"]
+        ARD_USB["Micro-USB Port"]
+    end
 
+    subgraph Motor["Vibration Motor Circuit"]
+        MOSFET["N-Channel MOSFET (Gate)"]
+        DIODE["Flyback Protection Diode"]
+        VIB_MOTOR["Vibration Motor"]
+        ARD_VIB --> MOSFET
+        MOSFET --> VIB_MOTOR
+        DIODE <--> VIB_MOTOR
+    end
 
-## Command set (detailed) — exact syntax and examples
+    HM_TX -->|"UART Serial Direct"| ARD_RX1
+    ARD_TX1 -->|"5V TX Signal"| R1
+    ARD_VCC -->|"3.3V Power Line"| HM_VCC
+    ARD_GND -->|"Common Ground"| HM_GND
+    R2 -->|"Ground Connection"| ARD_GND
 
-All commands are ASCII text in the payload. Commands are executed sequentially. Commands may be chained using `&&` or `;` inside a single payload (the executor executes left-to-right). Spaces separate arguments unless inside quoted strings.
+    style HM10 fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
+    style Divider fill:#312e81,stroke:#a5b4fc,stroke-width:2px,color:#f8fafc
+    style Micro fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
+    style Motor fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
+```
 
-Common syntactic rules:
-- Strings: `type "some text"` — use double quotes to surround literal text. Inside a quoted string, `\\n` represents newline, `\\t` tab and `\\"` a literal double quote.
-- Numeric arguments are plain decimal integers.
-- Macro names: `m0`..`m5` refer to macro slots 0..5.
+> [!IMPORTANT]
+> **Power & Voltage Safety**:
+> - Never supply 5V directly to the HM-10 BLE module logic pins; use 3.3V or a voltage divider (1kΩ / 2kΩ) on the Arduino TX line.
+> - Do **NOT** drive the vibration motor directly from an ATmega32U4 I/O pin. Always use an N-channel MOSFET or transistor with a flyback diode.
 
-Supported commands (examples):
+---
 
-- `help` or `?`
-  - Prints full help text to both Serial and BLE. Example: `help`
+## 📦 Protocol Framing Specification
 
-- `type "..."`
-  - Types the literal characters to the USB host using `Keyboard.write`. Supports escapes: `\\n`, `\\t`, `\\"`.
-  - Example: `type "Hello\\n"` (types Hello and Enter via newline escape — but consider also `enter` for explicit ENTER key).
+All communications use fixed binary framing to ensure byte stream resynchronization and host ACK validation.
 
-- `delay N`
-  - Delay for N milliseconds (blocks execution of command sequence). Example: `delay 200`
+### 1. Transmit Frame (Host → Device)
 
-- `enter`, `tab`, `backspace`
-  - Sends common control keys. Example: `enter`
+| Field | Offset (Bytes) | Size | Value / Range | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **STX** | `0` | 1 byte | `0x02` | Start of Text delimiter |
+| **VERSION** | `1` | 1 byte | `0x01` | Protocol Version identifier |
+| **SEQ** | `2` | 1 byte | `0x00 - 0xFF` | Host Sequence Counter (returned in ACK) |
+| **LEN_HI** | `3` | 1 byte | `0x00 - 0x01` | High byte of Payload Length (Big-Endian) |
+| **LEN_LO** | `4` | 1 byte | `0x00 - 0xFF` | Low byte of Payload Length (Big-Endian) |
+| **PAYLOAD** | `5` | `N` bytes | ASCII String | Command payload (Max 384 bytes) |
+| **CHECKSUM**| `5 + N` | 1 byte | `0x00 - 0xFF` | XOR checksum of all `N` payload bytes |
+| **ETX** | `6 + N` | 1 byte | `0x03` | End of Text delimiter |
 
-- `press <modifier> <ms>`
-  - Temporarily presses a modifier (shift, ctrl, alt, gui) for `<ms>` milliseconds then releases it.
-  - Example: `press shift 50`
+### 2. Acknowledge (ACK) Frame (Device → Host)
 
-- `hold <modifier>` and `release <modifier>`
-  - Hold keeps the modifier pressed until a later `release` call.
-  - Example: `hold ctrl && type "a" && release ctrl`
+| Field | Offset (Bytes) | Size | Value | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **STX** | `0` | 1 byte | `0x02` | Start of Text delimiter |
+| **VERSION** | `1` | 1 byte | `0x01` | Protocol Version identifier |
+| **SEQ** | `2` | 1 byte | Matches RX SEQ | Sequence Counter matching request frame |
+| **STATUS** | `3` | 1 byte | `0x01` / `0x00` | Status (`1` = Success, `0` = Error) |
+| **CODE** | `4` | 1 byte | `0x00 - 0x03` | Error Code (`0`: OK, `1`: Parse Error, `2`: Len Exceeded, `3`: Checksum Error) |
+| **ETX** | `5` | 1 byte | `0x03` | End of Text delimiter |
 
-- `vibrate N`
-  - Vibrates the motor for N milliseconds (drives `VIB_PIN`). Example: `vibrate 100`
+---
 
-- `media <cmd>` (requires HID-Project / consumer support)
-  - Multimedia commands: `play_pause`, `volume_up`, `volume_down`, `next`.
-  - Example: `media play_pause`
+## ⌨️ Command Set Reference
 
-- `macro define mX { ... }`
-  - Saves the content between the nearest `{}` into macro slot `mX` where X is 0..5.
-  - The body is stored as plain ASCII and later executed as a payload when running the macro.
-  - Example: `macro define m0 { type "Hello" && enter }`
+Commands are passed as ASCII payloads inside framed packets. Multiple commands can be chained in a single payload using `&&` or `;`.
 
-- `macro run mX`
-  - Runs a previously saved macro slot.
-  - Example: `macro run m0`
+| Command Category | Command Syntax | Description | Example |
+| :--- | :--- | :--- | :--- |
+| **System** | `help`, `?` | Outputs help documentation over Serial & BLE | `help` |
+| **System** | `ble name "<name>"` | Sends `AT+NAME` command to rename HM-10 | `ble name "Otter"` |
+| **Text Typing** | `type "..."` | Types text (supports `\n`, `\t`, `\"` escapes) | `type "Hello\n"` |
+| **Delay** | `delay <ms>` | Pauses execution for `<ms>` milliseconds | `delay 250` |
+| **Simple Keys**| `enter`, `tab`, `backspace` | Sends common control keypresses | `enter` |
+| **Modifiers** | `press <mod> <ms>` | Press & release modifier (`shift`, `ctrl`, `alt`, `gui`) | `press shift 50` |
+| **Modifiers** | `hold <mod>` / `release <mod>` | Continuously holds or releases modifier key | `hold ctrl && type "a" && release ctrl` |
+| **Haptics** | `vibrate <ms>` | Pulses vibration motor on `VIB_PIN` | `vibrate 100` |
+| **Media Keys** | `media <cmd>` | Controls `play_pause`, `volume_up`, `volume_down`, `next`, `prev`, `mute` | `media volume_up` |
+| **Mouse Move** | `mouse move <dx> <dy>` | Executes relative USB mouse HID cursor movement | `mouse move 10 -5` |
+| **Mouse Click**| `mouse click <left\|right\|middle>`| Triggers single mouse click | `mouse click left` |
+| **Mouse Scroll**| `mouse scroll <amount>`| Scrolls mouse wheel vertically | `mouse scroll 2` |
+| **Jiggler** | `jiggler <on\|off\|toggle>`| Toggles background Mouse Jiggler micro-movements | `jiggler toggle` |
+| **Macros** | `macro define mX { ... }` | Saves command sequence to EEPROM slot `m0`..`m5` | `macro define m0 { type "Hi" && enter }` |
+| **Macros** | `macro run mX` | Executes macro sequence stored in slot `m0`..`m5` | `macro run m0` |
 
-Chaining example
-- `type "notepad" && enter && delay 200 && type "Hello"`
-  - The executor will type `notepad`, press enter, wait 200 ms, and type `Hello`.
+---
 
-Return/ACK behavior
-- After each top-level payload is parsed and executed the device sends an ACK with the sequence number. The ACK communicates success or a simple single-byte code for errors.
+## 💾 EEPROM Macro Storage
 
+- Rubber Otter allocates non-volatile EEPROM memory for **6 macro slots** (`m0` through `m5`), with a maximum payload length of `256` bytes per slot (`MACRO_SLOT_SIZE`).
+- Defined macros persist across board reboots and USB disconnects.
+- Magic byte validation ensures EEPROM slots are cleanly initialized to empty state on first boot.
 
-## Macros and EEPROM
+> [!WARNING]
+> EEPROM memory has a finite write endurance (typically ~100,000 write cycles). Avoid writing macro definitions inside rapid automated loops.
 
-- The firmware provides `MACRO_SLOTS` (defaults to 6, `m0`..`m5`) and each slot has a `MACRO_SLOT_SIZE` (e.g. 256 bytes) limit.
-- Macros are written to EEPROM via `macro define` and read back with `macro run`.
-- EEPROM writes are limited in lifetime — avoid excessively frequent writes.
-- On first boot (if EEPROM magic missing) the firmware initializes macro slots to empty.
+---
 
+## 🛠️ Build & Upload Instructions
 
-## Build & upload
+### 1. PlatformIO (Recommended)
 
-PlatformIO (recommended)
-- Install PlatformIO (pip recommended):
+Install PlatformIO CLI via Python or Homebrew:
 
 ```bash
+# Using Python pip
 python3 -m pip install --user -U platformio
-# or with Homebrew on macOS
+
+# Using Homebrew (macOS)
 brew install platformio
 ```
 
-- Build for Leonardo (default env):
+#### Build Environments Matrix
+
+| Environment | Board Target | HID Stack | Command |
+| :--- | :--- | :--- | :--- |
+| `leonardo` | Arduino Leonardo | Standard `<Keyboard.h>` | `platformio run -e leonardo` |
+| `pro_micro` | SparkFun Pro Micro 16MHz | Standard `<Keyboard.h>` | `platformio run -e pro_micro` |
+| `leonardo_hid` | Arduino Leonardo | Extended `<HID-Project.h>` | `platformio run -e leonardo_hid` |
+| `pro_micro_hid` | SparkFun Pro Micro 16MHz | Extended `<HID-Project.h>` | `platformio run -e pro_micro_hid` |
+
+#### Upload Firmware
 
 ```bash
-platformio run -e leonardo
-```
-
-- Build for Leonardo with HID-Project (multimedia keys):
-
-```bash
-platformio run -e leonardo_hid
-```
-
-- Build for Pro Micro:
-
-```bash
-platformio run -e pro_micro
-```
-
-- Upload to device (example using `leonardo` env):
-
-```bash
+# Upload to Arduino Leonardo
 platformio run -e leonardo -t upload
+
+# Upload to SparkFun Pro Micro (with verbose log)
+platformio run -e pro_micro -t upload -v
 ```
 
-Notes:
-- If using `pro_micro` and upload fails because the card did not enter bootloader, press/reset the board (double-tap reset) and re-run upload.
-- Use `platformio run -e <env> -t upload -v` for verbose logs.
+> [!TIP]
+> If Pro Micro upload fails to enter the bootloader, double-tap the physical Reset pin on the Pro Micro board right as PlatformIO outputs `Looking for upload port...`.
 
-Arduino IDE
-- Open `src/RubberOtter.ino` in Arduino IDE.
-- Select board: `Arduino Leonardo` (or appropriate Pro Micro entry if you have a Pro Micro board package installed).
-- Select correct serial port and upload.
+### 2. Arduino IDE
 
+1. Open [`src/RubberOtter.ino`](file:///Users/atacan/CLionProjects/RubberOtter/src/RubberOtter.ino) in Arduino IDE.
+2. Select target board: **Tools > Board > Arduino Leonardo** (or SparkFun Pro Micro).
+3. Select serial port under **Tools > Port** and click **Upload**.
 
-## CLion integration (External Tools)
+---
 
-You can run PlatformIO commands inside CLion either via the integrated Terminal or by configuring External Tools.
+## 💻 CLion IDE Integration
 
-1. Terminal (fast):
-- View > Tool Windows > Terminal (or Alt+F12) and run the PlatformIO CLI commands above.
+Run PlatformIO compilation and flashing directly within CLion:
 
-2. External Tool (single-click / shortcut):
-- Preferences / Settings > Tools > External Tools
-- Add a new tool, for example:
-  - Name: `PlatformIO: Build (leonardo)`
-  - Program: the full path to `platformio` (run `which platformio` to get it)
-  - Arguments: `run -e leonardo`
-  - Working directory: `$ProjectFileDir$`
-- Repeat for `upload` with arguments `run -e leonardo -t upload`.
-- Optionally bind keyboard shortcuts: Preferences > Keymap > External Tools > choose tool > Add Keyboard Shortcut.
+1. **Terminal Window**: Open `Alt+F12` / `Cmd+F12` and run `platformio run -e leonardo`.
+2. **External Tools Setup**:
+   - Go to **Preferences / Settings > Tools > External Tools > Add (+)**
+   - **Name**: `PlatformIO: Build (leonardo)`
+   - **Program**: `/usr/local/bin/platformio` (or output of `which platformio`)
+   - **Arguments**: `run -e leonardo`
+   - **Working Directory**: `$ProjectFileDir$`
 
-Important: use the absolute path to the `platformio` binary in the External Tool `Program` field to avoid PATH issues inside CLion.
+---
 
+## 🚀 Continuous Integration (CI)
 
-## Continuous Integration (GitHub Actions)
+The repository includes an automated GitHub Actions workflow (`.github/workflows/ci.yml`) that builds all four PlatformIO matrix environments on every pull request and push:
 
-This repository includes a GitHub Actions workflow `.github/workflows/ci.yml` which builds a matrix of PlatformIO environments on each push/PR:
-- Environments built: `leonardo`, `leonardo_hid`, `pro_micro`, `pro_micro_hid`.
-- The CI publishes `firmware.hex` as artifacts for each environment.
+- Automated build verification for `leonardo`, `pro_micro`, `leonardo_hid`, and `pro_micro_hid`.
+- Generates compiled `.hex` binaries as workflow artifacts.
 
-To reproduce CI locally run the included helper script:
-
+To test CI builds locally, execute:
 ```bash
 chmod +x scripts/ci-local.sh
 ./scripts/ci-local.sh
 ```
 
+---
 
-## Quick test utility: `scripts/send_packet.py`
+## 🐍 Quick Test Helper (`scripts/send_packet.py`)
 
-A small Python helper is included at `scripts/send_packet.py` to create a properly framed packet, send it over a serial port and wait for an ACK.
-
-Usage example (macOS/Unix):
+Send framed packets over USB serial and inspect ACKs using the included Python helper script:
 
 ```bash
+# Install dependency
 pip3 install pyserial
-python3 scripts/send_packet.py /dev/cu.usbmodemXXXX --cmd 'type "Hello\\n"' --seq 1
+
+# Send framed text command over serial
+python3 scripts/send_packet.py /dev/cu.usbmodemXXXX --cmd 'type "Hello World\n"' --seq 1
 ```
-
-The script will print the device ACK frame and a short human-readable result.
-
-(See the `scripts/` directory for the script source and arguments.)
-
-
-## Troubleshooting & tips
-
-- No ACK received:
-  - Verify BLE link (HM-10) is connected and correct serial pins are used.
-  - Make sure host sends frames that follow the framing exactly. Use `scripts/send_packet.py` to test.
-  - Increase timeout and retries on the host side.
-
-- Wrong keys typed / wrong layout:
-  - HID-Project has various keyboard layouts. The firmware uses simple `Keyboard.write` behavior. If you need a different keyboard layout change the layout in `HID-Project` or adapt the `InputHelpers` functions.
-
-- Macro data disappears:
-  - Check EEPROM size on your board. Pro Micro usually has limited EEPROM — macro slot sizes are conservative but verify using `MACRO_SLOTS` and `MACRO_SLOT_SIZE` in `MacroStore.h`.
-
-- Build errors regarding `Keyboard.h` vs `HID-Project`:
-  - Use `leonardo_hid` / `pro_micro_hid` envs for HID-Project (multimedia) support, or `leonardo`/`pro_micro` for the simpler Keyboard API. The project already configures conditional includes for both.
-
-
-## Security and reliability considerations
-
-- Do not store secrets in EEPROM or send them in clear over BLE without encryption.
-- Host should implement ACK/timeout/retry for reliability.
-- Avoid writing macros to EEPROM at extremely high rates to prevent premature EEPROM wear.
-
-
-## Contact / contribution
-
-If you find issues or want to contribute features, open a GitHub issue or submit a pull request. Include the board used, PlatformIO environment, and reproduction steps for bugs.
 
 ---
 
-End of README.
+## ❓ Troubleshooting & Security
+
+### Troubleshooting
+
+- **No ACK Received**:
+  - Verify HM-10 BLE TX/RX lines are connected correctly (HM-10 TX → MCU Pin 0 RX1, HM-10 RX ← MCU Pin 1 TX1 via divider).
+  - Confirm baud rate is set to `9600` on hardware `Serial1`.
+- **Wrong Key Characters Typed**:
+  - `Keyboard.write` defaults to US English layout. If using alternative layouts, use `HID-Project` keyboard definitions.
+- **Macro Data Not Persisting**:
+  - Verify EEPROM size on board and ensure `macro define` syntax includes proper braces: `macro define m0 { ... }`.
+
+### Security Considerations
+
+> [!CAUTION]
+> Do not store unencrypted passwords or secrets in EEPROM or transmit sensitive strings over unencrypted BLE links. Always validate checksums and sequence numbers on the host side.
+
+---
+
+## 📜 License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
