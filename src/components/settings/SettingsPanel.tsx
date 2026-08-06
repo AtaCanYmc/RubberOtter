@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { Settings, Cpu, Volume2, Smartphone, Shield, RotateCcw } from 'lucide-react';
+import { Settings, Cpu, Volume2, Smartphone, Shield, RotateCcw, Network } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../services/storage/macroStore';
 
 export const SettingsPanel: React.FC = () => {
@@ -19,7 +19,7 @@ export const SettingsPanel: React.FC = () => {
           </div>
           <div className="text-left">
             <h2 className="text-base font-bold text-slate-100">Application Settings</h2>
-            <p className="text-xs text-slate-400">GATT parameters & Feedback options</p>
+            <p className="text-xs text-slate-400">GATT parameters & Protocol mode</p>
           </div>
         </div>
 
@@ -32,8 +32,42 @@ export const SettingsPanel: React.FC = () => {
         </button>
       </div>
 
+      {/* Protocol Selection Mode Card */}
+      <div className="glass-card rounded-2xl p-5 space-y-3 shadow-xl border-brand-500/30">
+        <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
+          <Network className="w-4 h-4 text-brand-400" />
+          <h3 className="text-xs font-bold text-slate-300">Bluetooth Protocol Engine</h3>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <button
+            onClick={() => updateSettings({ protocolMode: 'single_byte' })}
+            className={`p-3 rounded-xl border text-left transition-all ${
+              settings.protocolMode === 'single_byte'
+                ? 'bg-brand-500/20 border-brand-500/50 text-brand-300 font-bold'
+                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <h4 className="text-xs font-bold">Single-Byte Protocol</h4>
+            <p className="text-[10px] text-slate-400 mt-1">Master-Key & ESP32 BLE (0x11-0x85)</p>
+          </button>
+
+          <button
+            onClick={() => updateSettings({ protocolMode: 'framed_ascii' })}
+            className={`p-3 rounded-xl border text-left transition-all ${
+              settings.protocolMode === 'framed_ascii'
+                ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300 font-bold'
+                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <h4 className="text-xs font-bold">Framed ASCII Protocol</h4>
+            <p className="text-[10px] text-slate-400 mt-1">RubberOtter STX/ETX Framed Stream</p>
+          </button>
+        </div>
+      </div>
+
       {/* Hardware Driver Mode Card */}
-      <div className="glass-card rounded-2xl p-5 space-y-4 shadow-xl border-brand-500/30">
+      <div className="glass-card rounded-2xl p-5 space-y-4 shadow-xl border-amber-500/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">

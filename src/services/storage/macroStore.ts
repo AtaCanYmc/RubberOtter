@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   enableSound: true,
   jiggleIntervalSec: 20,
   trackpadSensitivity: 2.5,
+  protocolMode: 'single_byte',
 };
 
 export function loadSavedMacros(): CustomMacro[] {

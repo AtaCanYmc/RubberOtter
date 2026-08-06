@@ -1,6 +1,7 @@
 /// <reference types="web-bluetooth" />
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
+export type ProtocolMode = 'single_byte' | 'framed_ascii';
 
 export interface LogEntry {
   id: string;
@@ -27,4 +28,5 @@ export interface AppSettings {
   enableSound: boolean;
   jiggleIntervalSec: number;
   trackpadSensitivity: number;
+  protocolMode: ProtocolMode;
 }

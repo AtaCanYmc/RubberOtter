@@ -4,6 +4,8 @@ import { BleManager } from '../services/bluetooth/BleManager';
 import { MockBleDriver } from '../services/bluetooth/MockBleDriver';
 import { useSettings } from './SettingsContext';
 import { soundEffects } from '../services/audio/soundEffects';
+import { encodeFramedPacket } from '../protocol/framedProtocol';
+import { PROTOCOL_NAMES } from '../protocol/byteMap';
 
 interface BluetoothContextType {
   connectionState: ConnectionState;
@@ -14,6 +16,7 @@ interface BluetoothContextType {
   disconnect: () => Promise<void>;
   sendByte: (byteCode: number, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
   sendPacket: (data: Uint8Array, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
+  sendFramedAscii: (payloadText: string, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
   totalPacketsSent: number;
   totalBytesSent: number;
 }
@@ -32,7 +35,7 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const mockDriverRef = useRef<MockBleDriver | null>(null);
 
   const addLog = (log: LogEntry) => {
-    setLogs((prev) => [log, ...prev].slice(0, 300)); // Keep max 300 logs
+    setLogs((prev) => [log, ...prev].slice(0, 300));
   };
 
   const handleStateChange = (state: ConnectionState, msg: string) => {
@@ -64,12 +67,26 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
+  const sendFramedAscii = async (
+    payloadText: string,
+    feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
+  ): Promise<boolean> => {
+    const packet = encodeFramedPacket(payloadText);
+    return await sendPacket(packet, feedbackType);
+  };
+
   const sendByte = async (
     byteCode: number,
     feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
   ): Promise<boolean> => {
-    const packet = new Uint8Array([byteCode & 0xff]);
-    return await sendPacket(packet, feedbackType);
+    if (settings.protocolMode === 'framed_ascii') {
+      // Convert byte action to framed ASCII command string equivalent
+      const name = PROTOCOL_NAMES[byteCode] || `cmd_${byteCode}`;
+      return await sendFramedAscii(`exec ${name}`, feedbackType);
+    } else {
+      const packet = new Uint8Array([byteCode & 0xff]);
+      return await sendPacket(packet, feedbackType);
+    }
   };
 
   const sendPacket = async (
@@ -111,6 +128,7 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         disconnect,
         sendByte,
         sendPacket,
+        sendFramedAscii,
         totalPacketsSent,
         totalBytesSent,
       }}
