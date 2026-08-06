@@ -4,6 +4,12 @@
 #include "Utils.h"
 #include "CommandExecutor.h"
 #include <string.h>
+#ifdef USE_HID_PROJECT
+#include <HID-Project.h>
+#else
+#include <Keyboard.h>
+#include <Mouse.h>
+#endif
 
 static uint8_t ringBuf[RING_BUF_SIZE];
 static uint16_t ringHead = 0, ringTail = 0;
@@ -30,8 +36,45 @@ void initPacketParser() {
   payloadIdx = 0;
 }
 
+// Fallback single-byte protocol handler (for direct byte commands 0x11 - 0x85)
+static void handleSingleByteCommand(uint8_t cmd) {
+  switch (cmd) {
+    case 0x11: Keyboard.write(0xE8); break; // Play/Pause
+    case 0x12: Keyboard.write(0xEB); break; // Next
+    case 0x13: Keyboard.write(0xEC); break; // Prev
+    case 0x14: Keyboard.write(0xE9); break; // Vol Up
+    case 0x15: Keyboard.write(0xEA); break; // Vol Down
+    case 0x16: Keyboard.write(0xED); break; // Mute
+    case 0x21: Keyboard.write(KEY_RIGHT_ARROW); break;
+    case 0x22: Keyboard.write(KEY_LEFT_ARROW); break;
+    case 0x23: Keyboard.write(KEY_F5); break;
+    case 0x24: Keyboard.write('b'); break;
+    case 0x31:
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('l'); delay(50); Keyboard.releaseAll();
+      break;
+    case 0x32:
+      // Jiggler toggle
+      execute_command("jiggler toggle", 0);
+      break;
+    case 0x33:
+      Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(KEY_ESC); delay(50); Keyboard.releaseAll();
+      break;
+    case 0x34:
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('d'); delay(50); Keyboard.releaseAll();
+      break;
+    case 0x41:
+      execute_command("type \"b\" && delay 120 && type \"4\" && delay 120 && type \"2\"", 0);
+      break;
+    case 0x81: Mouse.click(MOUSE_LEFT); break;
+    case 0x82: Mouse.click(MOUSE_RIGHT); break;
+    case 0x83: Mouse.click(MOUSE_MIDDLE); break;
+    case 0x84: Mouse.move(0, 0, 1); break;
+    case 0x85: Mouse.move(0, 0, -1); break;
+  }
+}
+
 void packetParser_poll() {
-  // fill ring buffer from BLE serial
+  // Fill ring buffer from BLE serial
   if (BLE_SERIAL) {
     while (BLE_SERIAL->available() && ringFree() > 0) {
       int v = BLE_SERIAL->read();
@@ -49,13 +92,16 @@ void packetParser_poll() {
           payloadLen = 0;
           payloadIdx = 0;
           state = READ_HDR;
+        } else if (b >= 0x10 && b <= 0x8F) {
+          // Process fallback single-byte command
+          handleSingleByteCommand(b);
         }
         break;
 
       case READ_HDR:
         headerBuf[hdrIdx++] = b;
         if (hdrIdx == 4) {
-          // header: VERSION, SEQ, LEN_HI, LEN_LO
+          // Header: VERSION, SEQ, LEN_HI, LEN_LO
           if (headerBuf[0] != VERSION) {
             seqNum = headerBuf[1];
             sendAck(seqNum, false, 1);
@@ -97,6 +143,15 @@ void packetParser_poll() {
 
       case WAIT_ETX:
         if (b == ETX) {
+          state = WAIT_STX;
+        } else if (b == STX) {
+          // Next frame starts immediately
+          hdrIdx = 0;
+          payloadLen = 0;
+          payloadIdx = 0;
+          state = READ_HDR;
+        } else {
+          // Reset to WAIT_STX on corrupt ETX to prevent parser lockup
           state = WAIT_STX;
         }
         break;
