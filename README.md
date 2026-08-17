@@ -277,27 +277,30 @@ chmod +x scripts/ci-local.sh
 
 ---
 
-## 🧰 Developer Tools & Scripts
+## 🧰 Developer Tools & CLI
 
-Comprehensive documentation for all helper scripts is available in **[`docs/TOOLS_AND_SCRIPTS.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/TOOLS_AND_SCRIPTS.md)**.
+Complete documentation for the Rubber Otter CLI is available in **[`docs/CLI_REFERENCE.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/CLI_REFERENCE.md)** and script guides in **[`docs/TOOLS_AND_SCRIPTS.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/TOOLS_AND_SCRIPTS.md)**.
 
-### Device Scanner (`scripts/scan_devices.py`)
-Scan connected USB Serial ports (ATmega32U4 / Leonardo / Pro Micro) and nearby Bluetooth Low Energy (BLE) HM-10 devices (`Otter`):
+### Unified CLI Tool (`scripts/cli.py`)
+Discover devices, execute payload commands, manage EEPROM macros, and launch REPL console:
 
 ```bash
 # Install dependencies
 pip3 install pyserial bleak
 
-# Scan both USB Serial ports and BLE devices
-python3 scripts/scan_devices.py --mode all
-```
+# Scan for USB Serial ports & BLE devices
+python3 scripts/cli.py scan
 
-### Quick Test Helper (`scripts/send_packet.py`)
-Send framed commands over USB serial and inspect ACK responses:
+# Send commands directly (auto-detects port)
+python3 scripts/cli.py send "delay 50"
+python3 scripts/cli.py jiggler toggle
+python3 scripts/cli.py vibrate 150
 
-```bash
-# Send framed text command over serial
-python3 scripts/send_packet.py /dev/cu.usbmodemXXXX --cmd 'type "Hello World\n"' --seq 1
+# Launch interactive REPL console
+python3 scripts/cli.py shell
+
+# Machine-readable JSON mode
+python3 scripts/cli.py scan --json
 ```
 
 ---
