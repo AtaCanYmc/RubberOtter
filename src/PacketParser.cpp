@@ -83,6 +83,13 @@ void packetParser_poll() {
     }
   }
 
+  // Fill ring buffer from USB Serial
+  while (Serial && Serial.available() && ringFree() > 0) {
+    int v = Serial.read();
+    if (v < 0) break;
+    ringWrite((uint8_t)v);
+  }
+
   while (ringAvailable()) {
     uint8_t b = ringRead();
     switch (state) {

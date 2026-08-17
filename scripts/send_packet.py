@@ -68,6 +68,9 @@ def main():
     frame = build_frame(args.seq & 0xFF, payload)
 
     s = serial.Serial(args.port, args.baud, timeout=0.05)
+    s.dtr = True
+    s.rts = True
+    time.sleep(0.3)
     try:
         attempts = 0
         while attempts <= args.retries:
