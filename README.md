@@ -19,7 +19,7 @@ A modular, production-grade **Arduino & PlatformIO C++ firmware** for ATmega32U4
 - [🛠️ Build & Upload Instructions](#%EF%B8%8F-build--upload-instructions)
 - [💻 CLion IDE Integration](#-clion-ide-integration)
 - [🚀 Continuous Integration (CI)](#-continuous-integration-ci)
-- [🐍 Quick Test Helper (`scripts/send_packet.py`)](#-quick-test-helper-scriptssend_packetpy)
+- [🧰 Developer Tools & Scripts](#-developer-tools--scripts)
 - [❓ Troubleshooting & Security](#-troubleshooting--security)
 
 ---
@@ -277,14 +277,25 @@ chmod +x scripts/ci-local.sh
 
 ---
 
-## 🐍 Quick Test Helper (`scripts/send_packet.py`)
+## 🧰 Developer Tools & Scripts
 
-Send framed packets over USB serial and inspect ACKs using the included Python helper script:
+Comprehensive documentation for all helper scripts is available in **[`docs/TOOLS_AND_SCRIPTS.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/TOOLS_AND_SCRIPTS.md)**.
+
+### Device Scanner (`scripts/scan_devices.py`)
+Scan connected USB Serial ports (ATmega32U4 / Leonardo / Pro Micro) and nearby Bluetooth Low Energy (BLE) HM-10 devices (`Otter`):
 
 ```bash
-# Install dependency
-pip3 install pyserial
+# Install dependencies
+pip3 install pyserial bleak
 
+# Scan both USB Serial ports and BLE devices
+python3 scripts/scan_devices.py --mode all
+```
+
+### Quick Test Helper (`scripts/send_packet.py`)
+Send framed commands over USB serial and inspect ACK responses:
+
+```bash
 # Send framed text command over serial
 python3 scripts/send_packet.py /dev/cu.usbmodemXXXX --cmd 'type "Hello World\n"' --seq 1
 ```
