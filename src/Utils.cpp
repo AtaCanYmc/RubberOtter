@@ -50,4 +50,5 @@ void sendAck(uint8_t seq, bool ok, uint8_t code) {
   ack[4] = code;
   ack[5] = ETX;
   if (BLE_SERIAL) BLE_SERIAL->write(ack, sizeof(ack));
+  if (Serial) Serial.write(ack, sizeof(ack));
 }

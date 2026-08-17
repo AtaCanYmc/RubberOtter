@@ -581,8 +581,7 @@ void loop() {
     ringWrite(b);
   }
 
-#ifdef USE_USB_DEBUG
-  // Optional: also accept framed test packets over USB Serial when enabled
+  // read bytes from USB Serial into ring buffer if available
   while (Serial.available()) {
     uint8_t b = Serial.read();
     size_t free = ringFree();
@@ -591,7 +590,6 @@ void loop() {
     }
     ringWrite(b);
   }
-#endif
 
   // parse state machine
   while (ringAvailable()) {
