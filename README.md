@@ -262,12 +262,12 @@ Run PlatformIO compilation and flashing directly within CLion:
 
 ---
 
-## 🚀 Continuous Integration (CI)
+## 🚀 Continuous Integration & Continuous Deployment (CI/CD)
 
-The repository includes an automated GitHub Actions workflow (`.github/workflows/ci.yml`) that builds all four PlatformIO matrix environments on every pull request and push:
+The repository includes automated GitHub Actions workflows:
 
-- Automated build verification for `leonardo`, `pro_micro`, `leonardo_hid`, and `pro_micro_hid`.
-- Generates compiled `.hex` binaries as workflow artifacts.
+- **CI Pipeline (`.github/workflows/ci.yml`)**: Builds all four PlatformIO matrix environments (`leonardo`, `pro_micro`, `leonardo_hid`, `pro_micro_hid`) and runs static analysis on every push/PR.
+- **Automated Release (`.github/workflows/release.yml`)**: Automatically compiles and attaches all 4 binary `.hex` files to GitHub Releases upon tag creation (`v*.*.*`).
 
 To test CI builds locally, execute:
 ```bash
