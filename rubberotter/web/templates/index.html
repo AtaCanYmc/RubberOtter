@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OtterDeck — Rubber Otter Web Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+  <!-- Header & Navigation -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">🦦</span>
+      <div class="brand-text">
+        <h1>OtterDeck</h1>
+        <span class="brand-subtitle">Rubber Otter Control & Hardware Deck</span>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <div id="connectionStatusBadge" class="status-badge status-disconnected">
+        <span class="status-dot"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+      <button id="themeToggleBtn" class="btn btn-icon" title="Toggle Theme">🌓</button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="dashboard-grid">
+    
+    <!-- Left Column: Hardware Connection & Quick Controls -->
+    <section class="grid-column">
+      
+      <!-- Card 1: Device Discovery & Connection -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🔌 Device Connection & Discovery</h3>
+          <button id="scanBtn" class="btn btn-sm btn-secondary">⚡ Rescan</button>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="portSelect">USB CDC Serial Port:</label>
+            <div class="input-with-button">
+              <select id="portSelect" class="form-control">
+                <option value="">Scanning for devices...</option>
+              </select>
+              <button id="connectBtn" class="btn btn-primary">Connect</button>
+            </div>
+          </div>
+
+          <div class="discovered-summary" id="discoveredSummary">
+            <span class="summary-item" id="usbCount">USB: 0 found</span>
+            <span class="summary-item" id="bleCount">BLE: 0 found</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Quick Haptics & Shortcut Actions -->
+      <div class="card">
+        <div class="card-header">
+          <h3>⚡ Haptics & Quick Shortcuts</h3>
+        </div>
+        <div class="card-body">
+          
+          <div class="quick-action-grid">
+            <button id="jigglerBtn" class="btn btn-action">
+              <span class="action-icon">🐭</span>
+              <span class="action-label">Mouse Jiggler</span>
+              <span id="jigglerStatus" class="action-sublabel">OFF</span>
+            </button>
+
+            <button id="vibrateBtn" class="btn btn-action">
+              <span class="action-icon">📳</span>
+              <span class="action-label">Vibrate</span>
+              <span class="action-sublabel">150 ms</span>
+            </button>
+          </div>
+
+          <div class="slider-group">
+            <label for="vibrateDuration">Vibration Duration (ms): <span id="vibrateVal">150</span></label>
+            <input type="range" id="vibrateDuration" min="50" max="1000" step="50" value="150" class="form-range">
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="keyboard-shortcuts">
+            <label>Common Key Actions:</label>
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline key-btn" data-cmd="enter">⏎ Enter</button>
+              <button class="btn btn-outline key-btn" data-cmd="tab">⇥ Tab</button>
+              <button class="btn btn-outline key-btn" data-cmd="backspace">⌫ Backspace</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI l">🔒 Lock Screen</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI space">🔍 Cmd+Space</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Center Column: Typing & Macro Execution -->
+    <section class="grid-column">
+      
+      <!-- Card 3: Typing & Payload Execution -->
+      <div class="card">
+        <div class="card-header">
+          <h3>⌨️ Keyboard Typing & Command Executor</h3>
+        </div>
+        <div class="card-body">
+          
+          <div class="form-group">
+            <label for="typeInput">Type Text Payload:</label>
+            <textarea id="typeInput" class="form-control code-font" rows="3" placeholder="Enter text string to type via USB HID..."></textarea>
+            <div class="form-actions align-right">
+              <button id="typeBtn" class="btn btn-success">Execute Typing</button>
+            </div>
+          </div>
+
+          <hr class="card-divider">
+
+          <div class="form-group">
+            <label for="rawCmdInput">Raw Frame Payload String:</label>
+            <div class="input-with-button">
+              <input type="text" id="rawCmdInput" class="form-control code-font" placeholder="e.g. delay 200 && type &quot;Hello&quot;">
+              <button id="sendRawBtn" class="btn btn-primary">Send Frame</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Card 4: EEPROM Persistent Macro Manager -->
+      <div class="card">
+        <div class="card-header">
+          <h3>💾 EEPROM Macro Slots (m0..m5)</h3>
+        </div>
+        <div class="card-body">
+          <div class="macro-slots-grid" id="macroSlotsGrid">
+            <!-- Dynamically populated macro slots -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Bottom Log Console -->
+  <footer class="app-console">
+    <div class="console-header">
+      <span class="console-title">📟 Live Frame & ACK Log Feed</span>
+      <button id="clearLogBtn" class="btn btn-sm btn-icon" title="Clear Logs">🗑️ Clear</button>
+    </div>
+    <div class="console-body code-font" id="logConsole">
+      <div class="log-entry log-info">[SYSTEM] Rubber Otter Web Dashboard loaded. Ready for hardware framing.</div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
