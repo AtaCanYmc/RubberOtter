@@ -1,0 +1,49 @@
+name: Release - Build & Attach Firmware Binaries
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build Firmware Artifacts
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [ "leonardo", "leonardo_hid", "pro_micro", "pro_micro_hid" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U platformio
+
+      - name: Build Firmware (env = ${{ matrix.env }})
+        run: |
+          platformio run -e ${{ matrix.env }}
+
+      - name: Rename Firmware Hex for Release
+        run: |
+          cp .pio/build/${{ matrix.env }}/firmware.hex ./RubberOtter-${{ matrix.env }}.hex
+
+      - name: Upload Release Firmware Assets
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+        with:
+          files: RubberOtter-${{ matrix.env }}.hex
