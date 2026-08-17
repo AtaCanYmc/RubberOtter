@@ -130,6 +130,15 @@ python3 -m unittest discover -s tests -p "test_*.py"
 
 ---
 
+## 🚀 CI/CD Automation Pipelines
+
+Automated GitHub Actions workflows are included in `.github/workflows/`:
+
+- **CI Test Matrix (`.github/workflows/ci.yml`)**: Runs tests across Python `3.8`, `3.9`, `3.10`, `3.11`, `3.12`, `3.13` on `ubuntu-latest` and `macos-latest`, verifying code quality, package build (`python -m build`), and `twine` verification on every push and pull request.
+- **Automated Release Publish (`.github/workflows/publish.yml`)**: Builds wheel (`.whl`) and source distribution (`.tar.gz`) packages and uploads them to GitHub Release assets upon tag creation (`v*.*.*`).
+
+---
+
 ## 📖 Documentation Links
 
 - 🐍 **[Python SDK API Reference](file:///Users/atacan/PycharmProjects/RubberOtterPy/docs/PYTHON_SDK.md)**
