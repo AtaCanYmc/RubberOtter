@@ -23,6 +23,7 @@ KNOWN_VID_PID = {
     "2341:8036": "Arduino Leonardo",
     "2341:0036": "Arduino Leonardo Bootloader",
     "1b4f:9204": "SparkFun Pro Micro 5V/16MHz",
+    "1b4f:9206": "SparkFun Pro Micro",
     "1b4f:9203": "SparkFun Pro Micro 3.3V/8MHz",
     "2341:0037": "Arduino Micro",
     "2341:8037": "Arduino Micro",
@@ -108,8 +109,8 @@ async def scan_ble_devices(target_name="Otter", timeout=5.0):
         print("[!] Install bleak using: pip install bleak\n")
         return []
 
-    target_keywords = [target_name.lower(), "hmsoft", "mlt-bt05", "hm-10", "otter"]
-
+    target_keywords = [target_name.lower(), "hmsoft", "mlt-bt05", "hm-10", "otter", "bt05"]
+    seen_addresses = set()
     found_devices = []
 
     def callback(device, advertising_data):
@@ -117,9 +118,12 @@ async def scan_ble_devices(target_name="Otter", timeout=5.0):
         rssi = advertising_data.rssi
         address = device.address
 
+        if address in seen_addresses:
+            return
+        seen_addresses.add(address)
+
         is_target = any(kw in name.lower() for kw in target_keywords)
 
-        # Check matching services if available
         if is_target or advertising_data.local_name:
             found_devices.append({
                 "name": name,
