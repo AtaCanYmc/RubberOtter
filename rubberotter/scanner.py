@@ -4,6 +4,7 @@ Scans connected USB CDC Serial ports and nearby Bluetooth Low Energy (BLE) devic
 """
 
 import asyncio
+import concurrent.futures
 import glob
 import os
 import sys
@@ -20,6 +21,20 @@ KNOWN_VID_PID = {
 }
 
 DEFAULT_BLE_TARGETS = ["otter", "hmsoft", "mlt-bt05", "hm-10", "bt05"]
+
+
+def _run_async(coro):
+    """Safely executes a coroutine from synchronous code regardless of active event loops."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    if loop and loop.is_running():
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(lambda: asyncio.run(coro)).result()
+    else:
+        return asyncio.run(coro)
 
 
 def scan_serial_ports(quiet: bool = False):
@@ -125,9 +140,33 @@ async def scan_ble_devices_async(target_name: str = "Otter", timeout: float = 5.
 def scan_ble_devices(target_name: str = "Otter", timeout: float = 5.0):
     """Synchronous wrapper for BLE scanning."""
     try:
-        return asyncio.run(scan_ble_devices_async(target_name=target_name, timeout=timeout))
+        return _run_async(scan_ble_devices_async(target_name=target_name, timeout=timeout))
     except Exception as e:
         return {"error": str(e), "devices": []}
+
+
+async def auto_detect_ble_device_async(target_name: str = "Otter", timeout: float = 3.0):
+    """
+    Asynchronously scans nearby BLE devices and returns the address of the best matching Rubber Otter BLE device.
+    """
+    res = await scan_ble_devices_async(target_name=target_name, timeout=timeout)
+    devices = res.get("devices", [])
+    for d in devices:
+        if d.get("is_target"):
+            return d.get("address")
+    if devices:
+        return devices[0].get("address")
+    return None
+
+
+def auto_detect_ble_device(target_name: str = "Otter", timeout: float = 3.0):
+    """
+    Scans nearby BLE devices and returns the address of the best matching Rubber Otter BLE device.
+    """
+    try:
+        return _run_async(auto_detect_ble_device_async(target_name=target_name, timeout=timeout))
+    except Exception:
+        return None
 
 
 def scan_all(target_ble_name: str = "Otter", ble_timeout: float = 3.0):

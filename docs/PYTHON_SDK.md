@@ -1,6 +1,6 @@
 # 🐍 RubberOtterPy — Python SDK API Reference Manual
 
-The `rubberotter` Python SDK allows developers to integrate Rubber Otter ATmega32U4 hardware control directly into Python scripts, desktop tools, and web services.
+The `rubberotter` Python SDK allows developers to integrate Rubber Otter hardware control directly into Python scripts, desktop tools, and web services over **Bluetooth Low Energy (BLE)** or USB Serial.
 
 ---
 
@@ -9,6 +9,7 @@ The `rubberotter` Python SDK allows developers to integrate Rubber Otter ATmega3
 - [Installation](#installation)
 - [Synchronous Client (`RubberOtter`)](#synchronous-client-rubberotter)
   - [Basic Usage](#basic-usage)
+  - [BLE Connection Options](#ble-connection-options)
   - [Inline Function API Reference](#inline-function-api-reference)
 - [Asynchronous Client (`AsyncRubberOtter`)](#asynchronous-client-asyncrubberotter)
 - [Device Scanner API](#device-scanner-api)
@@ -28,11 +29,12 @@ pip install -e .
 
 ### Basic Usage
 
-Use the context manager `with RubberOtter() as otter:` to automatically open and close the serial connection to your Rubber Otter microcontroller:
+Use the context manager `with RubberOtter() as otter:` to automatically open and close the BLE or serial connection to your Rubber Otter microcontroller:
 
 ```python
 from rubberotter import RubberOtter
 
+# By default, connects via BLE auto-detection to nearby Rubber Otter device
 with RubberOtter() as otter:
     # Type text string via USB HID
     otter.type("Hello from Python SDK!\n")
@@ -42,6 +44,20 @@ with RubberOtter() as otter:
     
     # Toggle non-blocking mouse jiggler
     otter.jiggler_toggle()
+```
+
+### BLE Connection Options
+
+You can specify a target BLE MAC address/UUID or target name:
+
+```python
+# Connect to specific BLE MAC address / UUID
+with RubberOtter(ble_address="60F9F128-5B7C-1258-10D5-2694444599B7") as otter:
+    otter.vibrate(200)
+
+# Connect explicitly over USB Serial port
+with RubberOtter(port="/dev/cu.usbmodem14101") as otter:
+    otter.vibrate(200)
 ```
 
 ### Inline Function API Reference
@@ -135,7 +151,7 @@ import asyncio
 from rubberotter import AsyncRubberOtter
 
 async def main():
-    otter = AsyncRubberOtter()
+    otter = AsyncRubberOtter(use_ble=True)
     otter.connect()
     res = await otter.type_async("Hello Async!\n")
     print("ACK:", res)
@@ -148,18 +164,22 @@ asyncio.run(main())
 
 ## Device Scanner API
 
-Scan connected USB CDC Serial ports and nearby Bluetooth LE (BLE) devices:
+Scan nearby Bluetooth LE (BLE) devices and connected USB CDC Serial ports:
 
 ```python
-from rubberotter import scan_serial_ports, scan_ble_devices, scan_all
-
-# Scan USB Serial ports
-ports = scan_serial_ports()
-print("USB Ports:", ports)
+from rubberotter import scan_serial_ports, scan_ble_devices, auto_detect_ble_device, scan_all
 
 # Scan BLE devices (timeout in seconds)
 ble_res = scan_ble_devices(target_name="Otter", timeout=3.0)
 print("BLE Devices:", ble_res["devices"])
+
+# Auto-detect best matching BLE device address
+ble_addr = auto_detect_ble_device(target_name="Otter")
+print("Target BLE Address:", ble_addr)
+
+# Scan USB Serial ports
+ports = scan_serial_ports()
+print("USB Ports:", ports)
 
 # Scan both
 all_devices = scan_all()

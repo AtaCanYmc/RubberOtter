@@ -10,7 +10,7 @@ from ..scanner import scan_serial_ports, scan_ble_devices, scan_all
 
 # Global active client instance
 active_otter = None
-active_port = None
+active_target = None
 
 
 def create_app():
@@ -32,21 +32,23 @@ def create_app():
 
     @app.route("/api/status", methods=["GET"])
     def api_status():
-        global active_otter, active_port
+        global active_otter, active_target
         connected = False
-        if active_otter and active_otter._serial and active_otter._serial.is_open:
+        if active_otter:
             connected = True
         return jsonify({
             "connected": connected,
-            "port": active_port or (active_otter.port if active_otter else None),
+            "target": active_target or (active_otter.connection_target if active_otter else None),
+            "auto_ble": RubberOtter.auto_detect_ble(),
             "auto_port": RubberOtter.auto_detect_port(),
         })
 
     @app.route("/api/connect", methods=["POST"])
     def api_connect():
-        global active_otter, active_port
+        global active_otter, active_target
         data = request.get_json() or {}
-        port = data.get("port") or RubberOtter.auto_detect_port()
+        ble_address = data.get("ble_address")
+        port = data.get("port")
 
         if active_otter:
             try:
@@ -55,44 +57,57 @@ def create_app():
                 pass
 
         try:
-            otter = RubberOtter(port=port)
+            if ble_address:
+                otter = RubberOtter(ble_address=ble_address, use_ble=True)
+            elif port:
+                otter = RubberOtter(port=port, use_ble=False)
+            else:
+                # Default to BLE auto-detection
+                otter = RubberOtter(use_ble=True)
+
             otter.connect()
             active_otter = otter
-            active_port = port
-            return jsonify({"success": True, "port": port, "message": f"Connected to {port}"})
+            active_target = otter.connection_target
+            return jsonify({"success": True, "target": active_target, "message": f"Connected to {active_target}"})
         except Exception as e:
             active_otter = None
-            active_port = None
+            active_target = None
             return jsonify({"success": False, "error": str(e)}), 400
 
     @app.route("/api/disconnect", methods=["POST"])
     def api_disconnect():
-        global active_otter, active_port
+        global active_otter, active_target
         if active_otter:
             try:
                 active_otter.disconnect()
             except Exception:
                 pass
         active_otter = None
-        active_port = None
+        active_target = None
         return jsonify({"success": True, "message": "Disconnected"})
 
     @app.route("/api/send", methods=["POST"])
     def api_send():
-        global active_otter, active_port
+        global active_otter, active_target
         data = request.get_json() or {}
         cmd = data.get("cmd")
 
         if not cmd:
             return jsonify({"success": False, "error": "No command payload specified"}), 400
 
-        target_port = data.get("port") or active_port or RubberOtter.auto_detect_port()
+        ble_address = data.get("ble_address")
+        port = data.get("port")
 
         try:
-            if not active_otter or active_otter.port != target_port:
-                active_otter = RubberOtter(port=target_port)
+            if not active_otter:
+                if ble_address:
+                    active_otter = RubberOtter(ble_address=ble_address, use_ble=True)
+                elif port:
+                    active_otter = RubberOtter(port=port, use_ble=False)
+                else:
+                    active_otter = RubberOtter(use_ble=True)
                 active_otter.connect()
-                active_port = target_port
+                active_target = active_otter.connection_target
 
             res = active_otter.send(cmd)
             return jsonify(res)
@@ -126,13 +141,12 @@ def create_app():
         return api_send_internal(f'macro save {slot} "{body}"')
 
     def api_send_internal(cmd_str):
-        global active_otter, active_port
-        target_port = active_port or RubberOtter.auto_detect_port()
+        global active_otter, active_target
         try:
-            if not active_otter or active_otter.port != target_port:
-                active_otter = RubberOtter(port=target_port)
+            if not active_otter:
+                active_otter = RubberOtter(use_ble=True)
                 active_otter.connect()
-                active_port = target_port
+                active_target = active_otter.connection_target
             res = active_otter.send(cmd_str)
             return jsonify(res)
         except Exception as e:

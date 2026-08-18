@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Scan Devices
   async function performScan() {
-    log('Scanning for USB CDC Serial ports & BLE devices...', 'info');
+    log('Scanning for BLE devices & USB Serial ports...', 'info');
     scanBtn.disabled = true;
     try {
       const res = await fetch('/api/scan?timeout=2.0');
@@ -73,21 +73,31 @@ document.addEventListener('DOMContentLoaded', () => {
       usbCount.textContent = `USB: ${serials.length} found`;
       bleCount.textContent = `BLE: ${bles.length} found`;
 
-      if (serials.length === 0) {
+      if (bles.length === 0 && serials.length === 0) {
         const opt = document.createElement('option');
         opt.value = '';
-        opt.textContent = 'No USB Serial ports found';
+        opt.textContent = 'No Rubber Otter devices found';
         portSelect.appendChild(opt);
       } else {
+        // Add BLE devices first
+        bles.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = `ble:${d.address}`;
+          const matchLabel = d.is_target ? ' ★ [MATCH - BLE]' : '';
+          opt.textContent = `📡 BLE: ${d.name} (${d.address})${matchLabel}`;
+          portSelect.appendChild(opt);
+        });
+
+        // Add Serial ports
         serials.forEach(p => {
           const opt = document.createElement('option');
-          opt.value = p.device;
+          opt.value = `serial:${p.device}`;
           const matchLabel = p.candidate ? ` ★ [${p.board}]` : '';
-          opt.textContent = `${p.device}${matchLabel}`;
+          opt.textContent = `🔌 Serial: ${p.device}${matchLabel}`;
           portSelect.appendChild(opt);
         });
       }
-      log(`Scan complete. Found ${serials.length} USB serial ports and ${bles.length} BLE devices.`, 'success');
+      log(`Scan complete. Found ${bles.length} BLE devices and ${serials.length} USB serial ports.`, 'success');
     } catch (err) {
       log(`Scan error: ${err.message}`, 'error');
     } finally {
@@ -106,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isConnected) {
         connectionStatusBadge.className = 'status-badge status-connected';
-        statusText.textContent = `Connected (${data.port})`;
+        statusText.textContent = `Connected (${data.target || 'Device'})`;
         connectBtn.textContent = 'Disconnect';
         connectBtn.className = 'btn btn-secondary';
       } else {
@@ -127,17 +137,26 @@ document.addEventListener('DOMContentLoaded', () => {
       await fetch('/api/disconnect', { method: 'POST' });
       checkStatus();
     } else {
-      const selectedPort = portSelect.value;
-      log(`Connecting to port: ${selectedPort || 'Auto-detect'}...`, 'info');
+      const selectedVal = portSelect.value;
+      let bodyData = {};
+      if (selectedVal.startsWith('ble:')) {
+        bodyData.ble_address = selectedVal.replace('ble:', '');
+        log(`Connecting to BLE device: ${bodyData.ble_address}...`, 'info');
+      } else if (selectedVal.startsWith('serial:')) {
+        bodyData.port = selectedVal.replace('serial:', '');
+        log(`Connecting to Serial port: ${bodyData.port}...`, 'info');
+      } else {
+        log(`Connecting via BLE auto-detection...`, 'info');
+      }
       try {
         const res = await fetch('/api/connect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ port: selectedPort }),
+          body: JSON.stringify(bodyData),
         });
         const data = await res.json();
         if (data.success) {
-          log(`Connected to ${data.port} successfully!`, 'success');
+          log(`Connected to ${data.target} successfully!`, 'success');
           checkStatus();
         } else {
           log(`Connection failed: ${data.error}`, 'error');

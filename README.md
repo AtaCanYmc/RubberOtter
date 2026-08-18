@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](LICENSE)
 [![PlatformIO](https://img.shields.io/badge/MCU-ATmega32U4-orange.svg)](https://platformio.org/)
 
-**RubberOtterPy** is a modular, production-grade Python package that provides an **inline Python SDK**, a feature-rich **CLI tool**, and an embedded **Single Page Web Dashboard (`OtterDeck`)** for discovering, controlling, and managing Rubber Otter microcontrollers (SparkFun Pro Micro / Arduino Leonardo) over USB CDC Serial and Bluetooth LE (BLE HM-10 / BT05).
+**RubberOtterPy** is a modular, production-grade Python package that provides an **inline Python SDK**, a feature-rich **CLI tool**, and an embedded **Single Page Web Dashboard (`OtterDeck`)** for discovering, controlling, and managing Rubber Otter microcontrollers (SparkFun Pro Micro / Arduino Leonardo) over **Bluetooth LE (BLE HM-10 / BT05)** and USB CDC Serial.
 
 ---
 
@@ -33,12 +33,12 @@ pip install -e .
 
 ## 🐍 Python SDK Examples
 
-### Synchronous Context Manager & Inline API
+### Synchronous Context Manager & Inline API (BLE Mode)
 
 ```python
 from rubberotter import RubberOtter
 
-# Auto-detects USB port and opens connection
+# By default, auto-detects nearby Rubber Otter BLE device and opens connection
 with RubberOtter() as otter:
     # 1. Type text via USB HID Keyboard
     otter.type("Hello from RubberOtterPy!\n")
@@ -64,8 +64,8 @@ import asyncio
 from rubberotter import AsyncRubberOtter
 
 async def main():
-    async with AsyncRubberOtter() as otter:
-        res = await otter.type_async("Async typing payload\n")
+    async with AsyncRubberOtter(use_ble=True) as otter:
+        res = await otter.type_async("Async typing payload over BLE\n")
         print("ACK Response:", res)
 
 asyncio.run(main())
@@ -78,11 +78,15 @@ asyncio.run(main())
 Execute via `rubberotter` or `python3 -m rubberotter`:
 
 ```bash
-# Discover USB Serial ports & BLE devices
+# Discover BLE devices & USB Serial ports
 rubberotter scan
 rubberotter scan --json
 
-# Send framed commands
+# Direct BLE command (auto-detects BLE device or use --ble-address / -b)
+rubberotter vibrate 200
+rubberotter -b 60F9F128-5B7C-1258-10D5-2694444599B7 vibrate 200
+
+# Send framed commands over BLE
 rubberotter send "delay 100"
 rubberotter type "Hello World\n"
 
@@ -114,7 +118,7 @@ rubberotter serve --web-port 8080
 Open **[http://127.0.0.1:8080](http://127.0.0.1:8080)** in your web browser.
 
 ### Key Web Features
-- 🔌 **Device Connection Deck**: USB CDC Serial port auto-scan & 1-click connect.
+- 📡 **Device Connection Deck**: BLE device (`BT05` / `Otter`) and USB CDC Serial port auto-scan & 1-click connect.
 - ⚡ **Haptic & Quick Shortcut Deck**: Vibration motor slider, Mouse Jiggler toggle badge, common key action shortcuts.
 - ⌨️ **Typing & Payload Deck**: Text box for typing strings and raw packet test frame sender.
 - 💾 **EEPROM Macro Manager**: Visual cards for macro slots (`m0`..`m5`) with Read, Edit, and Run buttons.
@@ -125,17 +129,8 @@ Open **[http://127.0.0.1:8080](http://127.0.0.1:8080)** in your web browser.
 ## 🧪 Running Unit Tests
 
 ```bash
-python3 -m unittest discover -s tests -p "test_*.py"
+.venv/bin/python -m unittest discover -s tests -p "test_*.py"
 ```
-
----
-
-## 🚀 CI/CD Automation Pipelines
-
-Automated GitHub Actions workflows are included in `.github/workflows/`:
-
-- **CI Test Matrix (`.github/workflows/ci.yml`)**: Runs tests across Python `3.8`, `3.9`, `3.10`, `3.11`, `3.12`, `3.13` on `ubuntu-latest` and `macos-latest`, verifying code quality, package build (`python -m build`), and `twine` verification on every push and pull request.
-- **Automated Release Publish (`.github/workflows/publish.yml`)**: Builds wheel (`.whl`) and source distribution (`.tar.gz`) packages and uploads them to GitHub Release assets upon tag creation (`v*.*.*`).
 
 ---
 
@@ -149,9 +144,9 @@ Automated GitHub Actions workflows are included in `.github/workflows/`:
 
 ## 🇹🇷 Türkçe Açıklama
 
-**RubberOtterPy**, ATmega32U4 (SparkFun Pro Micro / Arduino Leonardo) mikrodenetleyicileri üzerindeki Rubber Otter donanımını USB Seri Port ve Bluetooth LE (HM-10 / BT05) üzerinden yönetmenizi sağlayan kapsamlı bir Python paketidir.
+**RubberOtterPy**, ATmega32U4 (SparkFun Pro Micro / Arduino Leonardo) mikrodenetleyicileri üzerindeki Rubber Otter donanımını **Bluetooth LE (HM-10 / BT05)** ve USB Seri Port üzerinden kablosuz yönetmenizi sağlayan kapsamlı bir Python paketidir.
 
 ### Temel Özellikler
-1. **Python SDK**: `RubberOtter` ve `AsyncRubberOtter` sınıfları ile Python kodunuzun içinden tek satırla klavye yazma (`otter.type()`), titreşim motoru tetikleme (`otter.vibrate()`), Mouse Jiggler açıp kapatma (`otter.jiggler_toggle()`) ve EEPROM makro yönetimi (`otter.macro_save()`, `otter.macro_run()`).
-2. **CLI Araçları**: Terminalden tek komutla tarama yapma (`rubberotter scan`), komut gönderme (`rubberotter send`), interaktif kabuk (`rubberotter shell`) ve web uygulamasını başlatma (`rubberotter serve`).
-3. **Web Dashboard (`OtterDeck`)**: Tarayıcınızdan canlı cihaz taraması yapabileceğiniz, sanal klavye ve makro yönetimi sunan, canlı log konsoluna sahip modern Web Uygulaması.
+1. **Bluetooth LE (BLE) Öncelikli SDK**: Cihaz USB'ye takılı olmasa dahi `RubberOtter` ve `AsyncRubberOtter` sınıfları doğrudan kablosuz BLE bağlantısı kurarak klavye yazma (`otter.type()`), titreşim motoru tetikleme (`otter.vibrate()`), Mouse Jiggler açıp kapatma (`otter.jiggler_toggle()`) işlemlerini gerçekleştirir.
+2. **CLI Araçları**: Terminalden kablosuz BLE tarama (`rubberotter scan`), doğrudan BLE komut gönderme (`rubberotter vibrate 200`), interaktif kabuk (`rubberotter shell`) ve web uygulamasını başlatma (`rubberotter serve`).
+3. **Web Dashboard (`OtterDeck`)**: Tarayıcınızdan kablosuz BLE cihazlarını ve seri portları tarayıp tek tıkla bağlanabileceğiniz gelişmiş web arayüzü.

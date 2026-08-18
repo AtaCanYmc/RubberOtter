@@ -41,19 +41,6 @@ def handle_scan(args):
         sys.stdout = open(os.devnull, "w")
 
     try:
-        if args.mode in ["serial", "all"]:
-            if not args.json:
-                print(colorize("\n🔌 SCANNING USB / SERIAL PORTS...", Colors.HEADER))
-            ports = scan_serial_ports()
-            result["serial_ports"] = ports
-            if not args.json:
-                for p in ports:
-                    match_str = f" ★ [MATCH: {p['board']}]" if p.get("candidate") else ""
-                    print(f" Port: {p['device']} {match_str}")
-                    print(f"   - Desc: {p['description']}")
-                    print(f"   - HWID: {p['hwid']}")
-                    print("-" * 50)
-
         if args.mode in ["ble", "all"]:
             scan_time = getattr(args, "scan_timeout", 5.0)
             if not args.json:
@@ -70,6 +57,20 @@ def handle_scan(args):
                     print(f"   - Address: {d['address']}")
                     print(f"   - RSSI:    {d['rssi']} dBm{tag}")
                     print("-" * 50)
+
+        if args.mode in ["serial", "all"]:
+            if not args.json:
+                print(colorize("\n🔌 SCANNING USB / SERIAL PORTS...", Colors.HEADER))
+            ports = scan_serial_ports()
+            result["serial_ports"] = ports
+            if not args.json:
+                for p in ports:
+                    match_str = f" ★ [MATCH: {p['board']}]" if p.get("candidate") else ""
+                    print(f" Port: {p['device']} {match_str}")
+                    print(f"   - Desc: {p['description']}")
+                    print(f"   - HWID: {p['hwid']}")
+                    print("-" * 50)
+
     finally:
         if args.json:
             sys.stdout.close()
@@ -84,9 +85,19 @@ def handle_scan(args):
 def handle_send(args):
     """Handles sending framed payloads."""
     try:
-        otter = RubberOtter(port=args.port, baud=args.baud, timeout=args.timeout, retries=args.retries)
+        otter = RubberOtter(
+            port=args.port,
+            ble_address=args.ble_address,
+            ble_target=args.target,
+            baud=args.baud,
+            timeout=args.timeout,
+            retries=args.retries,
+            raw=getattr(args, "raw", False),
+            no_ack=getattr(args, "no_ack", False),
+        )
         if not args.json:
-            print(colorize(f"Sending payload to {otter.port}: ", Colors.OKBLUE) + f"'{args.cmd}' (seq={args.seq})")
+            mode_str = " (RAW)" if args.raw else ""
+            print(colorize(f"Sending payload to {otter.connection_target}{mode_str}: ", Colors.OKBLUE) + f"'{args.cmd}' (seq={args.seq})")
 
         res = otter.send(args.cmd, seq=args.seq)
         otter.disconnect()
@@ -95,7 +106,8 @@ def handle_send(args):
             print(json.dumps(res, indent=2))
         else:
             if res.get("success"):
-                print(colorize(f"✔ ACK Received! (Seq: {res.get('seq')}, Status: {res.get('status')}, Code: {res.get('code')})", Colors.OKGREEN))
+                note = f" ({res.get('note')})" if res.get("note") else ""
+                print(colorize(f"✔ ACK Received!{note} (Seq: {res.get('seq')}, Status: {res.get('status')}, Code: {res.get('code')})", Colors.OKGREEN))
             else:
                 print(colorize(f"✖ Error: {res.get('error') or 'Command execution failed'}", Colors.FAIL))
                 sys.exit(1)
@@ -161,7 +173,16 @@ def handle_blename(args):
 def handle_shell(args):
     """Launches interactive REPL command prompt."""
     try:
-        otter = RubberOtter(port=args.port, baud=args.baud, timeout=args.timeout, retries=args.retries)
+        otter = RubberOtter(
+            port=args.port,
+            ble_address=args.ble_address,
+            ble_target=args.target,
+            baud=args.baud,
+            timeout=args.timeout,
+            retries=args.retries,
+            raw=getattr(args, "raw", False),
+            no_ack=getattr(args, "no_ack", False),
+        )
         otter.connect()
     except RubberOtterConnectionError as e:
         print(colorize(f"[!] {e}", Colors.FAIL))
@@ -169,7 +190,7 @@ def handle_shell(args):
 
     print(colorize("=" * 60, Colors.OKCYAN))
     print(colorize(" 🦦 Rubber Otter Interactive Console", Colors.BOLD + Colors.HEADER))
-    print(colorize(f" Connected Port: {otter.port}", Colors.OKBLUE))
+    print(colorize(f" Connected Target: {otter.connection_target}", Colors.OKBLUE))
     print(colorize(" Type commands directly or 'help' for options. Type 'exit' to quit.", Colors.OKCYAN))
     print(colorize("=" * 60, Colors.OKCYAN))
 
@@ -226,11 +247,15 @@ def handle_serve(args):
 
 def main():
     parent_parser = argparse.ArgumentParser(add_help=False)
-    parent_parser.add_argument("--port", help="Target USB Serial port (auto-detected if omitted)")
+    parent_parser.add_argument("--ble-address", "-b", help="Target Bluetooth LE (BLE) device MAC or UUID address")
+    parent_parser.add_argument("--target", default="Otter", help="Target BLE advertised name filter (default: Otter)")
+    parent_parser.add_argument("--port", help="Target USB Serial port (if explicitly connecting over USB)")
     parent_parser.add_argument("--baud", type=int, default=9600, help="Serial baud rate (default: 9600)")
     parent_parser.add_argument("--seq", type=int, default=1, help="Sequence number (0-255)")
-    parent_parser.add_argument("--timeout", type=float, default=1.0, help="ACK timeout in seconds (default: 1.0)")
+    parent_parser.add_argument("--timeout", type=float, default=3.0, help="ACK timeout in seconds (default: 3.0)")
     parent_parser.add_argument("--retries", type=int, default=2, help="Number of retry attempts (default: 2)")
+    parent_parser.add_argument("--raw", action="store_true", help="Send un-framed raw string payload (for custom/simple MCU sketches)")
+    parent_parser.add_argument("--no-ack", action="store_true", help="Transmit payload without waiting for ACK response")
     parent_parser.add_argument("--json", action="store_true", help="Output machine-readable JSON format")
 
     parser = argparse.ArgumentParser(
@@ -245,7 +270,6 @@ def main():
     # scan
     p_scan = subparsers.add_parser("scan", parents=[parent_parser], help="Scan for connected USB Serial ports & BLE devices")
     p_scan.add_argument("--mode", choices=["serial", "ble", "all"], default="all", help="Scan mode (default: all)")
-    p_scan.add_argument("--target", default="Otter", help="Target BLE advertised name filter (default: Otter)")
     p_scan.add_argument("--scan-timeout", type=float, default=5.0, help="BLE scan timeout in seconds")
 
     # send
