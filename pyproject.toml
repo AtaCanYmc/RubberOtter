@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rubberotter"
-version = "1.0.0"
+version = "1.1.0"
 description = "Comprehensive Python SDK, CLI, and Web App to discover, control, and manage Rubber Otter ATmega32U4 microcontrollers over USB CDC Serial and Bluetooth LE (BLE)."
 readme = "README.md"
 authors = [{ name = "Rubber Otter Developer", email = "developer@rubberotter.local" }]
