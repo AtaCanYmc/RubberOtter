@@ -288,7 +288,7 @@ chmod +x scripts/ci-local.sh
 
 ## 🧰 Developer Tools & CLI
 
-Complete documentation for the Rubber Otter CLI is available in **[`docs/CLI_REFERENCE.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/CLI_REFERENCE.md)** and script guides in **[`docs/TOOLS_AND_SCRIPTS.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/TOOLS_AND_SCRIPTS.md)**.
+Complete documentation for all firmware capabilities and commands is available in **[`docs/COMMANDS_AND_CAPABILITIES.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/COMMANDS_AND_CAPABILITIES.md)**, CLI guide in **[`docs/CLI_REFERENCE.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/CLI_REFERENCE.md)**, and script guides in **[`docs/TOOLS_AND_SCRIPTS.md`](file:///Users/atacan/CLionProjects/RubberOtter/docs/TOOLS_AND_SCRIPTS.md)**.
 
 ### Unified CLI Tool (`scripts/cli.py`)
 Discover devices, execute payload commands, manage EEPROM macros, and launch REPL console:
