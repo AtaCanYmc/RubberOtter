@@ -1,5 +1,6 @@
 """
 Rubber Otter Web Application Flask Server & REST API Endpoints.
+Provides complete HTTP REST API for discovering, connecting, and controlling Rubber Otter devices.
 """
 
 import os
@@ -39,6 +40,7 @@ def create_app():
         return jsonify({
             "connected": connected,
             "target": active_target or (active_otter.connection_target if active_otter else None),
+            "connection_type": active_otter.connection_type if active_otter else None,
             "auto_ble": RubberOtter.auto_detect_ble(),
             "auto_port": RubberOtter.auto_detect_port(),
         })
@@ -49,6 +51,8 @@ def create_app():
         data = request.get_json() or {}
         ble_address = data.get("ble_address")
         port = data.get("port")
+        raw = data.get("raw", False)
+        no_ack = data.get("no_ack", False)
 
         if active_otter:
             try:
@@ -58,17 +62,21 @@ def create_app():
 
         try:
             if ble_address:
-                otter = RubberOtter(ble_address=ble_address, use_ble=True)
+                otter = RubberOtter(ble_address=ble_address, use_ble=True, raw=raw, no_ack=no_ack)
             elif port:
-                otter = RubberOtter(port=port, use_ble=False)
+                otter = RubberOtter(port=port, use_ble=False, raw=raw, no_ack=no_ack)
             else:
-                # Default to BLE auto-detection
-                otter = RubberOtter(use_ble=True)
+                otter = RubberOtter(use_ble=True, raw=raw, no_ack=no_ack)
 
             otter.connect()
             active_otter = otter
             active_target = otter.connection_target
-            return jsonify({"success": True, "target": active_target, "message": f"Connected to {active_target}"})
+            return jsonify({
+                "success": True,
+                "target": active_target,
+                "connection_type": otter.connection_type,
+                "message": f"Connected to {active_target}",
+            })
         except Exception as e:
             active_otter = None
             active_target = None
@@ -97,6 +105,8 @@ def create_app():
 
         ble_address = data.get("ble_address")
         port = data.get("port")
+        raw = data.get("raw")
+        no_ack = data.get("no_ack")
 
         try:
             if not active_otter:
@@ -109,45 +119,95 @@ def create_app():
                 active_otter.connect()
                 active_target = active_otter.connection_target
 
-            res = active_otter.send(cmd)
+            res = active_otter.send(cmd, raw=raw, no_ack=no_ack)
             return jsonify(res)
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
+
+    @app.route("/api/type", methods=["POST"])
+    def api_type():
+        data = request.get_json() or {}
+        text = data.get("text", "")
+        escaped = text.replace('"', '\\"')
+        return api_send_internal(f'type "{escaped}"', raw=data.get("raw"), no_ack=data.get("no_ack"))
+
+    @app.route("/api/press", methods=["POST"])
+    def api_press():
+        data = request.get_json() or {}
+        key = data.get("key", "enter")
+        return api_send_internal(key, raw=data.get("raw"), no_ack=data.get("no_ack"))
+
+    @app.route("/api/combo", methods=["POST"])
+    def api_combo():
+        data = request.get_json() or {}
+        keys = data.get("keys", [])
+        combo_str = " ".join(keys) if isinstance(keys, list) else str(keys)
+        if not combo_str.startswith("press"):
+            combo_str = f"press {combo_str}"
+        return api_send_internal(combo_str, raw=data.get("raw"), no_ack=data.get("no_ack"))
+
+    @app.route("/api/mouse", methods=["POST"])
+    def api_mouse():
+        data = request.get_json() or {}
+        action = data.get("action", "click")
+        if action == "click":
+            button = data.get("button", "left")
+            cmd = f"mouse {button}"
+        elif action == "move":
+            dx = data.get("dx", 0)
+            dy = data.get("dy", 0)
+            cmd = f"mouse move {dx} {dy}"
+        elif action == "wheel":
+            wheel = data.get("wheel", 1)
+            cmd = f"mouse wheel {wheel}"
+        else:
+            cmd = "mouse left"
+        return api_send_internal(cmd, raw=data.get("raw"), no_ack=data.get("no_ack"))
 
     @app.route("/api/jiggler", methods=["POST"])
     def api_jiggler():
         data = request.get_json() or {}
         action = data.get("action", "toggle")
         cmd = f"jiggler {action}" if action != "toggle" else "jiggler toggle"
-        return api_send_internal(cmd)
+        return api_send_internal(cmd, raw=data.get("raw"), no_ack=data.get("no_ack"))
 
     @app.route("/api/vibrate", methods=["POST"])
     def api_vibrate():
         data = request.get_json() or {}
         duration = data.get("duration", 100)
-        return api_send_internal(f"vibrate {duration}")
+        return api_send_internal(f"vibrate {duration}", raw=data.get("raw"), no_ack=data.get("no_ack"))
+
+    @app.route("/api/ble-name", methods=["POST"])
+    def api_ble_name():
+        data = request.get_json() or {}
+        name = data.get("name", "Otter")
+        return api_send_internal(f'ble name "{name}"', raw=data.get("raw"), no_ack=data.get("no_ack"))
+
+    @app.route("/api/macro/list", methods=["GET", "POST"])
+    def api_macro_list():
+        return api_send_internal("macro list")
 
     @app.route("/api/macro/run", methods=["POST"])
     def api_macro_run():
         data = request.get_json() or {}
         slot = data.get("slot", "m0")
-        return api_send_internal(f"macro run {slot}")
+        return api_send_internal(f"macro run {slot}", raw=data.get("raw"), no_ack=data.get("no_ack"))
 
     @app.route("/api/macro/save", methods=["POST"])
     def api_macro_save():
         data = request.get_json() or {}
         slot = data.get("slot", "m0")
         body = data.get("body", "")
-        return api_send_internal(f'macro save {slot} "{body}"')
+        return api_send_internal(f'macro save {slot} "{body}"', raw=data.get("raw"), no_ack=data.get("no_ack"))
 
-    def api_send_internal(cmd_str):
+    def api_send_internal(cmd_str, raw=None, no_ack=None):
         global active_otter, active_target
         try:
             if not active_otter:
                 active_otter = RubberOtter(use_ble=True)
                 active_otter.connect()
                 active_target = active_otter.connection_target
-            res = active_otter.send(cmd_str)
+            res = active_otter.send(cmd_str, raw=raw, no_ack=no_ack)
             return jsonify(res)
         except Exception as e:
             return jsonify({"success": False, "error": str(e)}), 500
@@ -157,5 +217,5 @@ def create_app():
 
 def run_server(host: str = "127.0.0.1", port: int = 8080, debug: bool = False):
     app = create_app()
-    print(f"\n🦦 Rubber Otter Web Dashboard running at: http://{host}:{port}/\n")
+    print(f"\n[OtterDeck] Rubber Otter Web Dashboard running at: http://{host}:{port}/\n")
     app.run(host=host, port=port, debug=debug)
