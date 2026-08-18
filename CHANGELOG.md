@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/AtaCanYmc/RubberOtter/compare/v1.1.0...v1.1.1) (2026-08-18)
+
+
+### Documentation
+
+* add comprehensive COMMANDS_AND_CAPABILITIES guide and link in README ([adc340e](https://github.com/AtaCanYmc/RubberOtter/commit/adc340e53b533f30e71db33730ab622adf6c9954))
+* update hardware wiring diagram and pin layout table for SoftwareSerial (Pin 8/9) ([594998a](https://github.com/AtaCanYmc/RubberOtter/commit/594998a1fee3d6d11955354e4997bd96c5c243b7))
+
 ## [1.1.0](https://github.com/AtaCanYmc/RubberOtter/compare/v1.0.0...v1.1.0) (2026-08-17)
 
 
