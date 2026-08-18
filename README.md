@@ -103,8 +103,8 @@ graph LR
     end
 
     subgraph Micro["Arduino Pro Micro / Leonardo (32U4)"]
-        ARD_RX1["Pin 0 (RX1)"]
-        ARD_TX1["Pin 1 (TX1)"]
+        ARD_RX["Pin 8 (SoftwareSerial RX)"]
+        ARD_TX["Pin 9 (SoftwareSerial TX)"]
         ARD_VCC["VCC (5V / 3.3V)"]
         ARD_GND["GND"]
         ARD_VIB["Pin 2 (VIB_PIN)"]
@@ -120,8 +120,8 @@ graph LR
         DIODE <--> VIB_MOTOR
     end
 
-    HM_TX -->|"UART Serial Direct"| ARD_RX1
-    ARD_TX1 -->|"5V TX Signal"| R1
+    HM_TX -->|"UART Serial (Direct)"| ARD_RX
+    ARD_TX -->|"5V TX Signal"| R1
     ARD_VCC -->|"3.3V Power Line"| HM_VCC
     ARD_GND -->|"Common Ground"| HM_GND
     R2 -->|"Ground Connection"| ARD_GND
@@ -131,6 +131,15 @@ graph LR
     style Micro fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
     style Motor fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
 ```
+
+### Pin Layout Mapping
+
+| Component | Pin (Pro Micro / Leonardo) | Target Pin / Description |
+| :--- | :--- | :--- |
+| **HM-10 TX** | **Pin 8** (`RX_PIN_SOFT`) | SoftwareSerial RX (Arduino receives BLE data) |
+| **HM-10 RX** | **Pin 9** (`TX_PIN_SOFT`) | SoftwareSerial TX (via 1kΩ / 2kΩ voltage divider) |
+| **Vibration Motor** | **Pin 2** (`VIB_PIN`) | Transistor / N-Channel MOSFET Gate driver |
+| **Hardware UART (Optional)** | **Pin 0 (RX1) / Pin 1 (TX1)** | Alternate HardwareSerial1 configuration |
 
 > [!IMPORTANT]
 > **Power & Voltage Safety**:
