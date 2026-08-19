@@ -22,6 +22,7 @@ export const PROTOCOL = {
   SEC_JIGGLER_TOGGLE: 0x32,   // Toggle periodic mouse jiggle
   SEC_TASK_MANAGER: 0x33,     // Ctrl + Shift + Esc
   SEC_SHOW_DESKTOP: 0x34,     // Win + D
+  SEC_VIBRATE_PULSE: 0x35,    // Pulse Vibration Motor
 
   // Gaming & Macro Mode (0x40 - 0x4F)
   GAME_CS_BUY: 0x41, // 'b' -> delay -> '4' -> delay -> '2'
@@ -50,6 +51,7 @@ export const PROTOCOL_NAMES: Record<number, string> = {
   0x32: 'Security: Toggle Mouse Jiggler',
   0x33: 'Security: Task Manager',
   0x34: 'Security: Show Desktop',
+  0x35: 'Security: Pulse Vibration Motor',
   0x41: 'Gaming: CS Buy Armor Sequence',
   0x80: 'Trackpad: Mouse Move Packet',
   0x81: 'Trackpad: Left Click',

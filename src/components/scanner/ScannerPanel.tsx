@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
-import { Radar, Bluetooth, RefreshCw, Signal, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Radar, Bluetooth, RefreshCw, Signal, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
 
 interface ScannedDevice {
   id: string;
@@ -58,7 +58,6 @@ export const ScannerPanel: React.FC = () => {
           optionalServices: [
             settings.serviceUuid,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
-            'ffe0',
             '00001800-0000-1000-8000-00805f9b34fb'
           ]
         });
@@ -114,8 +113,14 @@ export const ScannerPanel: React.FC = () => {
             <Radar className={`w-5 h-5 ${isScanning ? 'animate-spin text-brand-400' : ''}`} />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-100">BLE Device Scanner</h2>
-            <p className="text-xs text-slate-400">Scan surrounding Bluetooth LE hardware</p>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-base font-bold text-slate-100">BLE Device Scanner</h2>
+              <span className="px-2 py-0.5 rounded bg-brand-500/20 border border-brand-500/40 text-[9px] font-mono font-bold text-brand-300 flex items-center space-x-1">
+                <Zap className="w-2.5 h-2.5 text-brand-400" />
+                <span>BLE Only (GATT)</span>
+              </span>
+            </div>
+            <p className="text-xs text-slate-400">Scan Bluetooth Low Energy hardware (HM-10 / ESP32 BLE)</p>
           </div>
         </div>
 
@@ -158,7 +163,7 @@ export const ScannerPanel: React.FC = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-200">Searching Nearby Devices...</h3>
+            <h3 className="text-sm font-bold text-slate-200">Searching Nearby BLE Devices...</h3>
             <p className="text-xs text-slate-400 mt-1">Listening for HM-10, Otter & ESP32 BLE beacons</p>
           </div>
         </div>
@@ -169,7 +174,7 @@ export const ScannerPanel: React.FC = () => {
         <div className="flex items-center justify-between px-1">
           <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
             <Bluetooth className="w-3.5 h-3.5 text-brand-400" />
-            <span>Discovered Devices ({devices.length})</span>
+            <span>Discovered BLE Devices ({devices.length})</span>
           </h3>
           {devices.length > 0 && (
             <button
@@ -189,7 +194,7 @@ export const ScannerPanel: React.FC = () => {
             <div>
               <h4 className="text-xs font-bold text-slate-300">No BLE Devices Discovered Yet</h4>
               <p className="text-[11px] text-slate-500 max-w-xs mx-auto mt-1">
-                Tap <strong>Start Scan</strong> above to discover surrounding HM-10, Otter or ESP32 Bluetooth modules.
+                Tap <strong>Start Scan</strong> above to discover surrounding HM-10, Otter or ESP32 Bluetooth Low Energy modules.
               </p>
             </div>
           </div>

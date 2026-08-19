@@ -15,6 +15,7 @@ interface BluetoothContextType {
   sendByte: (byteCode: number, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
   sendPacket: (data: Uint8Array, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
   sendFramedAscii: (payloadText: string, feedbackType?: 'subtle' | 'confirm' | 'toggle' | 'alert') => Promise<boolean>;
+  triggerVibrate: (durationMs?: number) => Promise<boolean>;
   totalPacketsSent: number;
   totalBytesSent: number;
 }
@@ -76,6 +77,19 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return res.success;
   };
 
+  const triggerVibrate = async (durationMs = 100): Promise<boolean> => {
+    // 1. Mobile browser haptic burst
+    soundEffects.triggerHaptic(durationMs);
+
+    // 2. Transmit vibration command matching RubberOtterPy (vibrate <ms>) & Single-Byte (0x35)
+    if (settings.protocolMode === 'framed_ascii') {
+      return await sendFramedAscii(`vibrate ${durationMs}`, 'confirm');
+    } else {
+      await sendByte(0x35, 'confirm');
+      return await sendFramedAscii(`vibrate ${durationMs}`, 'confirm');
+    }
+  };
+
   const sendByte = async (
     byteCode: number,
     feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
@@ -124,6 +138,7 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         sendByte,
         sendPacket,
         sendFramedAscii,
+        triggerVibrate,
         totalPacketsSent,
         totalBytesSent,
       }}

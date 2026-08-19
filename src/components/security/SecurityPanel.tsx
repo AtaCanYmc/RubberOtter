@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
 import { PROTOCOL } from '../../protocol/byteMap';
-import { Lock, MousePointer, Cpu, LayoutGrid } from 'lucide-react';
+import { Lock, MousePointer, Cpu, LayoutGrid, Smartphone, Activity } from 'lucide-react';
 
 export const SecurityPanel: React.FC = () => {
-  const { sendByte } = useBluetooth();
+  const { sendByte, triggerVibrate } = useBluetooth();
   const { settings } = useSettings();
   const [jigglerActive, setJigglerActive] = useState(false);
 
@@ -19,7 +19,7 @@ export const SecurityPanel: React.FC = () => {
     <div className="flex-1 flex flex-col space-y-5">
       <div className="glass-card rounded-2xl p-5 text-center shadow-xl">
         <h2 className="text-base font-bold text-slate-100">Security & Utilities</h2>
-        <p className="text-xs text-slate-400">Lock workstation or prevent system sleep</p>
+        <p className="text-xs text-slate-400">Lock workstation, prevent sleep & trigger haptics</p>
       </div>
 
       {/* Lock Workstation Card */}
@@ -40,6 +40,48 @@ export const SecurityPanel: React.FC = () => {
           0x31
         </span>
       </button>
+
+      {/* Vibration Motor & Haptic Trigger Card */}
+      <div className="glass-card rounded-2xl p-5 space-y-4 shadow-xl border-amber-500/20">
+        <div className="flex items-center space-x-3 border-b border-slate-800 pb-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <Smartphone className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-slate-200">Vibration Haptics</h3>
+            <p className="text-xs text-slate-400">Triggers mobile & MCU hardware vibration motor</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => triggerVibrate(100)}
+            className="p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-center transition-all active:scale-95 group"
+          >
+            <Activity className="w-4 h-4 text-amber-400 mx-auto mb-1 group-hover:animate-bounce" />
+            <h4 className="text-xs font-bold text-slate-200">100ms Pulse</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">Short Haptic</p>
+          </button>
+
+          <button
+            onClick={() => triggerVibrate(300)}
+            className="p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-center transition-all active:scale-95 group"
+          >
+            <Activity className="w-4 h-4 text-amber-400 mx-auto mb-1 group-hover:animate-bounce" />
+            <h4 className="text-xs font-bold text-slate-200">300ms Pulse</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">Medium Haptic</p>
+          </button>
+
+          <button
+            onClick={() => triggerVibrate(500)}
+            className="p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-center transition-all active:scale-95 group"
+          >
+            <Activity className="w-4 h-4 text-amber-400 mx-auto mb-1 group-hover:animate-bounce" />
+            <h4 className="text-xs font-bold text-slate-200">500ms Pulse</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">Long Burst</p>
+          </button>
+        </div>
+      </div>
 
       {/* Mouse Jiggler Container */}
       <div className="glass-card rounded-2xl p-6 space-y-4 shadow-xl border-emerald-500/20">

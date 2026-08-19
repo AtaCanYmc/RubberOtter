@@ -60,11 +60,11 @@ export class BleManager {
       // Flexible filter matching RubberOtterPy auto-discovery
       this.device = await navigator.bluetooth.requestDevice({
         filters: [
-          { services: [serviceUuid] },
           { namePrefix: 'Otter' },
           { namePrefix: 'RubberOtter' },
           { namePrefix: 'HM-10' },
           { namePrefix: 'Master-Key' },
+          { services: [serviceUuid] }
         ],
         optionalServices: [
           serviceUuid,
@@ -79,7 +79,6 @@ export class BleManager {
           optionalServices: [
             serviceUuid,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
-            'ffe0',
             '00001800-0000-1000-8000-00805f9b34fb'
           ]
         });
@@ -258,7 +257,6 @@ export class BleManager {
     for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
       try {
         const startTime = Date.now();
-        const buffer = frameData.buffer as ArrayBuffer;
 
         const ackPromise = new Promise<AckFrame | { seq: number; statusOk: boolean; errorCode: number }>((resolve, reject) => {
           const timeoutId = setTimeout(() => {
@@ -269,7 +267,8 @@ export class BleManager {
           this.pendingAcks.set(seq, { seq, resolve, reject, timeoutId });
         });
 
-        if (this.characteristic.writeValueWithoutResponse) {
+        const buffer = frameData as unknown as BufferSource;
+        if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
           await this.characteristic.writeValueWithoutResponse(buffer);
         } else {
           await this.characteristic.writeValue(buffer);
@@ -295,7 +294,7 @@ export class BleManager {
             error: `Timeout waiting for ACK after ${maxRetries + 1} attempts over BLE.`,
           };
         }
-        await new Promise((r) => setTimeout(r, 100)); // Short delay before retry
+        await new Promise((r) => setTimeout(r, 100));
       }
     }
 
@@ -315,8 +314,8 @@ export class BleManager {
     this.lastPacketTime = now;
 
     try {
-      const buffer = data.buffer as ArrayBuffer;
-      if (this.characteristic.writeValueWithoutResponse) {
+      const buffer = data as unknown as BufferSource;
+      if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
         await this.characteristic.writeValueWithoutResponse(buffer);
       } else {
         await this.characteristic.writeValue(buffer);
