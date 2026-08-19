@@ -32,7 +32,7 @@
 
 static bool jigglerActiveState = false;
 static unsigned long lastJiggleMillis = 0;
-const unsigned long JIGGLE_INTERVAL_MS = 20000;
+const unsigned long JIGGLE_INTERVAL_MS = 5000; // 5-second interval for reliable OS sleep prevention
 
 void sendHelp() {
   Serial.println(F("Rubber Otter - Available commands:"));
@@ -50,8 +50,8 @@ void sendHelp() {
   Serial.println(F("  enter, tab, backspace   - simple keys"));
   if (BLE_SERIAL) BLE_SERIAL->println(F("  enter, tab, backspace   - simple keys"));
 
-  Serial.println(F("  press <mod> <ms>        - press modifier for ms (shift, ctrl, alt, gui)"));
-  if (BLE_SERIAL) BLE_SERIAL->println(F("  press <mod> <ms>        - press modifier for ms (shift, ctrl, alt, gui)"));
+  Serial.println(F("  press <mod> <ms>        - press modifier for ms (shift, ctrl, alt, gui, right, left, f5)"));
+  if (BLE_SERIAL) BLE_SERIAL->println(F("  press <mod> <ms>        - press modifier for ms (shift, ctrl, alt, gui, right, left, f5)"));
 
   Serial.println(F("  hold <mod> / release <mod> - hold or release modifier"));
   if (BLE_SERIAL) BLE_SERIAL->println(F("  hold <mod> / release <mod> - hold or release modifier"));
@@ -59,8 +59,8 @@ void sendHelp() {
   Serial.println(F("  vibrate N               - vibrate motor for N ms"));
   if (BLE_SERIAL) BLE_SERIAL->println(F("  vibrate N               - vibrate motor for N ms"));
 
-  Serial.println(F("  media <cmd>             - media play_pause/volume_up/volume_down/next/mute"));
-  if (BLE_SERIAL) BLE_SERIAL->println(F("  media <cmd>             - media play_pause/volume_up/volume_down/next/mute"));
+  Serial.println(F("  media <cmd>             - media play_pause/volume_up/volume_down/next/prev/mute"));
+  if (BLE_SERIAL) BLE_SERIAL->println(F("  media <cmd>             - media play_pause/volume_up/volume_down/next/prev/mute"));
 
   Serial.println(F("  mouse move <dx> <dy>    - relative mouse move"));
   if (BLE_SERIAL) BLE_SERIAL->println(F("  mouse move <dx> <dy>    - relative mouse move"));
@@ -124,6 +124,18 @@ void press_modifier_by_name(const char* name, uint16_t ms) {
     Keyboard.press(KEY_LEFT_GUI);
     delay(ms);
     Keyboard.release(KEY_LEFT_GUI);
+  } else if (strcmp(name, "right") == 0) {
+    Keyboard.write(KEY_RIGHT_ARROW);
+  } else if (strcmp(name, "left") == 0) {
+    Keyboard.write(KEY_LEFT_ARROW);
+  } else if (strcmp(name, "f5") == 0) {
+    Keyboard.write(KEY_F5);
+  } else if (strcmp(name, "gui l") == 0 || strcmp(name, "win l") == 0) {
+    Keyboard.press(KEY_LEFT_GUI); Keyboard.press('l'); delay(ms); Keyboard.releaseAll();
+  } else if (strcmp(name, "gui d") == 0 || strcmp(name, "win d") == 0) {
+    Keyboard.press(KEY_LEFT_GUI); Keyboard.press('d'); delay(ms); Keyboard.releaseAll();
+  } else if (strcmp(name, "ctrl shift esc") == 0) {
+    Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(KEY_ESC); delay(ms); Keyboard.releaseAll();
   }
 }
 
@@ -176,9 +188,23 @@ void mouse_scroll(int8_t amount) {
   Mouse.move(0, 0, amount);
 }
 
+static void do_jiggle_pulse() {
+  // Visibly clear 20-pixel square movement returning to exact starting position
+  Mouse.move(20, 0, 0);
+  delay(60);
+  Mouse.move(0, 20, 0);
+  delay(60);
+  Mouse.move(-20, 0, 0);
+  delay(60);
+  Mouse.move(0, -20, 0);
+}
+
 void jiggler_set(bool active) {
   jigglerActiveState = active;
-  lastJiggleMillis = millis();
+  if (active) {
+    do_jiggle_pulse(); // Immediate visible square pulse on toggle
+    lastJiggleMillis = millis();
+  }
 }
 
 bool jiggler_get() {
@@ -190,9 +216,7 @@ void jiggler_poll() {
     unsigned long currentMillis = millis();
     if (currentMillis - lastJiggleMillis >= JIGGLE_INTERVAL_MS) {
       lastJiggleMillis = currentMillis;
-      Mouse.move(1, 0, 0);
-      delay(30);
-      Mouse.move(-1, 0, 0);
+      do_jiggle_pulse();
     }
   }
 }

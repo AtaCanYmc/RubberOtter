@@ -39,28 +39,46 @@ void initPacketParser() {
 // Fallback single-byte protocol handler (for direct byte commands 0x11 - 0x85)
 static void handleSingleByteCommand(uint8_t cmd) {
   switch (cmd) {
+#ifdef USE_HID_PROJECT
+    case 0x11: Consumer.write(MEDIA_PLAY_PAUSE); break;
+    case 0x12: Consumer.write(MEDIA_NEXT); break;
+    case 0x13: Consumer.write(MEDIA_PREVIOUS); break;
+    case 0x14: Consumer.write(MEDIA_VOLUME_UP); break;
+    case 0x15: Consumer.write(MEDIA_VOLUME_DOWN); break;
+    case 0x16: Consumer.write(MEDIA_VOLUME_MUTE); break;
+#else
     case 0x11: Keyboard.write(0xE8); break; // Play/Pause
     case 0x12: Keyboard.write(0xEB); break; // Next
     case 0x13: Keyboard.write(0xEC); break; // Prev
     case 0x14: Keyboard.write(0xE9); break; // Vol Up
     case 0x15: Keyboard.write(0xEA); break; // Vol Down
     case 0x16: Keyboard.write(0xED); break; // Mute
+#endif
     case 0x21: Keyboard.write(KEY_RIGHT_ARROW); break;
     case 0x22: Keyboard.write(KEY_LEFT_ARROW); break;
     case 0x23: Keyboard.write(KEY_F5); break;
     case 0x24: Keyboard.write('b'); break;
     case 0x31:
-      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('l'); delay(50); Keyboard.releaseAll();
+      // Windows: Win + L, macOS: Ctrl + Cmd + Q
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('l'); delay(40); Keyboard.releaseAll();
+      Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_GUI); Keyboard.press('q'); delay(40); Keyboard.releaseAll();
       break;
     case 0x32:
       // Jiggler toggle
       execute_command("jiggler toggle", 0);
       break;
     case 0x33:
-      Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(KEY_ESC); delay(50); Keyboard.releaseAll();
+      // Windows: Ctrl + Shift + Esc, macOS: Cmd + Alt + Esc
+      Keyboard.press(KEY_LEFT_CTRL); Keyboard.press(KEY_LEFT_SHIFT); Keyboard.press(KEY_ESC); delay(40); Keyboard.releaseAll();
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press(KEY_LEFT_ALT); Keyboard.press(KEY_ESC); delay(40); Keyboard.releaseAll();
       break;
     case 0x34:
-      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('d'); delay(50); Keyboard.releaseAll();
+      // Windows: Win + D, macOS: Cmd + F3
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press('d'); delay(40); Keyboard.releaseAll();
+      Keyboard.press(KEY_LEFT_GUI); Keyboard.press(KEY_F3); delay(40); Keyboard.releaseAll();
+      break;
+    case 0x35:
+      execute_command("vibrate 100", 0);
       break;
     case 0x41:
       execute_command("type \"b\" && delay 120 && type \"4\" && delay 120 && type \"2\"", 0);
