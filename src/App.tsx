@@ -3,6 +3,8 @@ import { SettingsProvider } from './context/SettingsContext';
 import { BluetoothProvider } from './context/BluetoothContext';
 import { Header } from './components/header/Header';
 import { NavBar, TabId } from './components/nav/NavBar';
+import { ScannerPanel } from './components/scanner/ScannerPanel';
+import { TextPanel } from './components/text/TextPanel';
 import { MediaPanel } from './components/media/MediaPanel';
 import { PresentationPanel } from './components/presentation/PresentationPanel';
 import { SecurityPanel } from './components/security/SecurityPanel';
@@ -12,7 +14,7 @@ import { ConsolePanel } from './components/console/ConsolePanel';
 import { SettingsPanel } from './components/settings/SettingsPanel';
 
 export const AppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('media');
+  const [activeTab, setActiveTab] = useState<TabId>('scanner');
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-cyber-dark text-slate-100 select-none">
@@ -21,6 +23,8 @@ export const AppContent: React.FC = () => {
 
       {/* Tab View Pane Container */}
       <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col">
+        {activeTab === 'scanner' && <ScannerPanel />}
+        {activeTab === 'text' && <TextPanel />}
         {activeTab === 'media' && <MediaPanel />}
         {activeTab === 'reader' && <PresentationPanel />}
         {activeTab === 'security' && <SecurityPanel />}

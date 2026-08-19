@@ -1,11 +1,9 @@
 import React from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
-import { useSettings } from '../../context/SettingsContext';
-import { Key, Zap, Power, Cpu } from 'lucide-react';
+import { Key, Zap, Power } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { connectionState, statusMessage, connect, disconnect } = useBluetooth();
-  const { settings } = useSettings();
 
   const handleToggleConnection = async () => {
     if (connectionState === 'connected') {
@@ -38,17 +36,9 @@ export const Header: React.FC = () => {
             <Key className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-sm font-extrabold tracking-wider bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                MASTER-KEY
-              </h1>
-              {settings.useMockDriver && (
-                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono font-bold text-amber-400 flex items-center space-x-1">
-                  <Cpu className="w-2.5 h-2.5" />
-                  <span>SIM</span>
-                </span>
-              )}
-            </div>
+            <h1 className="text-sm font-extrabold tracking-wider bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              MASTER-KEY
+            </h1>
             <p className="text-[11px] text-slate-400 font-medium">BLE HID Bridge</p>
           </div>
         </div>

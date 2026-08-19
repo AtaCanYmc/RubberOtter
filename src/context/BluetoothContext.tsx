@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { ConnectionState, LogEntry } from '../@types/bluetooth';
 import { BleManager } from '../services/bluetooth/BleManager';
-import { MockBleDriver } from '../services/bluetooth/MockBleDriver';
 import { useSettings } from './SettingsContext';
 import { soundEffects } from '../services/audio/soundEffects';
-import { encodeFramedPacket } from '../protocol/framedProtocol';
 import { PROTOCOL_NAMES } from '../protocol/byteMap';
 
 interface BluetoothContextType {
@@ -32,7 +30,6 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [totalBytesSent, setTotalBytesSent] = useState<number>(0);
 
   const bleManagerRef = useRef<BleManager | null>(null);
-  const mockDriverRef = useRef<MockBleDriver | null>(null);
 
   const addLog = (log: LogEntry) => {
     setLogs((prev) => [log, ...prev].slice(0, 300));
@@ -45,34 +42,38 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   useEffect(() => {
     bleManagerRef.current = new BleManager(handleStateChange, addLog);
-    mockDriverRef.current = new MockBleDriver(handleStateChange, addLog);
   }, []);
 
   const connect = async (): Promise<boolean> => {
-    if (settings.useMockDriver) {
-      return await mockDriverRef.current!.connect();
-    } else {
-      return await bleManagerRef.current!.connect(
-        settings.serviceUuid,
-        settings.characteristicUuid
-      );
-    }
+    return await bleManagerRef.current!.connect(
+      settings.serviceUuid,
+      settings.characteristicUuid
+    );
   };
 
   const disconnect = async (): Promise<void> => {
-    if (settings.useMockDriver) {
-      await mockDriverRef.current!.disconnect();
-    } else {
-      await bleManagerRef.current!.disconnect();
-    }
+    await bleManagerRef.current!.disconnect();
   };
 
   const sendFramedAscii = async (
     payloadText: string,
     feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
   ): Promise<boolean> => {
-    const packet = encodeFramedPacket(payloadText);
-    return await sendPacket(packet, feedbackType);
+    if (settings.enableSound && feedbackType) {
+      soundEffects.playClick(feedbackType);
+    }
+    if (settings.enableHaptics && feedbackType) {
+      soundEffects.triggerHaptic(20);
+    }
+
+    const res = await bleManagerRef.current!.sendFramedWithAck(payloadText);
+
+    if (res.success) {
+      setTotalPacketsSent((p) => p + 1);
+      setTotalBytesSent((b) => b + payloadText.length + 7);
+    }
+
+    return res.success;
   };
 
   const sendByte = async (
@@ -80,7 +81,6 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
   ): Promise<boolean> => {
     if (settings.protocolMode === 'framed_ascii') {
-      // Convert byte action to framed ASCII command string equivalent
       const name = PROTOCOL_NAMES[byteCode] || `cmd_${byteCode}`;
       return await sendFramedAscii(`exec ${name}`, feedbackType);
     } else {
@@ -100,12 +100,7 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       soundEffects.triggerHaptic(20);
     }
 
-    let success = false;
-    if (settings.useMockDriver) {
-      success = await mockDriverRef.current!.sendPacket(data);
-    } else {
-      success = await bleManagerRef.current!.sendPacket(data);
-    }
+    const success = await bleManagerRef.current!.sendPacket(data);
 
     if (success) {
       setTotalPacketsSent((p) => p + 1);

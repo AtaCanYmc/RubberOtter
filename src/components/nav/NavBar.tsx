@@ -1,7 +1,7 @@
 import React from 'react';
-import { Music, Presentation, Shield, Gamepad2, MousePointer, Terminal, Settings } from 'lucide-react';
+import { Music, Presentation, Shield, Gamepad2, MousePointer, Terminal, Settings, Radar, Type } from 'lucide-react';
 
-export type TabId = 'media' | 'reader' | 'security' | 'gaming' | 'trackpad' | 'console' | 'settings';
+export type TabId = 'scanner' | 'text' | 'media' | 'reader' | 'security' | 'gaming' | 'trackpad' | 'console' | 'settings';
 
 interface NavBarProps {
   activeTab: TabId;
@@ -10,6 +10,8 @@ interface NavBarProps {
 
 export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
   const tabs = [
+    { id: 'scanner' as TabId, label: 'Scanner', icon: Radar },
+    { id: 'text' as TabId, label: 'Text', icon: Type },
     { id: 'media' as TabId, label: 'Media', icon: Music },
     { id: 'reader' as TabId, label: 'Reader', icon: Presentation },
     { id: 'security' as TabId, label: 'Security', icon: Shield },
@@ -21,7 +23,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
 
   return (
     <nav className="sticky bottom-0 z-40 glass-card border-t border-slate-800/80 px-2 py-1.5">
-      <div className="max-w-md mx-auto grid grid-cols-7 gap-0.5 text-center">
+      <div className="max-w-md mx-auto grid grid-cols-9 gap-0.5 text-center">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

@@ -15,16 +15,16 @@ A modern, responsive **Progressive Web Application (PWA)** built with **Vite, Re
 graph TD
     subgraph Frontend["PWA Web Application (RubberOtterWeb)"]
         UI["Web App UI (Vite + React + Tailwind)"]
-        BT_MGR["BluetoothManager / MockBleDriver"]
-        ENC["Packet Encoder (0x11 - 0x85)"]
+        BT_MGR["BluetoothManager Engine"]
+        ENC["Packet Encoder (0x11 - 0x85 & STX..ETX)"]
         
         UI -->|"User Action (Click/Touch)"| ENC
-        ENC -->|"Encode Bytes [0x80, dx, dy]"| BT_MGR
+        ENC -->|"Encode Bytes / Frames"| BT_MGR
     end
 
     subgraph Transport["Wireless & Serial Transport"]
         GATT["Web Bluetooth API (navigator.bluetooth)"]
-        BLE["HM-10 BLE Module (Service: 0xffe0, Char: 0xffe1)"]
+        BLE["HM-10 / ESP32 BLE Module"]
         UART["Serial1 UART @ 9600 Baud (TX1/RX1)"]
         
         BT_MGR -->|"GATT Write Characteristic"| GATT
@@ -33,12 +33,12 @@ graph TD
     end
 
     subgraph Backend["Arduino Firmware (ATmega32U4)"]
-        ARDUINO["Arduino Pro Micro Microcontroller"]
-        DECODER["Command Decoder Loop (switch-case)"]
+        ARDUINO["Arduino Microcontroller"]
+        DECODER["Command Decoder Loop"]
         HID_LIB["USB HID Stack (<Keyboard.h> & <Mouse.h>)"]
         JIGGLER["Background Mouse Jiggler (millis timer)"]
 
-        UART -->|"Serial1.read()"| ARDUINO
+        UART -->|"Serial Payload"| ARDUINO
         ARDUINO --> DECODER
         DECODER -->|"HID Action"| HID_LIB
         JIGGLER -.->|"Periodic Micro-movement"| HID_LIB
@@ -67,7 +67,6 @@ graph TD
 - 🔒 **Security & Utilities**: Workstation Lock (`Win + L`), Mouse Jiggler toggle switch with customizable interval timers, Task Manager shortcut (`Ctrl+Shift+Esc`), and Show Desktop (`Win+D`).
 - 🎮 **Gaming & Custom Macros**: Built-in CS Armor & Helmet Buy macro (`0x41`) + Interactive Custom Macro Builder saved in `localStorage`.
 - 🖱️ **Virtual Trackpad**: Interactive touch surface supporting multi-touch gestures (single tap for Left Click `0x81`, 2-finger tap for Right Click `0x82`), cursor tracking, scroll controls (`0x84`, `0x85`), and sensitivity slider (1.0x - 5.0x).
-- 🤖 **In-Browser Hardware Simulator**: Toggleable Mock Driver allowing full app testing without needing a physical HM-10 module connected.
 - 📜 **GATT Packet Terminal**: Live stream of all transmitted packets with timestamp, log category (`tx`, `info`, `warn`, `error`), Hex payload view, and copy logs functionality.
 - 🔊 **Tactile Feedback**: Synthesized Web Audio API mechanical click sounds & mobile Web Haptics (`navigator.vibrate`).
 

@@ -33,7 +33,6 @@ export const DEFAULT_MACROS: CustomMacro[] = [
 export const DEFAULT_SETTINGS: AppSettings = {
   serviceUuid: '0000ffe0-0000-1000-8000-00805f9b34fb',
   characteristicUuid: '0000ffe1-0000-1000-8000-00805f9b34fb',
-  useMockDriver: true, // Default to mock mode so user can immediately play in browser
   enableHaptics: true,
   enableSound: true,
   jiggleIntervalSec: 20,

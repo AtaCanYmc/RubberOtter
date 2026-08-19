@@ -23,7 +23,6 @@ export interface CustomMacro {
 export interface AppSettings {
   serviceUuid: string;
   characteristicUuid: string;
-  useMockDriver: boolean;
   enableHaptics: boolean;
   enableSound: boolean;
   jiggleIntervalSec: number;

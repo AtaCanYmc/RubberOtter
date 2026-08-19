@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { Settings, Cpu, Volume2, Smartphone, Shield, RotateCcw, Network } from 'lucide-react';
+import { Settings, Volume2, Smartphone, Shield, RotateCcw, Network } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../services/storage/macroStore';
 
 export const SettingsPanel: React.FC = () => {
@@ -63,33 +63,6 @@ export const SettingsPanel: React.FC = () => {
             <h4 className="text-xs font-bold">Framed ASCII Protocol</h4>
             <p className="text-[10px] text-slate-400 mt-1">RubberOtter STX/ETX Framed Stream</p>
           </button>
-        </div>
-      </div>
-
-      {/* Hardware Driver Mode Card */}
-      <div className="glass-card rounded-2xl p-5 space-y-4 shadow-xl border-amber-500/30">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-slate-200">Hardware Simulator Mode</h3>
-              <p className="text-[10px] text-slate-400">
-                Simulates HM-10 BLE without physical hardware
-              </p>
-            </div>
-          </div>
-
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.useMockDriver}
-              onChange={(e) => updateSettings({ useMockDriver: e.target.checked })}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500" />
-          </label>
         </div>
       </div>
 
