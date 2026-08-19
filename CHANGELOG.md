@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/AtaCanYmc/RubberOtter/compare/v1.1.1...v1.1.2) (2026-08-19)
+
+
+### Code Refactoring
+
+* update jiggler functionality and enhance command handling ([3ec0aaa](https://github.com/AtaCanYmc/RubberOtter/commit/3ec0aaaa20932ada350938d7a02d862df4527dd8))
+
 ## [1.1.1](https://github.com/AtaCanYmc/RubberOtter/compare/v1.1.0...v1.1.1) (2026-08-18)
 
 
