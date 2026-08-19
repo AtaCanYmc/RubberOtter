@@ -3,7 +3,7 @@ import { ConnectionState, LogEntry } from '../@types/bluetooth';
 import { BleManager } from '../services/bluetooth/BleManager';
 import { useSettings } from './SettingsContext';
 import { soundEffects } from '../services/audio/soundEffects';
-import { PROTOCOL_NAMES } from '../protocol/byteMap';
+import { PROTOCOL_ASCII_COMMANDS } from '../protocol/byteMap';
 
 interface BluetoothContextType {
   connectionState: ConnectionState;
@@ -78,10 +78,8 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const triggerVibrate = async (durationMs = 100): Promise<boolean> => {
-    // 1. Mobile browser haptic burst
     soundEffects.triggerHaptic(durationMs);
 
-    // 2. Transmit vibration command matching RubberOtterPy (vibrate <ms>) & Single-Byte (0x35)
     if (settings.protocolMode === 'framed_ascii') {
       return await sendFramedAscii(`vibrate ${durationMs}`, 'confirm');
     } else {
@@ -95,8 +93,13 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     feedbackType: 'subtle' | 'confirm' | 'toggle' | 'alert' = 'subtle'
   ): Promise<boolean> => {
     if (settings.protocolMode === 'framed_ascii') {
-      const name = PROTOCOL_NAMES[byteCode] || `cmd_${byteCode}`;
-      return await sendFramedAscii(`exec ${name}`, feedbackType);
+      let asciiCmd = PROTOCOL_ASCII_COMMANDS[byteCode] || `cmd_${byteCode}`;
+      if (settings.targetOs === 'macos') {
+        if (byteCode === 0x31) asciiCmd = 'press gui ctrl q';
+        else if (byteCode === 0x33) asciiCmd = 'press gui alt esc';
+        else if (byteCode === 0x34) asciiCmd = 'press gui f3';
+      }
+      return await sendFramedAscii(asciiCmd, feedbackType);
     } else {
       const packet = new Uint8Array([byteCode & 0xff]);
       return await sendPacket(packet, feedbackType);

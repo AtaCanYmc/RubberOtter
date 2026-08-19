@@ -60,3 +60,30 @@ export const PROTOCOL_NAMES: Record<number, string> = {
   0x84: 'Trackpad: Scroll Up',
   0x85: 'Trackpad: Scroll Down',
 };
+
+/**
+ * Exact Framed ASCII Command Strings matching RubberOtter C++ Executor & Python Client
+ */
+export const PROTOCOL_ASCII_COMMANDS: Record<number, string> = {
+  0x11: 'media play_pause',
+  0x12: 'media next',
+  0x13: 'media prev',
+  0x14: 'media volume_up',
+  0x15: 'media volume_down',
+  0x16: 'media mute',
+  0x21: 'press right',
+  0x22: 'press left',
+  0x23: 'press f5',
+  0x24: 'type "b"',
+  0x31: 'press gui l',
+  0x32: 'jiggler toggle',
+  0x33: 'press ctrl shift esc',
+  0x34: 'press gui d',
+  0x35: 'vibrate 100',
+  0x41: 'type "b" && delay 120 && type "4" && delay 120 && type "2"',
+  0x81: 'mouse click left',
+  0x82: 'mouse click right',
+  0x83: 'mouse click middle',
+  0x84: 'mouse scroll 1',
+  0x85: 'mouse scroll -1',
+};

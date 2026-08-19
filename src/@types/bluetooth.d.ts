@@ -2,6 +2,7 @@
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 export type ProtocolMode = 'single_byte' | 'framed_ascii';
+export type TargetOs = 'windows' | 'macos' | 'linux';
 
 export interface LogEntry {
   id: string;
@@ -28,4 +29,5 @@ export interface AppSettings {
   jiggleIntervalSec: number;
   trackpadSensitivity: number;
   protocolMode: ProtocolMode;
+  targetOs: TargetOs;
 }

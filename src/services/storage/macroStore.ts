@@ -1,7 +1,21 @@
-import { CustomMacro, AppSettings } from '../../@types/bluetooth';
+import { CustomMacro, AppSettings, TargetOs } from '../../@types/bluetooth';
 
 const MACROS_KEY = 'master_key_custom_macros_v1';
 const SETTINGS_KEY = 'master_key_settings_v1';
+
+const detectOs = (): TargetOs => {
+  if (typeof navigator !== 'undefined') {
+    const platform = navigator.platform.toLowerCase();
+    const ua = navigator.userAgent.toLowerCase();
+    if (platform.includes('mac') || ua.includes('macintosh') || ua.includes('mac os')) {
+      return 'macos';
+    }
+    if (platform.includes('linux') || ua.includes('linux')) {
+      return 'linux';
+    }
+  }
+  return 'windows';
+};
 
 export const DEFAULT_MACROS: CustomMacro[] = [
   {
@@ -38,6 +52,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   jiggleIntervalSec: 20,
   trackpadSensitivity: 2.5,
   protocolMode: 'single_byte',
+  targetOs: detectOs(),
 };
 
 export function loadSavedMacros(): CustomMacro[] {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
-import { Settings, Volume2, Smartphone, Shield, RotateCcw, Network } from 'lucide-react';
+import { Settings, Volume2, Smartphone, Shield, RotateCcw, Network, Monitor, Apple, Laptop } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../services/storage/macroStore';
 
 export const SettingsPanel: React.FC = () => {
@@ -19,7 +19,7 @@ export const SettingsPanel: React.FC = () => {
           </div>
           <div className="text-left">
             <h2 className="text-base font-bold text-slate-100">Application Settings</h2>
-            <p className="text-xs text-slate-400">GATT parameters & Protocol mode</p>
+            <p className="text-xs text-slate-400">Target Host OS & Protocol Mode</p>
           </div>
         </div>
 
@@ -30,6 +30,55 @@ export const SettingsPanel: React.FC = () => {
         >
           <RotateCcw className="w-4 h-4" />
         </button>
+      </div>
+
+      {/* Target Host OS Selection Card */}
+      <div className="glass-card rounded-2xl p-5 space-y-3 shadow-xl border-indigo-500/30">
+        <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
+          <Laptop className="w-4 h-4 text-indigo-400" />
+          <h3 className="text-xs font-bold text-slate-300">Target Host PC Operating System</h3>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2.5 pt-1">
+          <button
+            onClick={() => updateSettings({ targetOs: 'macos' })}
+            className={`p-3 rounded-xl border text-center transition-all ${
+              settings.targetOs === 'macos'
+                ? 'bg-brand-500/20 border-brand-500/50 text-brand-300 font-bold'
+                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Apple className="w-4 h-4 mx-auto mb-1 text-slate-200" />
+            <h4 className="text-xs font-bold">macOS</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">Apple Mac</p>
+          </button>
+
+          <button
+            onClick={() => updateSettings({ targetOs: 'windows' })}
+            className={`p-3 rounded-xl border text-center transition-all ${
+              settings.targetOs === 'windows'
+                ? 'bg-brand-500/20 border-brand-500/50 text-brand-300 font-bold'
+                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Monitor className="w-4 h-4 mx-auto mb-1 text-indigo-400" />
+            <h4 className="text-xs font-bold">Windows</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">PC / Surface</p>
+          </button>
+
+          <button
+            onClick={() => updateSettings({ targetOs: 'linux' })}
+            className={`p-3 rounded-xl border text-center transition-all ${
+              settings.targetOs === 'linux'
+                ? 'bg-brand-500/20 border-brand-500/50 text-brand-300 font-bold'
+                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Laptop className="w-4 h-4 mx-auto mb-1 text-amber-400" />
+            <h4 className="text-xs font-bold">Linux</h4>
+            <p className="text-[9px] text-slate-400 mt-0.5">Ubuntu / Debian</p>
+          </button>
+        </div>
       </div>
 
       {/* Protocol Selection Mode Card */}
