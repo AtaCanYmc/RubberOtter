@@ -2,17 +2,29 @@ import React, { useState } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
 import { PROTOCOL } from '../../protocol/byteMap';
-import { Lock, MousePointer, Cpu, LayoutGrid, Smartphone, Activity } from 'lucide-react';
+import { Lock, MousePointer, Cpu, LayoutGrid, Smartphone, Activity, Play } from 'lucide-react';
 
 export const SecurityPanel: React.FC = () => {
-  const { sendByte, triggerVibrate } = useBluetooth();
+  const { sendByte, sendFramedAscii, triggerVibrate } = useBluetooth();
   const { settings } = useSettings();
   const [jigglerActive, setJigglerActive] = useState(false);
 
   const handleJigglerToggle = () => {
     const newState = !jigglerActive;
     setJigglerActive(newState);
-    sendByte(PROTOCOL.SEC_JIGGLER_TOGGLE, 'toggle');
+    if (settings.protocolMode === 'framed_ascii') {
+      sendFramedAscii(newState ? 'jiggler on' : 'jiggler off', 'toggle');
+    } else {
+      sendByte(PROTOCOL.SEC_JIGGLER_TOGGLE, 'toggle');
+    }
+  };
+
+  const handleTestJigglePulse = () => {
+    if (settings.protocolMode === 'framed_ascii') {
+      sendFramedAscii('jiggler toggle', 'subtle');
+    } else {
+      sendByte(PROTOCOL.SEC_JIGGLER_TOGGLE, 'subtle');
+    }
   };
 
   return (
@@ -33,7 +45,7 @@ export const SecurityPanel: React.FC = () => {
           </div>
           <div className="text-left">
             <h3 className="text-base font-bold text-rose-200">Lock Workstation</h3>
-            <p className="text-xs text-rose-400/80">Sends Win + L Shortcut (0x31)</p>
+            <p className="text-xs text-rose-400/80">Sends Lock Shortcut ({settings.targetOs === 'macos' ? 'Ctrl+Cmd+Q' : 'Win+L'})</p>
           </div>
         </div>
         <span className="px-3 py-1 rounded-lg bg-rose-950/60 border border-rose-500/30 text-xs font-mono text-rose-300">
@@ -96,23 +108,34 @@ export const SecurityPanel: React.FC = () => {
             </div>
           </div>
 
-          {/* Switch */}
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={jigglerActive}
-              onChange={handleJigglerToggle}
-              className="sr-only peer"
-            />
-            <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
-          </label>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleTestJigglePulse}
+              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-bold text-emerald-300 transition-all active:scale-95 flex items-center space-x-1"
+              title="Test 20px Square Pulse"
+            >
+              <Play className="w-3 h-3 text-emerald-400" />
+              <span>Test Pulse</span>
+            </button>
+
+            {/* Switch */}
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={jigglerActive}
+                onChange={handleJigglerToggle}
+                className="sr-only peer"
+              />
+              <div className="w-12 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-300 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
+            </label>
+          </div>
         </div>
 
         <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs flex items-center justify-between text-slate-400">
           <div className="flex items-center space-x-2">
             <span>Status:</span>
             <strong className={jigglerActive ? 'text-emerald-400 font-bold' : 'text-slate-400 font-normal'}>
-              {jigglerActive ? `Active (${settings.jiggleIntervalSec}s interval)` : 'Disabled'}
+              {jigglerActive ? `Active (5s 20px Square Pulse)` : 'Disabled'}
             </strong>
           </div>
           <span
@@ -134,8 +157,12 @@ export const SecurityPanel: React.FC = () => {
             <Cpu className="w-5 h-5" />
           </div>
           <div className="text-left">
-            <h4 className="text-xs font-bold text-slate-200">Task Manager</h4>
-            <p className="text-[10px] text-slate-400">Ctrl+Shift+Esc</p>
+            <h4 className="text-xs font-bold text-slate-200">
+              {settings.targetOs === 'macos' ? 'Force Quit' : 'Task Manager'}
+            </h4>
+            <p className="text-[10px] text-slate-400">
+              {settings.targetOs === 'macos' ? 'Cmd+Opt+Esc' : 'Ctrl+Shift+Esc'}
+            </p>
           </div>
         </button>
 
@@ -149,7 +176,9 @@ export const SecurityPanel: React.FC = () => {
           </div>
           <div className="text-left">
             <h4 className="text-xs font-bold text-slate-200">Show Desktop</h4>
-            <p className="text-[10px] text-slate-400">Win + D</p>
+            <p className="text-[10px] text-slate-400">
+              {settings.targetOs === 'macos' ? 'Cmd + F3' : 'Win + D'}
+            </p>
           </div>
         </button>
       </div>
