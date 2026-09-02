@@ -25,7 +25,7 @@ interface ScannedDevice {
 
 export const ScannerPanel: React.FC = () => {
   const { connectionState, connect, disconnect } = useBluetooth();
-  const { settings } = useSettings();
+  const { settings, t } = useSettings();
 
   const [isScanning, setIsScanning] = useState(false);
   const [devices, setDevices] = useState<ScannedDevice[]>([]);
@@ -99,9 +99,9 @@ export const ScannerPanel: React.FC = () => {
 
   const getRssiColor = (rssi?: number) => {
     if (!rssi) return 'text-zinc-500';
-    if (rssi >= -65) return 'text-emerald-400';
-    if (rssi >= -78) return 'text-amber-400';
-    return 'text-rose-400';
+    if (rssi >= -65) return 'text-emerald-500 dark:text-emerald-400';
+    if (rssi >= -78) return 'text-amber-500 dark:text-amber-400';
+    return 'text-rose-500 dark:text-rose-400';
   };
 
   return (
@@ -109,18 +109,18 @@ export const ScannerPanel: React.FC = () => {
       {/* Action Header Card */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center space-x-3.5">
-          <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-otter-400 shadow-subtle">
-            <Radio className={`w-5 h-5 ${isScanning ? 'animate-spin text-otter-400' : ''}`} />
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center text-otter-600 dark:text-otter-400 shadow-subtle">
+            <Radio className={`w-5 h-5 ${isScanning ? 'animate-spin text-otter-600 dark:text-otter-400' : ''}`} />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-semibold text-zinc-100">BLE Device Scanner</h2>
-              <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/50 text-[10px] font-mono text-zinc-300">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('scanner.title')}</h2>
+              <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/50 text-[10px] font-mono text-zinc-700 dark:text-zinc-300">
                 GATT 0xFFE0
               </span>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Discover and pair with HM-10, BT05, or ESP32 Bluetooth Low Energy modules
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              {t('scanner.description')}
             </p>
           </div>
         </div>
@@ -128,25 +128,25 @@ export const ScannerPanel: React.FC = () => {
         <button
           onClick={handleStartScan}
           disabled={isScanning}
-          className="btn-tactile px-4 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50"
+          className="btn-tactile px-4 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 border border-zinc-900 dark:border-zinc-200"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-          <span>{isScanning ? 'Scanning...' : 'Start Scan'}</span>
+          <span>{isScanning ? t('scanner.scanning') : t('scanner.startScan')}</span>
         </button>
       </div>
 
       {/* Experimental Advertisements Banner */}
       {hasLeScanSupport && (
-        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-          <span>Web Bluetooth LE Advertisement Scanning API is supported in your browser.</span>
+        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-medium">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+          <span>{t('scanner.advertisementSupport')}</span>
         </div>
       )}
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-rose-950/30 border border-rose-500/30 text-rose-300 text-xs font-medium">
-          <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-rose-500/10 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs font-medium">
+          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -154,29 +154,29 @@ export const ScannerPanel: React.FC = () => {
       {/* Discovered Devices Container */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center space-x-2">
-            <Bluetooth className="w-3.5 h-3.5 text-otter-400" />
-            <span>Discovered Hardware ({devices.length})</span>
+          <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center space-x-2">
+            <Bluetooth className="w-3.5 h-3.5 text-otter-600 dark:text-otter-400" />
+            <span>{t('scanner.discovered')} ({devices.length})</span>
           </h3>
           {devices.length > 0 && (
             <button
               onClick={() => setDevices([])}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors"
             >
-              Clear List
+              {t('scanner.clearList')}
             </button>
           )}
         </div>
 
         {devices.length === 0 && !isScanning ? (
           <div className="instrument-card rounded-xl p-8 text-center space-y-3">
-            <div className="w-11 h-11 rounded-lg bg-zinc-900 border border-zinc-800 mx-auto flex items-center justify-center text-zinc-500">
-              <Radar className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mx-auto flex items-center justify-center text-zinc-600 dark:text-zinc-300">
+              <Radar className="w-5 h-5 text-otter-600 dark:text-otter-400" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-zinc-300">No BLE Devices Found Yet</h4>
-              <p className="text-xs text-zinc-500 max-w-sm mx-auto mt-1">
-                Click <strong>Start Scan</strong> above to open the native Web Bluetooth picker and connect to your Rubber Otter microcontroller.
+              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">{t('scanner.noDevices')}</h4>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mt-1">
+                {t('scanner.noDevicesDesc')}
               </p>
             </div>
           </div>
@@ -189,8 +189,8 @@ export const ScannerPanel: React.FC = () => {
                   key={device.id}
                   className={`instrument-card rounded-xl p-4 transition-all duration-150 border ${
                     isConnected
-                      ? 'border-emerald-500/40 bg-emerald-950/10'
-                      : 'border-zinc-800/80 hover:border-zinc-700'
+                      ? 'border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-950/10'
+                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -198,8 +198,8 @@ export const ScannerPanel: React.FC = () => {
                       <div
                         className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                           isConnected
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-zinc-850 text-zinc-300 border border-zinc-700/60'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                            : 'bg-zinc-100 dark:bg-zinc-850 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60'
                         }`}
                       >
                         <Cpu className="w-4 h-4" />
@@ -207,22 +207,22 @@ export const ScannerPanel: React.FC = () => {
 
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="text-xs font-semibold text-zinc-100">{device.name}</h4>
+                          <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{device.name}</h4>
                           {isConnected && (
-                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-medium text-emerald-400 flex items-center space-x-1">
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-medium text-emerald-700 dark:text-emerald-400 flex items-center space-x-1">
                               <CheckCircle2 className="w-2.5 h-2.5" />
-                              <span>Connected</span>
+                              <span>{t('scanner.connectedBadge')}</span>
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center space-x-3 mt-1 text-[11px] text-zinc-400 font-mono">
+                        <div className="flex items-center space-x-3 mt-1 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                           <span className={`flex items-center space-x-1 ${getRssiColor(device.rssi)}`}>
                             <Signal className="w-3 h-3" />
                             <span>{device.rssi} dBm</span>
                           </span>
-                          <span className="text-zinc-600">•</span>
-                          <span>Seen: {device.lastSeen}</span>
+                          <span className="text-zinc-400 dark:text-zinc-600">•</span>
+                          <span>{t('scanner.seen')}: {device.lastSeen}</span>
                         </div>
                       </div>
                     </div>
@@ -231,16 +231,16 @@ export const ScannerPanel: React.FC = () => {
                       onClick={isConnected ? disconnect : connect}
                       className={`btn-tactile px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 border ${
                         isConnected
-                          ? 'bg-zinc-900 hover:bg-zinc-850 text-rose-400 border-rose-500/30'
-                          : 'bg-zinc-800 hover:bg-zinc-750 text-zinc-100 border-zinc-700/60'
+                          ? 'bg-zinc-100 hover:bg-zinc-200 text-rose-600 dark:bg-zinc-900 dark:hover:bg-zinc-850 dark:text-rose-400 border-rose-500/30'
+                          : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 border-zinc-900 dark:border-zinc-200'
                       }`}
                     >
                       {isConnected ? (
-                        <span>Disconnect</span>
+                        <span>{t('scanner.disconnectBtn')}</span>
                       ) : (
                         <>
-                          <span>Connect</span>
-                          <ArrowRight className="w-3 h-3 text-zinc-400" />
+                          <span>{t('scanner.connectBtn')}</span>
+                          <ArrowRight className="w-3 h-3" />
                         </>
                       )}
                     </button>

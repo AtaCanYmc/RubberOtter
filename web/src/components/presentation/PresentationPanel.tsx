@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
+import { useSettings } from '../../context/SettingsContext';
 import { PROTOCOL } from '../../protocol/byteMap';
 import { ChevronLeft, ChevronRight, Maximize, Play, Pause, RotateCcw, Clock, Monitor } from 'lucide-react';
 
 export const PresentationPanel: React.FC = () => {
   const { sendByte } = useBluetooth();
+  const { t } = useSettings();
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
 
@@ -46,7 +48,7 @@ export const PresentationPanel: React.FC = () => {
             <Clock className="w-5 h-5 text-otter-600 dark:text-otter-400" />
           </div>
           <div>
-            <h2 className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Presentation Timer</h2>
+            <h2 className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t('presentation.timer')}</h2>
             <p className="text-xl font-mono font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{formatTime(seconds)}</p>
           </div>
         </div>
@@ -57,7 +59,7 @@ export const PresentationPanel: React.FC = () => {
             className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-200 text-xs font-semibold border border-zinc-200 dark:border-zinc-700/60 flex items-center space-x-1.5"
           >
             {isActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span>{isActive ? 'Pause' : 'Start'}</span>
+            <span>{isActive ? t('presentation.pause') : t('presentation.start')}</span>
           </button>
           <button
             onClick={() => {
@@ -65,7 +67,7 @@ export const PresentationPanel: React.FC = () => {
               setSeconds(0);
             }}
             className="btn-tactile p-2 rounded-lg bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-800"
-            title="Reset Timer"
+            title={t('presentation.reset')}
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -83,8 +85,8 @@ export const PresentationPanel: React.FC = () => {
             <ChevronLeft className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Previous Slide</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Left Arrow (←) keystroke</p>
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('presentation.prevSlide')}</h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{t('presentation.prevDesc')}</p>
           </div>
         </button>
 
@@ -97,8 +99,8 @@ export const PresentationPanel: React.FC = () => {
             <ChevronRight className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold">Next Slide</h3>
-            <p className="text-xs text-zinc-300 dark:text-zinc-700 mt-0.5">Right Arrow (→) keystroke</p>
+            <h3 className="text-sm font-semibold">{t('presentation.nextSlide')}</h3>
+            <p className="text-xs text-zinc-300 dark:text-zinc-700 mt-0.5">{t('presentation.nextDesc')}</p>
           </div>
         </button>
       </div>
@@ -110,7 +112,7 @@ export const PresentationPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-3.5 flex items-center justify-center space-x-2 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800"
         >
           <Maximize className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <span className="text-xs font-medium">Fullscreen (F5)</span>
+          <span className="text-xs font-medium">{t('presentation.fullscreen')}</span>
         </button>
 
         <button
@@ -118,7 +120,7 @@ export const PresentationPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-3.5 flex items-center justify-center space-x-2 text-zinc-700 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800"
         >
           <Monitor className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <span className="text-xs font-medium">Black Screen (B)</span>
+          <span className="text-xs font-medium">{t('presentation.blackScreen')}</span>
         </button>
       </div>
     </div>

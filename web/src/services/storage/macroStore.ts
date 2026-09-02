@@ -1,4 +1,4 @@
-import { CustomMacro, AppSettings, TargetOs } from '../../@types/bluetooth';
+import { CustomMacro, AppSettings, TargetOs, Language } from '../../@types/bluetooth';
 
 const MACROS_KEY = 'master_key_custom_macros_v1';
 const SETTINGS_KEY = 'master_key_settings_v1';
@@ -15,6 +15,17 @@ const detectOs = (): TargetOs => {
     }
   }
   return 'windows';
+};
+
+const detectLanguage = (): Language => {
+  if (typeof navigator !== 'undefined') {
+    const lang = (navigator.language || '').toLowerCase();
+    if (lang.startsWith('tr')) return 'tr';
+    if (lang.startsWith('de')) return 'de';
+    if (lang.startsWith('fr')) return 'fr';
+    if (lang.startsWith('es')) return 'es';
+  }
+  return 'en';
 };
 
 export const DEFAULT_MACROS: CustomMacro[] = [
@@ -54,6 +65,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   protocolMode: 'single_byte',
   targetOs: detectOs(),
   themeMode: 'dark',
+  language: detectLanguage(),
 };
 
 export function loadSavedMacros(): CustomMacro[] {

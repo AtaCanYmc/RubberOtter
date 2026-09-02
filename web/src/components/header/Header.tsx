@@ -6,7 +6,7 @@ import { RubberOtterLogo } from '../brand/RubberOtterLogo';
 
 export const Header: React.FC = () => {
   const { connectionState, statusMessage, connect, disconnect } = useBluetooth();
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, t } = useSettings();
 
   const handleToggleConnection = async () => {
     if (connectionState === 'connected') {
@@ -27,21 +27,21 @@ export const Header: React.FC = () => {
         return (
           <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-            <span>Connected</span>
+            <span>{t('header.connected')}</span>
           </span>
         );
       case 'connecting':
         return (
           <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
-            <span>Connecting...</span>
+            <span>{t('header.connecting')}</span>
           </span>
         );
       case 'error':
         return (
           <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-rose-500 dark:bg-rose-400" />
-            <span>Error</span>
+            <span>{t('header.error')}</span>
           </span>
         );
       case 'disconnected':
@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
         return (
           <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-600 dark:text-zinc-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-            <span>Ready</span>
+            <span>{t('header.ready')}</span>
           </span>
         );
     }
@@ -71,7 +71,7 @@ export const Header: React.FC = () => {
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center space-x-1.5">
-              <span>BLE HID Bridge</span>
+              <span>{t('header.bleBridge')}</span>
               <span className="text-zinc-400 dark:text-zinc-600">•</span>
               <span className="uppercase text-zinc-600 dark:text-zinc-400">{settings.targetOs}</span>
             </p>
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
           <button
             onClick={handleToggleTheme}
             className="btn-tactile p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
-            title={settings.themeMode === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            title={settings.themeMode === 'dark' ? t('header.switchLight') : t('header.switchDark')}
           >
             {settings.themeMode === 'dark' ? (
               <Sun className="w-4 h-4 text-amber-400" />
@@ -114,12 +114,12 @@ export const Header: React.FC = () => {
             {connectionState === 'connected' ? (
               <>
                 <Power className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">Disconnect</span>
+                <span className="hidden xs:inline">{t('header.disconnect')}</span>
               </>
             ) : (
               <>
                 <Bluetooth className="w-3.5 h-3.5" />
-                <span>{connectionState === 'connecting' ? 'Connecting...' : 'Connect'}</span>
+                <span>{connectionState === 'connecting' ? t('header.connecting') : t('header.connect')}</span>
               </>
             )}
           </button>

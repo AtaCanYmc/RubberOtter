@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { Language } from '../../@types/bluetooth';
 import {
   Settings,
   Volume2,
@@ -11,16 +12,25 @@ import {
   Apple,
   Laptop,
   Moon,
-  Sun
+  Sun,
+  Globe
 } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../services/storage/macroStore';
 
 export const SettingsPanel: React.FC = () => {
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, t, setLanguage } = useSettings();
 
   const handleResetSettings = () => {
     updateSettings(DEFAULT_SETTINGS);
   };
+
+  const languages: { id: Language; label: string; flag: string; nativeName: string }[] = [
+    { id: 'en', label: 'English', flag: '🇬🇧', nativeName: 'English' },
+    { id: 'tr', label: 'Türkçe', flag: '🇹🇷', nativeName: 'Türkçe' },
+    { id: 'de', label: 'Deutsch', flag: '🇩🇪', nativeName: 'Deutsch' },
+    { id: 'fr', label: 'Français', flag: '🇫🇷', nativeName: 'Français' },
+    { id: 'es', label: 'Español', flag: '🇪🇸', nativeName: 'Español' },
+  ];
 
   return (
     <div className="flex-1 flex flex-col space-y-4">
@@ -31,25 +41,54 @@ export const SettingsPanel: React.FC = () => {
             <Settings className="w-5 h-5 text-otter-600 dark:text-otter-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Application Configuration</h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Appearance theme, target OS, protocol engine & GATT parameters</p>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('settings.title')}</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{t('settings.description')}</p>
           </div>
         </div>
 
         <button
           onClick={handleResetSettings}
           className="btn-tactile p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-800 transition-colors"
-          title="Reset to Factory Defaults"
+          title={t('settings.resetDefaults')}
         >
           <RotateCcw className="w-4 h-4" />
         </button>
+      </div>
+
+      {/* Language Selector */}
+      <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3">
+        <div className="flex items-center space-x-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+          <Globe className="w-4 h-4 text-otter-600 dark:text-otter-400" />
+          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('settings.languageTitle')}</h3>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 pt-1">
+          {languages.map((lang) => {
+            const isSelected = settings.language === lang.id;
+            return (
+              <button
+                key={lang.id}
+                onClick={() => setLanguage(lang.id)}
+                className={`btn-tactile p-3 rounded-lg border text-center transition-all ${
+                  isSelected
+                    ? 'bg-otter-500/10 dark:bg-otter-950/40 border-otter-500 text-otter-900 dark:text-otter-200 font-semibold shadow-sm'
+                    : 'bg-white/80 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-850 hover:text-zinc-900 dark:hover:text-zinc-200'
+                }`}
+              >
+                <span className="text-lg block mb-1">{lang.flag}</span>
+                <h4 className="text-xs font-semibold">{lang.label}</h4>
+                <p className="text-[10px] opacity-75 font-mono mt-0.5">{lang.nativeName}</p>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Appearance Theme Selector */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3">
         <div className="flex items-center space-x-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
           <Moon className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Appearance Theme</h3>
+          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('settings.themeTitle')}</h3>
         </div>
 
         <div className="grid grid-cols-3 gap-2.5 pt-1">
@@ -63,8 +102,8 @@ export const SettingsPanel: React.FC = () => {
             }`}
           >
             <Moon className={`w-4 h-4 mx-auto mb-1.5 ${settings.themeMode === 'dark' ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-500 dark:text-zinc-400'}`} />
-            <h4 className="text-xs font-semibold">Dark</h4>
-            <p className="text-[10px] opacity-75 font-mono mt-0.5">Obsidian Dark</p>
+            <h4 className="text-xs font-semibold">{t('settings.dark')}</h4>
+            <p className="text-[10px] opacity-75 font-mono mt-0.5">{t('settings.darkDesc')}</p>
           </button>
 
           {/* Light Mode */}
@@ -77,8 +116,8 @@ export const SettingsPanel: React.FC = () => {
             }`}
           >
             <Sun className={`w-4 h-4 mx-auto mb-1.5 ${settings.themeMode === 'light' ? 'text-amber-500' : 'text-zinc-500 dark:text-zinc-400'}`} />
-            <h4 className="text-xs font-semibold">Light</h4>
-            <p className="text-[10px] opacity-75 font-mono mt-0.5">Clean White</p>
+            <h4 className="text-xs font-semibold">{t('settings.light')}</h4>
+            <p className="text-[10px] opacity-75 font-mono mt-0.5">{t('settings.lightDesc')}</p>
           </button>
 
           {/* System Auto */}
@@ -91,8 +130,8 @@ export const SettingsPanel: React.FC = () => {
             }`}
           >
             <Monitor className={`w-4 h-4 mx-auto mb-1.5 ${settings.themeMode === 'system' ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-500 dark:text-zinc-400'}`} />
-            <h4 className="text-xs font-semibold">System</h4>
-            <p className="text-[10px] opacity-75 font-mono mt-0.5">OS Sync</p>
+            <h4 className="text-xs font-semibold">{t('settings.system')}</h4>
+            <p className="text-[10px] opacity-75 font-mono mt-0.5">{t('settings.systemDesc')}</p>
           </button>
         </div>
       </div>
@@ -101,7 +140,7 @@ export const SettingsPanel: React.FC = () => {
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3">
         <div className="flex items-center space-x-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
           <Laptop className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Target Host PC Operating System</h3>
+          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('settings.targetOsTitle')}</h3>
         </div>
 
         <div className="grid grid-cols-3 gap-2.5 pt-1">
@@ -153,7 +192,7 @@ export const SettingsPanel: React.FC = () => {
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3">
         <div className="flex items-center space-x-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
           <Network className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Bluetooth Protocol Engine</h3>
+          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('settings.protocolTitle')}</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
@@ -165,8 +204,8 @@ export const SettingsPanel: React.FC = () => {
                 : 'bg-white/80 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-850 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <h4 className="text-xs font-semibold">Single-Byte Protocol</h4>
-            <p className="text-[11px] opacity-75 font-mono mt-1">Direct HEX Codes (0x11 - 0x85)</p>
+            <h4 className="text-xs font-semibold">{t('settings.singleByteTitle')}</h4>
+            <p className="text-[11px] opacity-75 font-mono mt-1">{t('settings.singleByteDesc')}</p>
           </button>
 
           <button
@@ -177,8 +216,8 @@ export const SettingsPanel: React.FC = () => {
                 : 'bg-white/80 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-850 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <h4 className="text-xs font-semibold">Framed ASCII Protocol</h4>
-            <p className="text-[11px] opacity-75 font-mono mt-1">STX/ETX Framed + XOR Checksum</p>
+            <h4 className="text-xs font-semibold">{t('settings.framedAsciiTitle')}</h4>
+            <p className="text-[11px] opacity-75 font-mono mt-1">{t('settings.framedAsciiDesc')}</p>
           </button>
         </div>
       </div>
@@ -186,7 +225,7 @@ export const SettingsPanel: React.FC = () => {
       {/* Feedback & Haptics */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3.5">
         <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 pb-2 border-b border-zinc-200 dark:border-zinc-800">
-          Feedback & Sound Effects
+          {t('settings.feedbackTitle')}
         </h3>
 
         {/* Sound Effects */}
@@ -194,8 +233,8 @@ export const SettingsPanel: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Volume2 className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
             <div>
-              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">Audio Clicks</h4>
-              <p className="text-[11px] text-zinc-500">Synthesizes Web Audio click sounds on interaction</p>
+              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">{t('settings.soundEffects')}</h4>
+              <p className="text-[11px] text-zinc-500">{t('settings.soundDesc')}</p>
             </div>
           </div>
 
@@ -215,8 +254,8 @@ export const SettingsPanel: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Smartphone className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
             <div>
-              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">Mobile Haptics</h4>
-              <p className="text-[11px] text-zinc-500">Triggers vibration pulses on mobile devices</p>
+              <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">{t('settings.mobileHaptics')}</h4>
+              <p className="text-[11px] text-zinc-500">{t('settings.hapticsDesc')}</p>
             </div>
           </div>
 
@@ -236,12 +275,12 @@ export const SettingsPanel: React.FC = () => {
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3.5">
         <div className="flex items-center space-x-2 pb-2 border-b border-zinc-200 dark:border-zinc-800">
           <Shield className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">HM-10 GATT UUID Parameters</h3>
+          <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('settings.gattTitle')}</h3>
         </div>
 
         <div className="space-y-3">
           <div>
-            <label className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 block mb-1">GATT Service UUID</label>
+            <label className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 block mb-1">{t('settings.serviceUuid')}</label>
             <input
               type="text"
               value={settings.serviceUuid}
@@ -251,7 +290,7 @@ export const SettingsPanel: React.FC = () => {
           </div>
 
           <div>
-            <label className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 block mb-1">Characteristic UUID</label>
+            <label className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 block mb-1">{t('settings.charUuid')}</label>
             <input
               type="text"
               value={settings.characteristicUuid}

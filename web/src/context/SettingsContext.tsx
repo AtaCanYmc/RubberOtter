@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AppSettings, CustomMacro } from '../@types/bluetooth';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { AppSettings, CustomMacro, Language } from '../@types/bluetooth';
 import { loadSavedSettings, saveSettings, loadSavedMacros, saveMacros } from '../services/storage/macroStore';
+import { translations, Translations } from '../i18n/translations';
 
 interface SettingsContextType {
   settings: AppSettings;
@@ -8,6 +9,9 @@ interface SettingsContextType {
   macros: CustomMacro[];
   addMacro: (macro: CustomMacro) => void;
   deleteMacro: (id: string) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: keyof Translations) => string;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -58,6 +62,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setSettings((prev) => ({ ...prev, ...newSettings }));
   };
 
+  const setLanguage = (lang: Language) => {
+    updateSettings({ language: lang });
+  };
+
   const addMacro = (macro: CustomMacro) => {
     setMacros((prev) => [...prev.filter((m) => m.id !== macro.id), macro]);
   };
@@ -66,8 +74,29 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setMacros((prev) => prev.filter((m) => m.id !== id));
   };
 
+  const currentLang: Language = settings.language || 'en';
+
+  const t = useCallback(
+    (key: keyof Translations): string => {
+      const dict = translations[currentLang] || translations.en;
+      return dict[key] || translations.en[key] || (key as string);
+    },
+    [currentLang]
+  );
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, macros, addMacro, deleteMacro }}>
+    <SettingsContext.Provider
+      value={{
+        settings,
+        updateSettings,
+        macros,
+        addMacro,
+        deleteMacro,
+        language: currentLang,
+        setLanguage,
+        t,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );
@@ -79,4 +108,9 @@ export const useSettings = () => {
     throw new Error('useSettings must be used within a SettingsProvider');
   }
   return context;
+};
+
+export const useTranslation = () => {
+  const { t, language, setLanguage } = useSettings();
+  return { t, language, setLanguage };
 };

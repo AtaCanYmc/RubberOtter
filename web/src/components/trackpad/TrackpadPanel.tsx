@@ -7,7 +7,7 @@ import { MousePointer, Sliders, ArrowUp, ArrowDown } from 'lucide-react';
 
 export const TrackpadPanel: React.FC = () => {
   const { sendByte, sendPacket } = useBluetooth();
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, t } = useSettings();
   const trackpadRef = useRef<HTMLDivElement>(null);
   const pointerRef = useRef<HTMLDivElement>(null);
 
@@ -151,13 +151,13 @@ export const TrackpadPanel: React.FC = () => {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        className="flex-1 instrument-card trackpad-surface rounded-xl border-zinc-800 relative flex flex-col items-center justify-center touch-none overflow-hidden select-none min-h-[260px] sm:min-h-[320px] cursor-crosshair group"
+        className="flex-1 instrument-card trackpad-surface rounded-xl border-zinc-200 dark:border-zinc-800 relative flex flex-col items-center justify-center touch-none overflow-hidden select-none min-h-[260px] sm:min-h-[320px] cursor-crosshair group"
       >
-        <div className="text-center pointer-events-none space-y-1.5 opacity-40 group-hover:opacity-70 transition-opacity">
-          <MousePointer className="w-8 h-8 mx-auto text-otter-400" />
-          <p className="text-xs font-semibold text-zinc-300">Touch & Drag to Navigate Host Cursor</p>
-          <p className="text-[11px] text-zinc-500 font-mono">
-            Tap = Left Click • 2-Finger Tap = Right Click
+        <div className="text-center pointer-events-none space-y-1.5 opacity-60 group-hover:opacity-90 transition-opacity">
+          <MousePointer className="w-8 h-8 mx-auto text-otter-600 dark:text-otter-400" />
+          <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">{t('trackpad.dragPrompt')}</p>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
+            {t('trackpad.gestureHint')}
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export const TrackpadPanel: React.FC = () => {
           <div
             ref={pointerRef}
             style={{ left: `${pointerPos.x}px`, top: `${pointerPos.y}px` }}
-            className="absolute w-6 h-6 rounded-full bg-otter-400/30 border-2 border-otter-400 pointer-events-none transform -translate-x-1/2 -translate-y-1/2 shadow-subtle transition-transform duration-75"
+            className="absolute w-6 h-6 rounded-full bg-otter-500/30 border-2 border-otter-500 pointer-events-none transform -translate-x-1/2 -translate-y-1/2 shadow-subtle transition-transform duration-75"
           />
         )}
       </div>
@@ -174,8 +174,8 @@ export const TrackpadPanel: React.FC = () => {
       {/* Sensitivity Slider & Scroll Steppers */}
       <div className="instrument-card rounded-xl px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center space-x-2.5 flex-1">
-          <Sliders className="w-4 h-4 text-zinc-400 flex-shrink-0" />
-          <span className="text-xs font-medium text-zinc-400 whitespace-nowrap">Sensitivity:</span>
+          <Sliders className="w-4 h-4 text-zinc-500 dark:text-zinc-400 flex-shrink-0" />
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 whitespace-nowrap">{t('trackpad.sensitivity')}</span>
           <input
             type="range"
             min="1"
@@ -183,24 +183,24 @@ export const TrackpadPanel: React.FC = () => {
             step="0.5"
             value={settings.trackpadSensitivity}
             onChange={handleSensitivityChange}
-            className="w-full accent-otter-400 h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-otter-500 h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer"
           />
-          <span className="text-xs font-mono font-semibold text-otter-400 min-w-[32px]">
+          <span className="text-xs font-mono font-semibold text-otter-600 dark:text-otter-400 min-w-[32px]">
             {settings.trackpadSensitivity.toFixed(1)}x
           </span>
         </div>
 
-        <div className="flex items-center space-x-1.5 border-l border-zinc-800 pl-3">
+        <div className="flex items-center space-x-1.5 border-l border-zinc-200 dark:border-zinc-800 pl-3">
           <button
             onClick={() => sendByte(PROTOCOL.MOUSE_SCROLL_UP, 'subtle')}
-            className="btn-tactile p-2 rounded-lg bg-zinc-900 hover:bg-zinc-850 text-zinc-300 border border-zinc-800"
+            className="btn-tactile p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800"
             title="Scroll Up"
           >
             <ArrowUp className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => sendByte(PROTOCOL.MOUSE_SCROLL_DOWN, 'subtle')}
-            className="btn-tactile p-2 rounded-lg bg-zinc-900 hover:bg-zinc-850 text-zinc-300 border border-zinc-800"
+            className="btn-tactile p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800"
             title="Scroll Down"
           >
             <ArrowDown className="w-3.5 h-3.5" />
@@ -212,15 +212,15 @@ export const TrackpadPanel: React.FC = () => {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => sendByte(PROTOCOL.MOUSE_LEFT_CLICK, 'subtle')}
-          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl py-4 font-semibold text-xs text-zinc-200 border-zinc-800"
+          className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl py-4 font-semibold text-xs text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800"
         >
-          Left Click
+          {t('trackpad.leftClick')}
         </button>
         <button
           onClick={() => sendByte(PROTOCOL.MOUSE_RIGHT_CLICK, 'confirm')}
-          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl py-4 font-semibold text-xs text-zinc-200 border-zinc-800"
+          className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl py-4 font-semibold text-xs text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-800"
         >
-          Right Click
+          {t('trackpad.rightClick')}
         </button>
       </div>
     </div>

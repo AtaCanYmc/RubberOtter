@@ -5,7 +5,7 @@ import { Type, Send, CornerDownLeft, Trash2, Copy, Sparkles, Terminal, Check } f
 
 export const TextPanel: React.FC = () => {
   const { connectionState, sendFramedAscii, sendPacket } = useBluetooth();
-  const { settings } = useSettings();
+  const { settings, t } = useSettings();
 
   const [text, setText] = useState('');
   const [autoEnter, setAutoEnter] = useState(true);
@@ -25,7 +25,7 @@ export const TextPanel: React.FC = () => {
     if (!text.trim()) return;
 
     setIsSending(true);
-    setStatusText('Transmitting text payload...');
+    setStatusText(t('text.transmitting'));
 
     try {
       if (settings.protocolMode === 'framed_ascii') {
@@ -36,10 +36,10 @@ export const TextPanel: React.FC = () => {
         }
         const success = await sendFramedAscii(commandStr, 'confirm');
         if (success) {
-          setStatusText('Transmitted successfully');
+          setStatusText(t('text.success'));
           if (clearOnSend) setText('');
         } else {
-          setStatusText('Transmission failed');
+          setStatusText(t('text.failed'));
         }
       } else {
         const encoder = new TextEncoder();
@@ -56,7 +56,7 @@ export const TextPanel: React.FC = () => {
           await sendPacket(new Uint8Array([0x21]), 'confirm');
         }
 
-        setStatusText('Transmitted text stream');
+        setStatusText(t('text.success'));
         if (clearOnSend) setText('');
       }
     } catch (err: any) {
@@ -87,9 +87,9 @@ export const TextPanel: React.FC = () => {
             <Type className="w-5 h-5 text-otter-600 dark:text-otter-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Keystroke Injector</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('text.title')}</h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Transmit text, macros, and command strings directly via USB HID
+              {t('text.description')}
             </p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export const TextPanel: React.FC = () => {
           <button
             onClick={() => setText('')}
             className="btn-tactile p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-500 hover:text-rose-500 dark:text-zinc-400 dark:hover:text-rose-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
-            title="Clear"
+            title={t('text.clear')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -110,17 +110,17 @@ export const TextPanel: React.FC = () => {
         <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pb-1">
           <span className="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center space-x-1.5">
             <Terminal className="w-3.5 h-3.5 text-otter-600 dark:text-otter-400" />
-            <span>Payload Content</span>
+            <span>{t('text.payloadContent')}</span>
           </span>
           <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-            {text.length} chars • ~{Math.max(1, Math.ceil(text.length * 0.04))}s duration
+            {text.length} {t('text.chars')} • ~{Math.max(1, Math.ceil(text.length * 0.04))}s {t('text.duration')}
           </span>
         </div>
 
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Type or paste automated keystroke payloads, code, or terminal commands..."
+          placeholder={t('text.placeholder')}
           rows={5}
           className="w-full bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-xs font-mono text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-otter-500 focus:ring-1 focus:ring-otter-500/30 resize-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
         />
@@ -133,7 +133,7 @@ export const TextPanel: React.FC = () => {
             className="btn-tactile px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-xs font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1.5 disabled:opacity-40"
           >
             {copied ? <Check className="w-3 h-3 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />}
-            <span>{copied ? 'Copied' : 'Copy'}</span>
+            <span>{copied ? t('text.copied') : t('text.copy')}</span>
           </button>
 
           <div className="flex items-center space-x-4 text-xs">
@@ -145,7 +145,7 @@ export const TextPanel: React.FC = () => {
                 className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-otter-500 focus:ring-otter-500"
               />
               <span className="text-xs font-medium flex items-center space-x-1">
-                <span>+Enter</span>
+                <span>{t('text.autoEnter')}</span>
                 <CornerDownLeft className="w-3 h-3 text-zinc-400" />
               </span>
             </label>
@@ -157,7 +157,7 @@ export const TextPanel: React.FC = () => {
                 onChange={(e) => setClearOnSend(e.target.checked)}
                 className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-otter-500 focus:ring-otter-500"
               />
-              <span className="text-xs font-medium">Clear on send</span>
+              <span className="text-xs font-medium">{t('text.clearOnSend')}</span>
             </label>
           </div>
         </div>
@@ -167,7 +167,7 @@ export const TextPanel: React.FC = () => {
       <div className="instrument-card rounded-xl p-4 space-y-2.5">
         <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center space-x-1.5">
           <Sparkles className="w-3.5 h-3.5 text-otter-600 dark:text-otter-400" />
-          <span>Quick Snippets</span>
+          <span>{t('text.quickSnippets')}</span>
         </h3>
 
         <div className="flex flex-wrap gap-2">
@@ -204,10 +204,10 @@ export const TextPanel: React.FC = () => {
         <Send className={`w-3.5 h-3.5 ${isSending ? 'animate-bounce' : ''}`} />
         <span>
           {connectionState !== 'connected'
-            ? 'Connect BLE Device to Transmit'
+            ? t('text.connectToTransmit')
             : isSending
-            ? 'Transmitting Keystrokes...'
-            : 'Transmit Keystrokes'}
+            ? t('text.transmittingBtn')
+            : t('text.transmitBtn')}
         </span>
       </button>
     </div>

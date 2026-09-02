@@ -4,6 +4,7 @@ export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'err
 export type ProtocolMode = 'single_byte' | 'framed_ascii';
 export type TargetOs = 'windows' | 'macos' | 'linux';
 export type ThemeMode = 'dark' | 'light' | 'system';
+export type Language = 'en' | 'tr' | 'de' | 'fr' | 'es';
 
 export interface LogEntry {
   id: string;
@@ -32,4 +33,5 @@ export interface AppSettings {
   protocolMode: ProtocolMode;
   targetOs: TargetOs;
   themeMode: ThemeMode;
+  language: Language;
 }

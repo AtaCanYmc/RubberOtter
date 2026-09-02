@@ -7,7 +7,7 @@ import { Gamepad2, Zap, Plus, Trash2, ShieldCheck, Play, X } from 'lucide-react'
 
 export const GamingPanel: React.FC = () => {
   const { sendByte } = useBluetooth();
-  const { macros, addMacro, deleteMacro } = useSettings();
+  const { macros, addMacro, deleteMacro, t } = useSettings();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [macroName, setMacroName] = useState('');
@@ -53,8 +53,8 @@ export const GamingPanel: React.FC = () => {
             <Gamepad2 className="w-5 h-5 text-otter-600 dark:text-otter-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Gaming & Macro Sequences</h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Automated key combo chains and game buy sequences</p>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('gaming.title')}</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{t('gaming.description')}</p>
           </div>
         </div>
 
@@ -63,7 +63,7 @@ export const GamingPanel: React.FC = () => {
           className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-750 text-zinc-800 dark:text-zinc-100 text-xs font-semibold border border-zinc-200 dark:border-zinc-700/60 flex items-center space-x-1.5"
         >
           {showAddModal ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-          <span>{showAddModal ? 'Close' : 'New Macro'}</span>
+          <span>{showAddModal ? t('gaming.close') : t('gaming.newMacro')}</span>
         </button>
       </div>
 
@@ -75,8 +75,8 @@ export const GamingPanel: React.FC = () => {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">CS Armor & Helmet Buy Macro</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">Buy ('b') → Armor (4) → Helmet (2)</p>
+              <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{t('gaming.csBuyTitle')}</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('gaming.csBuyDesc')}</p>
             </div>
           </div>
           <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
@@ -89,29 +89,29 @@ export const GamingPanel: React.FC = () => {
           className="btn-tactile w-full py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-semibold text-xs flex items-center justify-center space-x-2 border border-zinc-900 dark:border-zinc-200 shadow-sm"
         >
           <Zap className="w-3.5 h-3.5" />
-          <span>Execute CS Buy Sequence</span>
+          <span>{t('gaming.csBuyBtn')}</span>
         </button>
       </div>
 
       {/* Add Macro Form */}
       {showAddModal && (
         <form onSubmit={handleCreateMacro} className="instrument-card rounded-xl p-4 sm:p-5 space-y-3.5 border-zinc-300 dark:border-zinc-700">
-          <h3 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Create Custom Macro</h3>
+          <h3 className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">{t('gaming.createMacroTitle')}</h3>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">Macro Name</label>
+              <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">{t('gaming.macroNameLabel')}</label>
               <input
                 type="text"
                 value={macroName}
                 onChange={(e) => setMacroName(e.target.value)}
-                placeholder="e.g. Quick Heal Macro"
+                placeholder={t('gaming.macroNamePlaceholder')}
                 className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-otter-500"
                 required
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">Hex Byte Code</label>
+                <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">{t('gaming.hexLabel')}</label>
                 <input
                   type="text"
                   value={macroHex}
@@ -121,7 +121,7 @@ export const GamingPanel: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">Delay (ms)</label>
+                <label className="text-xs text-zinc-600 dark:text-zinc-400 block mb-1">{t('gaming.delayLabel')}</label>
                 <input
                   type="number"
                   value={macroDelay}
@@ -137,13 +137,13 @@ export const GamingPanel: React.FC = () => {
               onClick={() => setShowAddModal(false)}
               className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 text-xs font-medium border border-zinc-200 dark:border-zinc-800"
             >
-              Cancel
+              {t('gaming.cancel')}
             </button>
             <button
               type="submit"
               className="btn-tactile px-3.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 text-xs font-semibold"
             >
-              Save Macro
+              {t('gaming.saveMacro')}
             </button>
           </div>
         </form>
@@ -152,7 +152,7 @@ export const GamingPanel: React.FC = () => {
       {/* Saved Custom Macros */}
       <div className="space-y-2.5">
         <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider px-1">
-          Saved Macros ({macros.length})
+          {t('gaming.savedMacros')} ({macros.length})
         </h3>
         <div className="grid grid-cols-1 gap-2.5">
           {macros.map((m) => (
@@ -168,7 +168,7 @@ export const GamingPanel: React.FC = () => {
                   className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-750 dark:text-zinc-200 text-xs font-semibold border border-zinc-200 dark:border-zinc-700/60 flex items-center space-x-1.5"
                 >
                   <Play className="w-3 h-3 text-otter-600 dark:text-otter-400" />
-                  <span>Run</span>
+                  <span>{t('gaming.run')}</span>
                 </button>
                 {m.category === 'User Custom' && (
                   <button

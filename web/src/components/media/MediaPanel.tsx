@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
+import { useSettings } from '../../context/SettingsContext';
 import { PROTOCOL } from '../../protocol/byteMap';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Music } from 'lucide-react';
 
 export const MediaPanel: React.FC = () => {
   const { sendByte } = useBluetooth();
+  const { t } = useSettings();
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlayPause = () => {
@@ -21,8 +23,8 @@ export const MediaPanel: React.FC = () => {
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Media & Volume Deck</h2>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Control host OS audio playback, tracks, and sound levels</p>
+          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('media.title')}</h2>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{t('media.description')}</p>
         </div>
 
         {/* Tactile Audio Bars */}
@@ -49,7 +51,7 @@ export const MediaPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-5 flex flex-col items-center justify-center space-y-2 group border-zinc-200 dark:border-zinc-800"
         >
           <SkipBack className="w-6 h-6 text-zinc-700 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white" />
-          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-950 dark:group-hover:text-zinc-100">Previous</span>
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-950 dark:group-hover:text-zinc-100">{t('media.prev')}</span>
         </button>
 
         {/* Play / Pause Primary Button */}
@@ -62,7 +64,7 @@ export const MediaPanel: React.FC = () => {
           ) : (
             <Play className="w-6 h-6 ml-0.5" />
           )}
-          <span className="text-xs font-semibold">{isPlaying ? 'Pause' : 'Play'}</span>
+          <span className="text-xs font-semibold">{isPlaying ? t('media.pause') : t('media.play')}</span>
         </button>
 
         {/* Next Track */}
@@ -71,7 +73,7 @@ export const MediaPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-5 flex flex-col items-center justify-center space-y-2 group border-zinc-200 dark:border-zinc-800"
         >
           <SkipForward className="w-6 h-6 text-zinc-700 dark:text-zinc-200 group-hover:text-zinc-950 dark:group-hover:text-white" />
-          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-950 dark:group-hover:text-zinc-100">Next</span>
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-zinc-950 dark:group-hover:text-zinc-100">{t('media.next')}</span>
         </button>
       </div>
 
@@ -83,7 +85,7 @@ export const MediaPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800"
         >
           <Volume1 className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
-          <span className="text-xs font-medium">Vol Down</span>
+          <span className="text-xs font-medium">{t('media.volDown')}</span>
         </button>
 
         {/* Mute */}
@@ -92,7 +94,7 @@ export const MediaPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-500/30 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-700 dark:text-zinc-200 hover:text-rose-600 dark:hover:text-rose-400 border-zinc-200 dark:border-zinc-800"
         >
           <VolumeX className="w-5 h-5 text-zinc-600 dark:text-zinc-300 hover:text-rose-500" />
-          <span className="text-xs font-medium">Mute Toggle</span>
+          <span className="text-xs font-medium">{t('media.mute')}</span>
         </button>
 
         {/* Vol Up */}
@@ -101,7 +103,7 @@ export const MediaPanel: React.FC = () => {
           className="btn-tactile instrument-card hover:bg-zinc-100 dark:hover:bg-zinc-850 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white border-zinc-200 dark:border-zinc-800"
         >
           <Volume2 className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
-          <span className="text-xs font-medium">Vol Up</span>
+          <span className="text-xs font-medium">{t('media.volUp')}</span>
         </button>
       </div>
     </div>
