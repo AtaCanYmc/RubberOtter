@@ -1,6 +1,6 @@
 """
 Rubber Otter Package CLI Module
-Provides subcommands for device scanning, payload transmission, macro management, interactive shell, and Web App server launch.
+Provides subcommands for device scanning, payload transmission, macro management, interactive shell, MCP Server, and Web App server launch.
 """
 
 import argparse
@@ -245,6 +245,65 @@ def handle_serve(args):
         sys.exit(1)
 
 
+def handle_mcp(args):
+    """Launches the Model Context Protocol (MCP) server or outputs config snippets."""
+    if args.config_claude:
+        py_path = sys.executable
+        config = {
+            "mcpServers": {
+                "rubberotter": {
+                    "command": py_path,
+                    "args": ["-m", "rubberotter.mcp.server"]
+                }
+            }
+        }
+        print(colorize("\n📋 Claude Desktop MCP Configuration:", Colors.HEADER))
+        print(colorize("Add the following snippet to ~/Library/Application Support/Claude/claude_desktop_config.json:\n", Colors.OKBLUE))
+        print(json.dumps(config, indent=2))
+        return
+
+    if args.config_cursor:
+        py_path = sys.executable
+        config = {
+            "name": "rubberotter",
+            "command": py_path,
+            "args": ["-m", "rubberotter.mcp.server"],
+            "type": "stdio"
+        }
+        print(colorize("\n📋 Cursor / Antigravity / Windsurf MCP Configuration:", Colors.HEADER))
+        print(colorize("Add this to your MCP Settings / mcp.json:\n", Colors.OKBLUE))
+        print(json.dumps(config, indent=2))
+        return
+
+    if args.list_tools:
+        from .ai.tools import RubberOtterToolRegistry
+        registry = RubberOtterToolRegistry()
+        tools = registry.list_tools()
+        if args.json:
+            print(json.dumps([t.to_mcp_tool() for t in tools], indent=2))
+        else:
+            print(colorize(f"\n🛠️ Available Rubber Otter AI / MCP Tools ({len(tools)}):", Colors.HEADER))
+            for t in tools:
+                print(f" • {colorize(t.name, Colors.BOLD + Colors.OKGREEN)}: {t.description}")
+        return
+
+    # Run MCP stdio server
+    from .mcp.server import run_stdio_server
+    try:
+        otter = None
+        if args.port or args.ble_address:
+            otter = RubberOtter(
+                port=args.port,
+                ble_address=args.ble_address,
+                ble_target=args.target,
+                baud=args.baud,
+                timeout=args.timeout,
+            )
+        asyncio.run(run_stdio_server(client=otter))
+    except KeyboardInterrupt:
+        pass
+
+
 def main():
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("--ble-address", "-b", help="Target Bluetooth LE (BLE) device MAC or UUID address")
@@ -260,7 +319,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         prog="rubberotter",
-        description="Rubber Otter Device Discovery, Management & Web Dashboard CLI",
+        description="Rubber Otter Device Discovery, Management, MCP Server & Web Dashboard CLI",
         parents=[parent_parser],
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -307,6 +366,12 @@ def main():
     p_serve.add_argument("--web-port", type=int, default=8080, help="Web Server HTTP port (default: 8080)")
     p_serve.add_argument("--debug", action="store_true", help="Enable Flask debug mode")
 
+    # mcp
+    p_mcp = subparsers.add_parser("mcp", parents=[parent_parser], help="Start Model Context Protocol (MCP) server for Claude, Cursor, Antigravity")
+    p_mcp.add_argument("--config-claude", action="store_true", help="Print Claude Desktop MCP configuration JSON snippet")
+    p_mcp.add_argument("--config-cursor", action="store_true", help="Print Cursor / Windsurf MCP configuration JSON snippet")
+    p_mcp.add_argument("--list-tools", action="store_true", help="List all available AI & MCP tools")
+
     args = parser.parse_args()
 
     if not args.subcommand:
@@ -323,6 +388,7 @@ def main():
         "ble-name": handle_blename,
         "shell": handle_shell,
         "serve": handle_serve,
+        "mcp": handle_mcp,
     }
 
     handler = handlers.get(args.subcommand)
