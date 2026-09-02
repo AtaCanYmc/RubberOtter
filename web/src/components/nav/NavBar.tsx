@@ -43,7 +43,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
   return (
     <>
       {/* Desktop / Tablet Top Navigation Pills */}
-      <div className="hidden md:flex items-center justify-start space-x-1 p-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800/80 mb-6 overflow-x-auto">
+      <div className="hidden md:flex items-center justify-start space-x-1 p-1.5 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 mb-6 overflow-x-auto transition-colors">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -53,11 +53,11 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
               onClick={() => setActiveTab(tab.id)}
               className={`btn-tactile flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                 isActive
-                  ? 'bg-zinc-800 text-zinc-100 shadow-sm border border-zinc-700/60'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-850/60'
+                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200 dark:border-zinc-700/60 font-semibold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-850/60'
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-otter-400' : 'text-zinc-400'}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-500 dark:text-zinc-400'}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -65,7 +65,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
       </div>
 
       {/* Mobile Sticky Bottom Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-obsidian-950/95 backdrop-blur-lg border-t border-zinc-800/80 px-2 py-2 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-obsidian-950/95 backdrop-blur-lg border-t border-zinc-200 dark:border-zinc-800/80 px-2 py-2 pb-safe transition-colors">
         <div className="flex items-center justify-between space-x-1 overflow-x-auto no-scrollbar">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -76,11 +76,11 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`btn-tactile flex flex-col items-center justify-center min-w-[58px] py-1.5 px-1 rounded-lg transition-all ${
                   isActive
-                    ? 'bg-zinc-900 text-zinc-100 font-semibold border border-zinc-700/60'
-                    : 'text-zinc-500 hover:text-zinc-300'
+                    ? 'bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-semibold border border-zinc-300 dark:border-zinc-700/60 shadow-sm'
+                    : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
                 }`}
               >
-                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-otter-400' : 'text-zinc-400'}`} />
+                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-400 dark:text-zinc-400'}`} />
                 <span className="text-[10px] tracking-tight">{tab.label}</span>
               </button>
             );

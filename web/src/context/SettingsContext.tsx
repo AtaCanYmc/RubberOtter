@@ -24,6 +24,36 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveMacros(macros);
   }, [macros]);
 
+  // Apply theme to document HTML element
+  useEffect(() => {
+    const applyTheme = () => {
+      const mode = settings.themeMode || 'dark';
+      const root = document.documentElement;
+
+      if (mode === 'dark') {
+        root.classList.add('dark');
+      } else if (mode === 'light') {
+        root.classList.remove('dark');
+      } else if (mode === 'system') {
+        const isSystemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isSystemDark) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+
+    applyTheme();
+
+    if (settings.themeMode === 'system' && window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [settings.themeMode]);
+
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }));
   };

@@ -3,6 +3,7 @@
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 export type ProtocolMode = 'single_byte' | 'framed_ascii';
 export type TargetOs = 'windows' | 'macos' | 'linux';
+export type ThemeMode = 'dark' | 'light' | 'system';
 
 export interface LogEntry {
   id: string;
@@ -30,4 +31,5 @@ export interface AppSettings {
   trackpadSensitivity: number;
   protocolMode: ProtocolMode;
   targetOs: TargetOs;
+  themeMode: ThemeMode;
 }

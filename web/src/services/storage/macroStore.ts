@@ -53,6 +53,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   trackpadSensitivity: 2.5,
   protocolMode: 'single_byte',
   targetOs: detectOs(),
+  themeMode: 'dark',
 };
 
 export function loadSavedMacros(): CustomMacro[] {

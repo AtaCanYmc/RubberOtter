@@ -17,7 +17,7 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('scanner');
 
   return (
-    <div className="min-h-screen flex flex-col bg-obsidian-950 text-zinc-100 select-none">
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-obsidian-950 text-zinc-900 dark:text-zinc-100 select-none transition-colors">
       {/* Sticky Hardware Header */}
       <Header />
 
