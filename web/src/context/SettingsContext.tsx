@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { AppSettings, CustomMacro, Language } from '../@types/bluetooth';
 import { loadSavedSettings, saveSettings, loadSavedMacros, saveMacros } from '../services/storage/macroStore';
 import { translations, Translations } from '../i18n/translations';
+import { universalBle } from '../services/bluetooth/universalBle';
 
 interface SettingsContextType {
   settings: AppSettings;
@@ -28,24 +29,31 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveMacros(macros);
   }, [macros]);
 
-  // Apply theme to document HTML element
+  // Apply theme to document HTML element & sync Native Mobile Status Bar
   useEffect(() => {
     const applyTheme = () => {
       const mode = settings.themeMode || 'dark';
       const root = document.documentElement;
+      let isDark = true;
 
       if (mode === 'dark') {
         root.classList.add('dark');
+        isDark = true;
       } else if (mode === 'light') {
         root.classList.remove('dark');
+        isDark = false;
       } else if (mode === 'system') {
         const isSystemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (isSystemDark) {
           root.classList.add('dark');
+          isDark = true;
         } else {
           root.classList.remove('dark');
+          isDark = false;
         }
       }
+
+      universalBle.setStatusBarStyle(isDark);
     };
 
     applyTheme();

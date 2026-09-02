@@ -1,7 +1,8 @@
+import { universalBle } from '../bluetooth/universalBle';
+
 /**
  * Web Audio & Haptic Feedback Service
  */
-
 class SoundEffectsService {
   private ctx: AudioContext | null = null;
 
@@ -76,13 +77,8 @@ class SoundEffectsService {
   }
 
   triggerHaptic(pattern: number | number[] = 25) {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      try {
-        navigator.vibrate(pattern);
-      } catch {
-        // Haptics unsupported or disabled
-      }
-    }
+    const duration = Array.isArray(pattern) ? pattern[0] : pattern;
+    universalBle.triggerHaptics(duration);
   }
 }
 

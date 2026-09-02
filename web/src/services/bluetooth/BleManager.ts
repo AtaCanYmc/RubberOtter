@@ -2,6 +2,7 @@ import { ConnectionState, LogEntry } from '../../@types/bluetooth';
 import { PROTOCOL_NAMES } from '../../protocol/byteMap';
 import { bytesToHex } from '../../protocol/packetEncoder';
 import { encodeFramedPacket, parseAckPacket, AckFrame } from '../../protocol/framedProtocol';
+import { universalBle } from './universalBle';
 
 interface PendingAck {
   seq: number;
@@ -19,7 +20,10 @@ export class BleManager {
   private autoReconnectRetries = 0;
   private maxReconnectRetries = 3;
   private lastPacketTime = 0;
-  private minPacketIntervalMs = 15;
+  private minPacketIntervalMs = 12;
+
+  private currentServiceUuid: string = '0000ffe0-0000-1000-8000-00805f9b34fb';
+  private currentCharUuid: string = '0000ffe1-0000-1000-8000-00805f9b34fb';
 
   private seqCounter = 1;
   private pendingAcks: Map<number, PendingAck> = new Map();
@@ -38,6 +42,15 @@ export class BleManager {
   ) {
     this.onStateChange = onStateChange;
     this.onLog = onLog;
+
+    // Listen to native universalBle notifications
+    universalBle.onStateChange((st, msg) => {
+      this.updateState(st, msg || st);
+    });
+
+    universalBle.onRxData((bytes) => {
+      this.handleReceivedBytes(bytes);
+    });
   }
 
   private getNextSeq(): number {
@@ -47,9 +60,32 @@ export class BleManager {
   }
 
   async connect(serviceUuid: string, characteristicUuid: string): Promise<boolean> {
+    this.currentServiceUuid = serviceUuid;
+    this.currentCharUuid = characteristicUuid;
+
+    if (universalBle.isNativeApp()) {
+      try {
+        this.updateState('connecting', 'Scanning native BLE devices...');
+        this.addLog('info', 'Starting native CoreBluetooth / Android BLE discovery...');
+        const dev = await universalBle.requestDevice(serviceUuid);
+        this.addLog('info', `Found native BLE hardware: ${dev.name} (${dev.id})`);
+
+        await universalBle.connect(dev.id, serviceUuid, characteristicUuid);
+        this.updateState('connected', `Connected to ${dev.name}`);
+        this.addLog('info', `Successfully connected to native BLE hardware: ${dev.name}`);
+        return true;
+      } catch (err: any) {
+        const errorMsg = err.message || 'Native BLE connection failed';
+        this.updateState('error', errorMsg);
+        this.addLog('error', `Native Connection Failed: ${errorMsg}`);
+        return false;
+      }
+    }
+
+    // Standard Web Bluetooth API Browser Flow
     if (typeof navigator === 'undefined' || !navigator.bluetooth) {
       this.updateState('error', 'Web Bluetooth API Unsupported');
-      this.addLog('error', 'Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or Bluefy on iOS.');
+      this.addLog('error', 'Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or install the native app.');
       return false;
     }
 
@@ -106,7 +142,6 @@ export class BleManager {
         this.characteristic = await service.getCharacteristic(characteristicUuid);
       } catch (discErr) {
         this.addLog('info', 'Primary UUID discovery fallback: Searching all GATT services...');
-        // Fallback discovery matching RubberOtterPy client.py
         const services = await this.server.getPrimaryServices();
         for (const s of services) {
           try {
@@ -155,12 +190,17 @@ export class BleManager {
   }
 
   async disconnect(): Promise<void> {
-    if (this.device && this.device.gatt?.connected) {
-      this.device.gatt.disconnect();
+    if (universalBle.isNativeApp()) {
+      await universalBle.disconnect();
+    } else {
+      if (this.device && this.device.gatt?.connected) {
+        this.device.gatt.disconnect();
+      }
+      this.device = null;
+      this.server = null;
+      this.characteristic = null;
     }
-    this.device = null;
-    this.server = null;
-    this.characteristic = null;
+
     this.rxBuffer = [];
     this.pendingAcks.forEach((p) => clearTimeout(p.timeoutId));
     this.pendingAcks.clear();
@@ -171,8 +211,11 @@ export class BleManager {
   private handleNotification(event: Event) {
     const target = event.target as BluetoothRemoteGATTCharacteristic;
     if (!target.value) return;
-
     const bytes = new Uint8Array(target.value.buffer);
+    this.handleReceivedBytes(bytes);
+  }
+
+  private handleReceivedBytes(bytes: Uint8Array) {
     for (let i = 0; i < bytes.length; i++) {
       this.rxBuffer.push(bytes[i]);
     }
@@ -185,11 +228,9 @@ export class BleManager {
       this.resolveAck(ack.seq, ack);
       this.rxBuffer = [];
     } else {
-      // Fallback text ACK parsing (e.g. "OK", "ACK", "SUCCESS") matching RubberOtterPy
       const text = new TextDecoder().decode(bytes).trim().toUpperCase();
       if (text.includes('OK') || text.includes('ACK') || text.includes('SUCCESS')) {
         this.addLog('rx', `[RX Text ACK] ${text}`, bytesToHex(bytes));
-        // Resolve oldest pending ACK
         const firstKey = this.pendingAcks.keys().next().value;
         if (firstKey !== undefined) {
           this.resolveAck(firstKey, { seq: firstKey, statusOk: true, errorCode: 0 });
@@ -239,14 +280,14 @@ export class BleManager {
   }
 
   /**
-   * Sends framed ASCII command with sequence tracking, ACK waiting, and auto-retry (RubberOtterPy matching)
+   * Sends framed ASCII command with sequence tracking, ACK waiting, and auto-retry
    */
   async sendFramedWithAck(
     payloadText: string,
     timeoutMs = 2000,
     maxRetries = 2
   ): Promise<{ success: boolean; seq: number; ack?: AckFrame; error?: string }> {
-    if (this.state !== 'connected' || !this.characteristic) {
+    if (this.state !== 'connected') {
       this.addLog('warn', 'Cannot send packet: BLE is disconnected');
       return { success: false, seq: 0, error: 'BLE Disconnected' };
     }
@@ -267,11 +308,16 @@ export class BleManager {
           this.pendingAcks.set(seq, { seq, resolve, reject, timeoutId });
         });
 
-        const buffer = frameData as unknown as BufferSource;
-        if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
-          await this.characteristic.writeValueWithoutResponse(buffer);
+        if (universalBle.isNativeApp()) {
+          await universalBle.write(frameData, this.currentServiceUuid, this.currentCharUuid);
         } else {
-          await this.characteristic.writeValue(buffer);
+          if (!this.characteristic) throw new Error('Characteristic not initialized');
+          const buffer = frameData as unknown as BufferSource;
+          if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
+            await this.characteristic.writeValueWithoutResponse(buffer);
+          } else {
+            await this.characteristic.writeValue(buffer);
+          }
         }
 
         this.totalPacketsSent++;
@@ -302,7 +348,7 @@ export class BleManager {
   }
 
   async sendPacket(data: Uint8Array): Promise<boolean> {
-    if (this.state !== 'connected' || !this.characteristic) {
+    if (this.state !== 'connected') {
       this.addLog('warn', 'Cannot send packet: BLE is disconnected');
       return false;
     }
@@ -314,11 +360,16 @@ export class BleManager {
     this.lastPacketTime = now;
 
     try {
-      const buffer = data as unknown as BufferSource;
-      if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
-        await this.characteristic.writeValueWithoutResponse(buffer);
+      if (universalBle.isNativeApp()) {
+        await universalBle.write(data, this.currentServiceUuid, this.currentCharUuid);
       } else {
-        await this.characteristic.writeValue(buffer);
+        if (!this.characteristic) return false;
+        const buffer = data as unknown as BufferSource;
+        if (this.characteristic.properties.writeWithoutResponse && this.characteristic.writeValueWithoutResponse) {
+          await this.characteristic.writeValueWithoutResponse(buffer);
+        } else {
+          await this.characteristic.writeValue(buffer);
+        }
       }
 
       this.totalPacketsSent++;

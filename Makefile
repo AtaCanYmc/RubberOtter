@@ -1,4 +1,4 @@
-.PHONY: help venv install test build dev-web dev-python build-firmware clean
+.PHONY: help venv install test build dev-web dev-python build-firmware mobile-sync mobile-android mobile-ios clean
 
 PYTHON ?= python3
 VENV ?= python/.venv
@@ -15,6 +15,9 @@ help:
 	@echo "  make dev-web        - Run Web PWA development server (Vite)"
 	@echo "  make dev-python     - Install Python package in editable mode"
 	@echo "  make build-firmware - Compile PlatformIO firmware for ATmega32U4"
+	@echo "  make mobile-sync    - Build Web app and sync to native iOS & Android Capacitor projects"
+	@echo "  make mobile-android - Open Android native project in Android Studio"
+	@echo "  make mobile-ios     - Open iOS native project in Xcode"
 	@echo "  make clean          - Remove build artifacts and temporary caches"
 
 venv:
@@ -49,6 +52,18 @@ build: venv
 	else \
 		echo "⚠️ PlatformIO not found, skipping firmware compilation."; \
 	fi
+
+mobile-sync:
+	@echo "📱 Syncing Web distribution to Native iOS & Android..."
+	cd web && npm run cap:sync
+
+mobile-android:
+	@echo "🤖 Opening Android project in Android Studio..."
+	cd web && npm run cap:open:android
+
+mobile-ios:
+	@echo "🍎 Opening iOS project in Xcode..."
+	cd web && npm run cap:open:ios
 
 dev-web:
 	cd web && npm run dev
