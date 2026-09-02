@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/AtaCanYmc/RubberOtter/compare/python-v1.1.0...python-v1.2.0) (2026-09-02)
+
+
+### Features
+
+* **python:** import RubberOtterPy repository as python package ([c8dac0e](https://github.com/AtaCanYmc/RubberOtter/commit/c8dac0ece105bdb6699705d35235fb32407b8fa1))
+
+
+### Bug Fixes
+
+* resolve code scanning alerts [#1](https://github.com/AtaCanYmc/RubberOtter/issues/1)-[#8](https://github.com/AtaCanYmc/RubberOtter/issues/8) in web APIs and text escaping ([3544809](https://github.com/AtaCanYmc/RubberOtter/commit/3544809e46ff81b127a8f77b7ce302dc33d31cd5))
+
+
+### Documentation
+
+* **assets:** add custom cyberpunk AI banners to all READMEs ([3f6e039](https://github.com/AtaCanYmc/RubberOtter/commit/3f6e039e868f13348246e4f8d2a8e524ea559d54))
+
 ## [1.1.0](https://github.com/AtaCanYmc/RubberOtterPy/compare/v1.0.0...v1.1.0) (2026-08-18)
 
 
