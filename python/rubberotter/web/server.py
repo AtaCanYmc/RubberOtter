@@ -29,6 +29,9 @@ def create_app():
         timeout = request.args.get("timeout", default=3.0, type=float)
         ble_target = request.args.get("target", default="Otter", type=str)
         res = scan_all(target_ble_name=ble_target, ble_timeout=timeout)
+        if res.get("ble_error"):
+            app.logger.warning("BLE scan failed: %s", res["ble_error"])
+            res["ble_error"] = "BLE scan failed"
         return jsonify(res)
 
     @app.route("/api/status", methods=["GET"])
@@ -77,10 +80,11 @@ def create_app():
                 "connection_type": otter.connection_type,
                 "message": f"Connected to {active_target}",
             })
-        except Exception as e:
+        except Exception:
             active_otter = None
             active_target = None
-            return jsonify({"success": False, "error": str(e)}), 400
+            app.logger.exception("Connect API failed")
+            return jsonify({"success": False, "error": "Connection failed"}), 400
 
     @app.route("/api/disconnect", methods=["POST"])
     def api_disconnect():
@@ -121,8 +125,9 @@ def create_app():
 
             res = active_otter.send(cmd, raw=raw, no_ack=no_ack)
             return jsonify(res)
-        except Exception as e:
-            return jsonify({"success": False, "error": str(e)}), 500
+        except Exception:
+            app.logger.exception("Send API failed")
+            return jsonify({"success": False, "error": "Command execution failed"}), 500
 
     @app.route("/api/type", methods=["POST"])
     def api_type():
@@ -209,8 +214,9 @@ def create_app():
                 active_target = active_otter.connection_target
             res = active_otter.send(cmd_str, raw=raw, no_ack=no_ack)
             return jsonify(res)
-        except Exception as e:
-            return jsonify({"success": False, "error": str(e)}), 500
+        except Exception:
+            app.logger.exception("Internal send API failed")
+            return jsonify({"success": False, "error": "Command execution failed"}), 500
 
     return app
 

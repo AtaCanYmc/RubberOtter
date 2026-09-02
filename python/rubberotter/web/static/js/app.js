@@ -55,7 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.dataset.originalText = btn.textContent;
       }
       const text = loadingText || btn.dataset.originalText;
-      btn.innerHTML = `<span class="spinner"></span>${text}`;
+      btn.replaceChildren();
+      const spinner = document.createElement('span');
+      spinner.className = 'spinner';
+      btn.appendChild(spinner);
+      btn.appendChild(document.createTextNode(text));
     } else {
       btn.disabled = false;
       if (btn.dataset.originalText) {
@@ -90,6 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
       raw: rawCheckbox ? rawCheckbox.checked : false,
       no_ack: noAckCheckbox ? noAckCheckbox.checked : false,
     };
+  }
+
+  function escapeTypeCommandText(value) {
+    return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   }
 
   // Scan Devices
@@ -251,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!text) return;
     setButtonLoading(typeBtn, true, 'Executing...');
     try {
-      const escaped = text.replace(/"/g, '\\"');
+      const escaped = escapeTypeCommandText(text);
       await sendCmd(`type "${escaped}"`);
     } finally {
       setButtonLoading(typeBtn, false);
@@ -266,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         typeInput.value = textToType;
         setButtonLoading(btn, true, 'Typing...');
         try {
-          const escaped = textToType.replace(/"/g, '\\"');
+          const escaped = escapeTypeCommandText(textToType);
           await sendCmd(`type "${escaped}"`);
         } finally {
           setButtonLoading(btn, false);
