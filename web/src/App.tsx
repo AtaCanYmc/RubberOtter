@@ -17,12 +17,12 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-obsidian-950 text-zinc-900 dark:text-zinc-100 select-none transition-colors">
-      {/* Sticky Hardware Header */}
-      <Header />
+      {/* Sticky Hardware Header with Desktop Navigation Tabs */}
+      <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Responsive Workstation Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col">
-        {/* Desktop / Tablet Nav Pill Bar */}
+        {/* Mobile Sticky Touch Navigation Bar */}
         <NavBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Panel Viewport Container */}
