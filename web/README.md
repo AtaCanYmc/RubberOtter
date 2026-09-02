@@ -1,176 +1,106 @@
 <p align="center">
-  <img src="docs/assets/banner.jpg" alt="RubberOtterWeb Banner" width="100%" />
+  <img src="../docs/assets/banner.jpg" alt="RubberOtterWeb Banner" width="100%" />
 </p>
 
-# 🦦 RubberOtterWeb — Web Bluetooth PWA Controller
+# 🦦 RubberOtterWeb — Precision Bluetooth HID Workstation & Mobile App
 
 [![CI Pipeline](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml)
 [![Deploy PWA](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../LICENSE)
 [![Built with React & Vite](https://img.shields.io/badge/Stack-Vite%20%7C%20React%2018%20%7C%20TS-cyan)](https://vitejs.dev)
+[![Capacitor Native](https://img.shields.io/badge/Mobile-Capacitor%206%2B%20(iOS%20%26%20Android)-blue)](https://capacitorjs.com)
 
-A modern, responsive **Progressive Web Application (PWA)** built with **Vite, React, TypeScript, and Tailwind CSS** that connects to an **HM-10 BLE module** over the Web Bluetooth API (`navigator.bluetooth`) to control a target host PC via USB HID (keyboard & mouse emulation).
+**RubberOtterWeb** is a high-performance **Progressive Web Application (PWA)** and **Native Mobile App (iOS & Android)** built with **Vite, React 18, TypeScript, Tailwind CSS, and Ionic Capacitor 6+**.
+
+It interfaces directly with the **Rubber Otter ATmega32U4 microcontroller** over Bluetooth Low Energy (HM-10 / ESP32 GATT Service `0xFFE0`) to wirelessly control host PCs (Windows, macOS, Linux) via plug-and-play USB HID keyboard and mouse emulation.
 
 ---
 
-## 📐 Control Flow & Architecture
+## 🌟 Key Features
+
+- 🎯 **Header-Integrated Navigation**: Modern single-pane desktop tab switching seamlessly built into the sticky header + ergonomic mobile bottom touch bar.
+- 📱 **Native Mobile Packaging (Capacitor 6+)**:
+  - **Apple iOS**: Native **CoreBluetooth** engine (bypassing Safari WKWebView limitations) + **Apple Taptic Engine** haptics.
+  - **Google Android**: Native Android BLE + Vibrator service.
+- 🌍 **5 Language Localizations**: Instant zero-reload switching between **English (🇬🇧)**, **Türkçe (🇹🇷)**, **Deutsch (🇩🇪)**, **Français (🇫🇷)**, and **Español (🇪🇸)**.
+- 🌓 **Adaptive Dual-Theme Engine**: Obsidian Dark (`#09090b`), Clean White (`#ffffff`), and system auto-sync with edge-to-edge mobile status bar theming.
+- ⌨️ **Keystroke Injector**: Fast typing stream injector, auto-enter toggle, snippet presets (Spotlight, Notepad, System Info), and duration estimation.
+- 🎵 **Media Control Deck**: Big tactile buttons for Play/Pause, Next/Prev Track, Volume Up/Down, and Mute with animated audio spectrum bars.
+- 📊 **Presentation Controller**: Slide navigation clicker (Left/Right Arrows), Fullscreen toggle (`F5`), Blank screen (`B`), and an integrated presentation stopwatch timer.
+- 🔒 **Security & Workstation Lock**: Workstation lock (`Win+L` / `Ctrl+Cmd+Q`), non-blocking mouse jiggler toggle, Task Manager shortcut (`Ctrl+Shift+Esc` / `Cmd+Opt+Esc`), and Show Desktop.
+- 🎮 **Gaming & Custom Macro Builder**: Built-in CS Buy sequence (`0x41`) + interactive custom macro creator saved in persistent `localStorage`.
+- 🖱️ **Precision Virtual Trackpad**: Multi-touch gestures (tap for Left Click, 2-finger tap for Right Click), cursor position indicator, scroll triggers, and sensitivity multiplier (1.0x - 5.0x).
+- 📜 **GATT Packet Terminal**: Real-time packet telemetry console with byte counter, timestamp, Hex payload formatting, and copy log export.
+
+---
+
+## 📐 Architecture & Platform Bridge
 
 ```mermaid
 graph TD
-    subgraph Frontend["PWA Web Application (RubberOtterWeb)"]
-        UI["Web App UI (Vite + React + Tailwind)"]
-        BT_MGR["BluetoothManager Engine"]
-        ENC["Packet Encoder (0x11 - 0x85 & STX..ETX)"]
-        
-        UI -->|"User Action (Click/Touch)"| ENC
-        ENC -->|"Encode Bytes / Frames"| BT_MGR
-    end
-
-    subgraph Transport["Wireless & Serial Transport"]
-        GATT["Web Bluetooth API (navigator.bluetooth)"]
-        BLE["HM-10 / ESP32 BLE Module"]
-        UART["Serial1 UART @ 9600 Baud (TX1/RX1)"]
-        
-        BT_MGR -->|"GATT Write Characteristic"| GATT
-        GATT -->|"BLE Wireless Signal"| BLE
-        BLE -->|"Hardware Serial Payload"| UART
-    end
-
-    subgraph Backend["Arduino Firmware (ATmega32U4)"]
-        ARDUINO["Arduino Microcontroller"]
-        DECODER["Command Decoder Loop"]
-        HID_LIB["USB HID Stack (<Keyboard.h> & <Mouse.h>)"]
-        JIGGLER["Background Mouse Jiggler (millis timer)"]
-
-        UART -->|"Serial Payload"| ARDUINO
-        ARDUINO --> DECODER
-        DECODER -->|"HID Action"| HID_LIB
-        JIGGLER -.->|"Periodic Micro-movement"| HID_LIB
-    end
-
-    subgraph Target["Target Host PC"]
-        USB["USB Port (CDC HID Device)"]
-        HOST["Target PC OS (Windows / Mac / Linux)"]
-
-        HID_LIB -->|"USB HID Signal"| USB
-        USB -->|"Emulated Keypress & Mouse Move"| HOST
-    end
-
-    style Frontend fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
-    style Transport fill:#070a12,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
-    style Backend fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
-    style Target fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
+    UI[React 18 + Tailwind PWA UI] --> Bridge[Universal Platform Bridge (universalBle.ts)]
+    Bridge -->|Desktop / Android Chrome| WebBLE[Web Bluetooth API + Web Vibration]
+    Bridge -->|iOS Native App| CoreBT[Capacitor CoreBluetooth + Taptic Engine]
+    Bridge -->|Android Native App| AndroidBLE[Capacitor Android BLE + Vibrator]
+    
+    WebBLE --> BLE[HM-10 / ESP32 GATT Service 0xFFE0]
+    CoreBT --> BLE
+    AndroidBLE --> BLE
+    BLE --> MCU[ATmega32U4 USB HID Controller]
+    MCU --> PC[Target Host PC]
 ```
-
----
-
-## ✨ Features
-
-- 🎵 **Media Remote**: Big tactile buttons for Play/Pause, Next/Prev Track, Volume Up/Down, and Mute with animated audio spectrum bars.
-- 📊 **Presentation Remote**: Slide advance controls (Left/Right Arrows), Fullscreen toggle (`F5`), Blank screen (`B`), and an integrated presentation stopwatch timer.
-- 🔒 **Security & Utilities**: Workstation Lock (`Win + L`), Mouse Jiggler toggle switch with customizable interval timers, Task Manager shortcut (`Ctrl+Shift+Esc`), and Show Desktop (`Win+D`).
-- 🎮 **Gaming & Custom Macros**: Built-in CS Armor & Helmet Buy macro (`0x41`) + Interactive Custom Macro Builder saved in `localStorage`.
-- 🖱️ **Virtual Trackpad**: Interactive touch surface supporting multi-touch gestures (single tap for Left Click `0x81`, 2-finger tap for Right Click `0x82`), cursor tracking, scroll controls (`0x84`, `0x85`), and sensitivity slider (1.0x - 5.0x).
-- 📜 **GATT Packet Terminal**: Live stream of all transmitted packets with timestamp, log category (`tx`, `info`, `warn`, `error`), Hex payload view, and copy logs functionality.
-- 🔊 **Tactile Feedback**: Synthesized Web Audio API mechanical click sounds & mobile Web Haptics (`navigator.vibrate`).
-
----
-
-## 🗺️ Single-Byte Protocol Map
-
-| Mode | Command Action | Hex Code | Host HID Execution |
-| :--- | :--- | :--- | :--- |
-| **Media** | Play / Pause | `0x11` | Media Play/Pause key |
-| | Next Track | `0x12` | Media Next Track |
-| | Previous Track | `0x13` | Media Previous Track |
-| | Volume Up | `0x14` | Media Volume Up |
-| | Volume Down | `0x15` | Media Volume Down |
-| | Mute Toggle | `0x16` | Media Mute |
-| **Presentation** | Next Slide | `0x21` | Right Arrow (`KEY_RIGHT_ARROW`) |
-| | Previous Slide | `0x22` | Left Arrow (`KEY_LEFT_ARROW`) |
-| | Fullscreen | `0x23` | F5 (`KEY_F5`) |
-| **Security** | Lock Screen | `0x31` | Windows + L (`KEY_LEFT_GUI` + `l`) |
-| | Mouse Jiggler | `0x32` | Toggle non-blocking periodic mouse micro-movement |
-| | Task Manager | `0x33` | Ctrl + Shift + Esc |
-| | Show Desktop | `0x34` | Windows + D |
-| **Gaming** | CS Buy Macro | `0x41` | Press `'b'` -> delay -> `'4'` -> delay -> `'2'` |
-| **Trackpad** | Move Packet | `0x80` | `[0x80, deltaX, deltaY]` relative move |
-| | Left Click | `0x81` | `Mouse.click(MOUSE_LEFT)` |
-| | Right Click | `0x82` | `Mouse.click(MOUSE_RIGHT)` |
-| | Middle Click | `0x83` | `Mouse.click(MOUSE_MIDDLE)` |
-| | Scroll Up | `0x84` | `Mouse.move(0, 0, 1)` |
-| | Scroll Down | `0x85` | `Mouse.move(0, 0, -1)` |
 
 ---
 
 ## ⚡ Quick Start
 
-### 1. Installation
+### 1. Web Development
 ```bash
-git clone https://github.com/USERNAME/RubberOtterWeb.git
-cd RubberOtterWeb
+# Install dependencies
 npm install
-```
 
-### 2. Run Development Server
-```bash
+# Start Vite local development server
 npm run dev
 ```
-Open `http://localhost:3000` in Chrome, Edge, or Bluefy on iOS.
+Open `http://localhost:3000` in Google Chrome, Microsoft Edge, or Opera.
 
-### 3. Production Build
+### 2. Native Mobile Sync & IDE Launch
 ```bash
-npm run build
+# Compile and sync to iOS & Android native projects
+npm run cap:sync
+
+# Open in Xcode (iOS)
+npm run cap:open:ios
+
+# Open in Android Studio (Android)
+npm run cap:open:android
 ```
 
 ---
 
-## 🔌 Hardware Wiring Diagram
+## 🗺️ Single-Byte Protocol Map
 
-```mermaid
-graph LR
-    subgraph HM10["HM-10 BLE Module"]
-        HM_TX["TX Pin"]
-        HM_RX["RX Pin"]
-        HM_VCC["VCC (3.3V / 5V)"]
-        HM_GND["GND"]
-    end
-
-    subgraph Divider["Voltage Divider (5V -> 3.3V Logic)"]
-        R1["Resistor 1kΩ"]
-        R2["Resistor 2kΩ / GND"]
-        HM_RX <--- R1
-        R1 <--- R2
-    end
-
-    subgraph Micro["Arduino Pro Micro (ATmega32U4)"]
-        ARD_RX1["Pin 0 (RX1)"]
-        ARD_TX1["Pin 1 (TX1)"]
-        ARD_VCC["VCC (5V)"]
-        ARD_GND["GND"]
-        ARD_USB["Micro-USB Port"]
-    end
-
-    subgraph PC["Target Host PC"]
-        HOST_USB["USB Type-A / Type-C Port"]
-    end
-
-    HM_TX -->|"UART Serial Direct"| ARD_RX1
-    ARD_TX1 -->|"5V TX Signal"| R1
-    ARD_VCC -->|"Power Line"| HM_VCC
-    ARD_GND -->|"Common Ground"| HM_GND
-    R2 -->|"Ground Connection"| ARD_GND
-
-    ARD_USB ===|"USB HID Cable"| HOST_USB
-
-    style HM10 fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
-    style Divider fill:#312e81,stroke:#a5b4fc,stroke-width:2px,color:#f8fafc
-    style Micro fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
-    style PC fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
-```
+| Category | Action | Hex Code | Host HID Execution |
+| :--- | :--- | :--- | :--- |
+| **Media** | Play / Pause | `0x11` | Media Play/Pause key |
+| | Next Track | `0x12` | Media Next Track |
+| | Previous Track | `0x13` | Media Previous Track |
+| | Volume Up / Down | `0x14` / `0x15` | Media Volume Up / Down |
+| | Mute Toggle | `0x16` | Media Mute |
+| **Presentation** | Next / Prev Slide | `0x21` / `0x22` | Right / Left Arrow |
+| | Fullscreen / Black | `0x23` / `0x24` | F5 / 'B' |
+| **Security** | Lock Screen | `0x31` | `Win + L` / `Ctrl + Cmd + Q` |
+| | Mouse Jiggler | `0x32` | Periodic micro-movements |
+| | Task Manager | `0x33` | `Ctrl + Shift + Esc` / `Cmd + Opt + Esc` |
+| | Show Desktop | `0x34` | `Win + D` / `Cmd + F3` |
+| | Vibration Pulse | `0x35` | Pin 2 haptic pulse |
+| **Gaming** | CS Buy Macro | `0x41` | Buy chain (`'b' -> 4 -> 2`) |
+| **Trackpad** | Move Packet | `0x80` | `[0x80, deltaX, deltaY]` relative vector |
+| | Left / Right Click | `0x81` / `0x82` | `Mouse.click(MOUSE_LEFT / RIGHT)` |
+| | Scroll Up / Down | `0x84` / `0x85` | `Mouse.move(0, 0, 1 / -1)` |
 
 ---
 
 ## 📜 License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+This project is licensed under the [Apache License 2.0](../LICENSE).
