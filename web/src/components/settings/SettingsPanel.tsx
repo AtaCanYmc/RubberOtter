@@ -110,7 +110,7 @@ export const SettingsPanel: React.FC = () => {
                 : 'bg-zinc-100/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <Apple className="w-4 h-4 mx-auto mb-1" />
+            <Apple className="w-4 h-4 mx-auto mb-1 text-zinc-800 dark:text-zinc-100" />
             <h4 className="text-xs font-semibold">macOS</h4>
             <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Apple Mac</p>
           </button>
@@ -123,7 +123,7 @@ export const SettingsPanel: React.FC = () => {
                 : 'bg-zinc-100/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <Monitor className="w-4 h-4 mx-auto mb-1" />
+            <Monitor className="w-4 h-4 mx-auto mb-1 text-zinc-800 dark:text-zinc-100" />
             <h4 className="text-xs font-semibold">Windows</h4>
             <p className="text-[10px] text-zinc-500 font-mono mt-0.5">PC / Surface</p>
           </button>
@@ -136,7 +136,7 @@ export const SettingsPanel: React.FC = () => {
                 : 'bg-zinc-100/60 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
             }`}
           >
-            <Laptop className="w-4 h-4 mx-auto mb-1" />
+            <Laptop className="w-4 h-4 mx-auto mb-1 text-zinc-800 dark:text-zinc-100" />
             <h4 className="text-xs font-semibold">Linux</h4>
             <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Ubuntu/Debian</p>
           </button>
