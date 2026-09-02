@@ -9,7 +9,7 @@ from .client import RubberOtter, AsyncRubberOtter, RubberOtterConnectionError
 from .ai.tools import RubberOtterToolRegistry, ToolDefinition
 from .mcp.server import RubberOtterMcpServer, run_stdio_server
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __author__ = "Rubber Otter Developer"
 
 __all__ = [
