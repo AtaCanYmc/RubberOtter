@@ -18,6 +18,7 @@ import {
   Radio,
   RefreshCw,
   Bluetooth,
+  Power,
   ShieldCheck,
   AlertCircle,
   Cpu,
@@ -50,6 +51,14 @@ export const SettingsPanel: React.FC = () => {
       setHasLeScanSupport(true);
     }
   }, []);
+
+  const handleToggleConnection = async () => {
+    if (connectionState === 'connected') {
+      await disconnect();
+    } else {
+      await connect();
+    }
+  };
 
   const handleStartScan = async () => {
     setErrorMessage(null);
@@ -152,7 +161,7 @@ export const SettingsPanel: React.FC = () => {
         </button>
       </div>
 
-      {/* 1. BLE Device Scanner Section */}
+      {/* 1. BLE Device Scanner & Direct Connect Section */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-4 border-otter-500/30">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center space-x-3">
@@ -170,14 +179,41 @@ export const SettingsPanel: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleStartScan}
-            disabled={isScanning}
-            className="btn-tactile px-3.5 py-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50 border border-zinc-900 dark:border-zinc-200 self-start sm:self-auto"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
-            <span>{isScanning ? t('scanner.scanning') : t('scanner.startScan')}</span>
-          </button>
+          <div className="flex items-center space-x-2 self-start sm:self-auto">
+            {/* Primary Connect / Disconnect Toggle Button */}
+            <button
+              onClick={handleToggleConnection}
+              disabled={connectionState === 'connecting'}
+              className={`btn-tactile px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 border shadow-sm ${
+                connectionState === 'connected'
+                  ? 'bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-850 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                  : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 border-zinc-900 dark:border-zinc-200'
+              }`}
+            >
+              {connectionState === 'connected' ? (
+                <>
+                  <Power className="w-3.5 h-3.5" />
+                  <span>{t('header.disconnect')}</span>
+                </>
+              ) : (
+                <>
+                  <Bluetooth className="w-3.5 h-3.5" />
+                  <span>{connectionState === 'connecting' ? t('header.connecting') : t('header.connect')}</span>
+                </>
+              )}
+            </button>
+
+            {/* Scan Devices Picker */}
+            <button
+              onClick={handleStartScan}
+              disabled={isScanning}
+              className="btn-tactile px-3 py-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 font-semibold text-xs flex items-center space-x-1.5 border border-zinc-200 dark:border-zinc-800 disabled:opacity-50"
+              title={t('scanner.startScan')}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
+              <span>{isScanning ? t('scanner.scanning') : t('scanner.startScan')}</span>
+            </button>
+          </div>
         </div>
 
         {/* Advertisements API Badge */}

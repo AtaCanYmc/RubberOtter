@@ -1,20 +1,12 @@
 import React from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
-import { Bluetooth, Power, Terminal, Sun, Moon } from 'lucide-react';
+import { Terminal, Sun, Moon } from 'lucide-react';
 import { RubberOtterLogo } from '../brand/RubberOtterLogo';
 
 export const Header: React.FC = () => {
-  const { connectionState, statusMessage, connect, disconnect } = useBluetooth();
+  const { connectionState } = useBluetooth();
   const { settings, updateSettings, t } = useSettings();
-
-  const handleToggleConnection = async () => {
-    if (connectionState === 'connected') {
-      await disconnect();
-    } else {
-      await connect();
-    }
-  };
 
   const handleToggleTheme = () => {
     const nextTheme = settings.themeMode === 'dark' ? 'light' : 'dark';
@@ -25,21 +17,21 @@ export const Header: React.FC = () => {
     switch (connectionState) {
       case 'connected':
         return (
-          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
             <span>{t('header.connected')}</span>
           </span>
         );
       case 'connecting':
         return (
-          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-medium">
+          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-medium shadow-sm">
             <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-ping" />
             <span>{t('header.connecting')}</span>
           </span>
         );
       case 'error':
         return (
-          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-medium">
+          <span className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-medium shadow-sm">
             <span className="w-2 h-2 rounded-full bg-rose-500 dark:bg-rose-400" />
             <span>{t('header.error')}</span>
           </span>
@@ -78,8 +70,8 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Telemetry & Connection Controls */}
-        <div className="flex items-center space-x-2 sm:space-x-2.5">
+        {/* Telemetry & Quick Theme Switch */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="hidden sm:flex items-center space-x-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1">
               <Terminal className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
@@ -100,29 +92,8 @@ export const Header: React.FC = () => {
             )}
           </button>
 
+          {/* Live Status Badge */}
           {getStatusIndicator()}
-
-          <button
-            onClick={handleToggleConnection}
-            disabled={connectionState === 'connecting'}
-            className={`btn-tactile px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 border shadow-sm ${
-              connectionState === 'connected'
-                ? 'bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-850 text-rose-600 dark:text-rose-400 border-rose-500/30'
-                : 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 border-zinc-900 dark:border-zinc-200'
-            }`}
-          >
-            {connectionState === 'connected' ? (
-              <>
-                <Power className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">{t('header.disconnect')}</span>
-              </>
-            ) : (
-              <>
-                <Bluetooth className="w-3.5 h-3.5" />
-                <span>{connectionState === 'connecting' ? t('header.connecting') : t('header.connect')}</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
     </header>
