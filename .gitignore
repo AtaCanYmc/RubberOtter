@@ -1,15 +1,22 @@
-# Editor/IDE
-.vscode/
+# IDE / Editor
 .idea/
+.vscode/
 *.iml
-
-# macOS
+*.swp
+*.swo
+*~
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 
-# Arduino / PlatformIO
-*.pio/
-.pioenvs/
+# PlatformIO / Firmware build artifacts
 .pio/
+.pioenvs/
+firmware/.pio/
+firmware/.pioenvs/
+firmware/cmake-build-*/
 *.elf
 *.hex
 *.bin
@@ -18,33 +25,38 @@
 *.map
 *.a
 
-# Arduino build folders
-build/
-cmake-build-debug/
-
-# Arduino temp files
-*.tmp
-*.bak
-*~
-
-# Python
+# Python build & virtual environments
 __pycache__/
-*.pyc
-
-# Logs
-*.log
-
-# Node/Electron (in case desktop code in repo)
-node_modules/
+*.py[cod]
+*$py.class
+*.so
+*.dylib
+build/
 dist/
+*.egg-info/
+*.egg
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
 
-# Serial/USB device special files (don't accidentally commit)
-/dev/
+# Node / Web build & dependencies
+node_modules/
+web/node_modules/
+web/dist/
+web/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# README or docs artifacts
-*.pdf
-
-# Secrets (be careful not to commit credentials)
+# Logs & Secrets
+*.log
 .env
+.env.local
+.env.*.local
 secrets.json
-

@@ -1,8 +1,42 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
-    ".": {
+    "firmware": {
       "release-type": "simple",
+      "package-name": "rubber-otter-firmware",
+      "changelog-path": "CHANGELOG.md",
+      "component": "firmware",
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Code Refactoring" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
+      ]
+    },
+    "python": {
+      "release-type": "python",
+      "package-name": "rubberotter",
+      "changelog-path": "CHANGELOG.md",
+      "component": "python",
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Code Refactoring" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "ci", "section": "Continuous Integration" },
+        { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
+      ]
+    },
+    "web": {
+      "release-type": "node",
+      "package-name": "rubber-otter-web",
+      "changelog-path": "CHANGELOG.md",
+      "component": "web",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
       "changelog-sections": [
         { "type": "feat", "section": "Features" },
         { "type": "fix", "section": "Bug Fixes" },

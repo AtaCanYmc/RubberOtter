@@ -1,10 +1,49 @@
 version: 2
 updates:
+  # Maintain GitHub Actions workflow dependencies
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Istanbul"
+    open-pull-requests-limit: 10
+    labels:
+      - "ci"
+      - "actions"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+  # Maintain Python dependencies in /python
+  - package-ecosystem: "pip"
+    directory: "/python"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Istanbul"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
-      - "github-actions"
+      - "python"
+    commit-message:
+      prefix: "chore(python-deps)"
+      include: "scope"
+
+  # Maintain npm dependencies in /web
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Istanbul"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+    commit-message:
+      prefix: "chore(web-deps)"
+      include: "scope"

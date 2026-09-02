@@ -1,13 +1,13 @@
-name: CD - Deploy to GitHub Pages
+name: CD - Deploy PWA to GitHub Pages
 
 on:
   push:
     branches:
       - main
       - master
-  release:
-    types:
-      - published
+    paths:
+      - 'web/**'
+      - '.github/workflows/cd-github-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +26,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
 
     steps:
       - name: Checkout Repository
@@ -36,6 +39,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: web/package-lock.json
 
       - name: Install Dependencies
         run: npm ci
@@ -49,7 +53,7 @@ jobs:
       - name: Upload Pages Artifact (dist)
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: './web/dist'
 
       - name: Deploy Artifact to GitHub Pages
         id: deployment
