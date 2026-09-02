@@ -49,7 +49,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
 
   return (
     /* Mobile Sticky Bottom Navigation Bar */
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-obsidian-950/95 backdrop-blur-lg border-t border-zinc-200 dark:border-zinc-800/80 px-2 py-2 pb-safe transition-colors">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#09090b]/95 backdrop-blur-lg border-t border-zinc-200 dark:border-zinc-800/80 px-2 py-2 pb-safe transition-colors">
       <div className="flex items-center justify-between space-x-1 overflow-x-auto no-scrollbar">
         {tabItems.map((tab) => {
           const Icon = tab.icon;

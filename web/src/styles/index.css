@@ -1,6 +1,35 @@
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:is(.dark, .dark *));
+
+@theme {
+  --color-obsidian-950: #09090b;
+  --color-obsidian-900: #121215;
+  --color-obsidian-850: #18181b;
+  --color-obsidian-800: #27272a;
+  --color-obsidian-700: #3f3f46;
+
+  --color-otter-50: #f0fdfa;
+  --color-otter-100: #ccfbf1;
+  --color-otter-200: #99f6e4;
+  --color-otter-300: #5eead4;
+  --color-otter-400: #2dd4bf;
+  --color-otter-500: #14b8a6;
+  --color-otter-600: #0d9488;
+  --color-otter-700: #0f766e;
+  --color-otter-800: #115e59;
+  --color-otter-900: #134e4a;
+  --color-otter-950: #042f2e;
+
+  --color-accent-cyan: #06b6d4;
+  --color-accent-indigo: #6366f1;
+  --color-accent-emerald: #10b981;
+  --color-accent-amber: #f59e0b;
+  --color-accent-rose: #f43f5e;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
 @layer base {
   :root {
@@ -11,26 +40,57 @@
     color-scheme: dark;
   }
 
-  html, body {
+  html {
     background-color: #fafafa;
     color: #09090b;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.dark {
+    background-color: #09090b;
+    color: #f4f4f5;
+  }
+
+  body {
+    background-color: inherit;
+    color: inherit;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     overflow-x: clip;
     min-height: 100vh;
+    min-height: 100dvh;
     transition: background-color 150ms ease, color 150ms ease;
   }
 
-  html.dark, html.dark body {
-    background-color: #09090b;
-    color: #f4f4f5;
+  /* iOS Form Controls Reset for Dark Mode */
+  input, select, textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-family: inherit;
   }
+
+  html.dark input,
+  html.dark select,
+  html.dark textarea {
+    color-scheme: dark;
+  }
+}
+
+/* iOS Safe Area Padding Utilities */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+}
+.pt-safe {
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0.75rem));
 }
 
 /* Precision Instrument Card */
 .instrument-card {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(228, 228, 231, 0.9);
@@ -38,9 +98,9 @@
 }
 
 html.dark .instrument-card {
-  background-color: rgba(24, 24, 27, 0.7);
-  border: 1px solid rgba(63, 63, 70, 0.4);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+  background-color: rgba(24, 24, 27, 0.85);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.6);
 }
 
 .instrument-panel {
@@ -51,13 +111,14 @@ html.dark .instrument-card {
 }
 
 html.dark .instrument-panel {
-  background-color: rgba(18, 18, 21, 0.9);
-  border: 1px solid rgba(63, 63, 70, 0.4);
+  background-color: rgba(18, 18, 21, 0.95);
+  border: 1px solid rgba(63, 63, 70, 0.5);
 }
 
 /* Tactile Button Feedback */
 .btn-tactile {
   transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-touch-callout: none;
 }
 .btn-tactile:active {
   transform: scale(0.97);
@@ -70,7 +131,7 @@ html.dark .instrument-panel {
 }
 
 html.dark .trackpad-surface {
-  background-image: radial-gradient(circle, rgba(113, 113, 122, 0.2) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(113, 113, 122, 0.25) 1px, transparent 1px);
 }
 
 /* Custom Scrollbar */

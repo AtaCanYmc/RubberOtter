@@ -29,7 +29,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveMacros(macros);
   }, [macros]);
 
-  // Apply theme to document HTML element & sync Native Mobile Status Bar
+  // Apply theme to document HTML element & sync Native Mobile Status Bar + Meta Theme Color
   useEffect(() => {
     const applyTheme = () => {
       const mode = settings.themeMode || 'dark';
@@ -53,6 +53,19 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
 
+      // 1. Set explicit colorScheme on document
+      root.style.colorScheme = isDark ? 'dark' : 'light';
+
+      // 2. Set explicit background on body to prevent white flashes on iOS bounce
+      document.body.style.backgroundColor = isDark ? '#09090b' : '#fafafa';
+
+      // 3. Dynamically update meta theme-color for iOS Safari / PWA top and bottom bars
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (themeMeta) {
+        themeMeta.setAttribute('content', isDark ? '#09090b' : '#fafafa');
+      }
+
+      // 4. Update Native Mobile Status Bar (iOS Core / Android)
       universalBle.setStatusBarStyle(isDark);
     };
 

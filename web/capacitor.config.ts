@@ -4,6 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.rubberotter.app',
   appName: 'Rubber Otter',
   webDir: 'dist',
+  backgroundColor: '#09090b',
   server: {
     androidScheme: 'https',
     cleartext: true

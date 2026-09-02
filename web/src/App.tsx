@@ -16,7 +16,7 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('text');
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-obsidian-950 text-zinc-900 dark:text-zinc-100 select-none transition-colors">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 select-none transition-colors">
       {/* Sticky Hardware Header with Desktop Navigation Tabs */}
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
 
