@@ -1,7 +1,8 @@
 import React from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
-import { Bluetooth, Power, Radio, Terminal, Sun, Moon } from 'lucide-react';
+import { Bluetooth, Power, Terminal, Sun, Moon } from 'lucide-react';
+import { RubberOtterLogo } from '../brand/RubberOtterLogo';
 
 export const Header: React.FC = () => {
   const { connectionState, statusMessage, connect, disconnect } = useBluetooth();
@@ -59,9 +60,7 @@ export const Header: React.FC = () => {
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         {/* Brand & Identity */}
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center text-otter-600 dark:text-otter-400 shadow-sm">
-            <Radio className="w-4 h-4 text-otter-600 dark:text-otter-400" />
-          </div>
+          <RubberOtterLogo size={36} className="flex-shrink-0" />
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
