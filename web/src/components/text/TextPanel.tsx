@@ -29,7 +29,7 @@ export const TextPanel: React.FC = () => {
 
     try {
       if (settings.protocolMode === 'framed_ascii') {
-        const escaped = text.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        const escaped = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
         let commandStr = `type "${escaped}"`;
         if (autoEnter) {
           commandStr += ' && enter';
