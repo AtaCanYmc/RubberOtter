@@ -1,17 +1,12 @@
 import React from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
-import { Terminal, Sun, Moon } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import { RubberOtterLogo } from '../brand/RubberOtterLogo';
 
 export const Header: React.FC = () => {
   const { connectionState } = useBluetooth();
-  const { settings, updateSettings, t } = useSettings();
-
-  const handleToggleTheme = () => {
-    const nextTheme = settings.themeMode === 'dark' ? 'light' : 'dark';
-    updateSettings({ themeMode: nextTheme });
-  };
+  const { settings, t } = useSettings();
 
   const getStatusIndicator = () => {
     switch (connectionState) {
@@ -70,7 +65,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Telemetry & Quick Theme Switch */}
+        {/* Telemetry & Connection Status */}
         <div className="flex items-center space-x-2 sm:space-x-3">
           <div className="hidden sm:flex items-center space-x-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1">
@@ -78,19 +73,6 @@ export const Header: React.FC = () => {
               <span>{settings.protocolMode === 'framed_ascii' ? 'ASCII' : 'HEX'}</span>
             </span>
           </div>
-
-          {/* Quick Theme Switch Button */}
-          <button
-            onClick={handleToggleTheme}
-            className="btn-tactile p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
-            title={settings.themeMode === 'dark' ? t('header.switchLight') : t('header.switchDark')}
-          >
-            {settings.themeMode === 'dark' ? (
-              <Sun className="w-4 h-4 text-amber-400" />
-            ) : (
-              <Moon className="w-4 h-4 text-zinc-700" />
-            )}
-          </button>
 
           {/* Live Status Badge */}
           {getStatusIndicator()}
