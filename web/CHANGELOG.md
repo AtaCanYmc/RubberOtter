@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.2.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.1.0...web-v2.2.0) (2026-09-02)
+
+
+### Features
+
+* **brand:** add custom vector Rubber Otter logo and favicon SVG ([0757cc0](https://github.com/AtaCanYmc/RubberOtter/commit/0757cc0363df6fe8012f02c75b133118eed29a86))
+* **favicon:** install RealFaviconGenerator icons and webmanifest ([c839bb5](https://github.com/AtaCanYmc/RubberOtter/commit/c839bb53ae8a038d471cf71d28bbb60686a61fec))
+* **header:** embed desktop navigation tabs directly into header ([bcb1dfa](https://github.com/AtaCanYmc/RubberOtter/commit/bcb1dfae8f9162c0d0fc24443a8fa4c32f2c7413))
+* **header:** move connect button from header into BLE scanner card in settings ([c2c2115](https://github.com/AtaCanYmc/RubberOtter/commit/c2c211517263ffd374cb4cda390081916042e439))
+* **i18n:** add English, Turkish, German, French, and Spanish localization support ([20ec14c](https://github.com/AtaCanYmc/RubberOtter/commit/20ec14c04f1d92d8a3222db43fe9e0a6861d17e8))
+* **settings:** add dark mode, light mode, and system theme switcher ([d48dc71](https://github.com/AtaCanYmc/RubberOtter/commit/d48dc71e0e94c832712a4b7b7b54b8275cc2e7ae))
+* **settings:** move BLE device scanner into settings panel and streamline navbar ([9876432](https://github.com/AtaCanYmc/RubberOtter/commit/98764326585091d8b9a5ce6e4a26058e46fab6ee))
+* **web:** complete redesign with Hallmark Dark Precision instrument theme and full responsive layout ([7ba23da](https://github.com/AtaCanYmc/RubberOtter/commit/7ba23dac09ea64ef7bbf14f6de66f0742281366a))
+* **web:** import RubberOtterWeb repository as web package ([d1efe63](https://github.com/AtaCanYmc/RubberOtter/commit/d1efe630a0d974a5bcb203bd5f9ff7594e68fdeb))
+
+
+### Bug Fixes
+
+* **contrast:** resolve white-on-white active selection and icon contrast in dark mode ([5922a3f](https://github.com/AtaCanYmc/RubberOtter/commit/5922a3f4eb9b50d211bf54a3dd62f9b78b0230f5))
+* resolve code scanning alerts [#1](https://github.com/AtaCanYmc/RubberOtter/issues/1)-[#8](https://github.com/AtaCanYmc/RubberOtter/issues/8) in web APIs and text escaping ([3544809](https://github.com/AtaCanYmc/RubberOtter/commit/3544809e46ff81b127a8f77b7ce302dc33d31cd5))
+* **ui:** enhance dark mode logo visibility and icon contrast across panels ([d0409bb](https://github.com/AtaCanYmc/RubberOtter/commit/d0409bb1300d70ca600f5606daaf75884bd68082))
+
+
+### Code Refactoring
+
+* **header:** remove theme toggle button from header ([9b2fef4](https://github.com/AtaCanYmc/RubberOtter/commit/9b2fef4a9170ab038b2fcf8919c64ae882b118f1))
+
+
+### Documentation
+
+* **assets:** add custom cyberpunk AI banners to all READMEs ([3f6e039](https://github.com/AtaCanYmc/RubberOtter/commit/3f6e039e868f13348246e4f8d2a8e524ea559d54))
+
 ## [2.1.0](https://github.com/AtaCanYmc/RubberOtterWeb/compare/rubber-otter-web-v2.0.0...rubber-otter-web-v2.1.0) (2026-08-19)
 
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/AtaCanYmc/RubberOtter/compare/firmware-v1.1.2...firmware-v1.2.0) (2026-09-02)
+
+
+### Features
+
+* **protocol:** add support for framed ASCII protocol and update settings ([798ea1b](https://github.com/AtaCanYmc/RubberOtter/commit/798ea1bfb80278ce9d98c983875bea44fd5291ac))
+
+
+### Code Refactoring
+
+* **firmware:** move firmware files into firmware/ directory ([ca968a5](https://github.com/AtaCanYmc/RubberOtter/commit/ca968a57dc1410a06d18441ff69652a1790cb163))
+
+
+### Documentation
+
+* **assets:** add custom cyberpunk AI banners to all READMEs ([3f6e039](https://github.com/AtaCanYmc/RubberOtter/commit/3f6e039e868f13348246e4f8d2a8e524ea559d54))
+
 ## [1.1.2](https://github.com/AtaCanYmc/RubberOtter/compare/v1.1.1...v1.1.2) (2026-08-19)
 
 
