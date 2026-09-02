@@ -1,6 +1,10 @@
+<p align="center">
+  <img src="docs/assets/banner.jpg" alt="Rubber Otter Firmware Banner" width="100%" />
+</p>
+
 # 🦦 Rubber Otter — Modular Bluetooth HID Firmware
 
-[![CI Pipeline](https://github.com/USERNAME/RubberOtter/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/RubberOtter/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml)
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-orange.svg)](https://platformio.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Target MCU](https://img.shields.io/badge/MCU-ATmega32U4%20%7C%20Leonardo%20%7C%20Pro%20Micro-cyan.svg)](https://www.microchip.com/en-us/product/ATmega32u4)

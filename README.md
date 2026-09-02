@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/banner.jpg" alt="Rubber Otter Banner" width="100%" />
+</p>
+
 # 🦦 Rubber Otter — Unified Bluetooth HID Ecosystem
 
 [![Firmware CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml)

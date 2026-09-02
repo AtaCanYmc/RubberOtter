@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/banner.jpg" alt="RubberOtterPy Banner" width="100%" />
+</p>
+
 # 🦦 RubberOtterPy — Comprehensive Python SDK, CLI & Web Dashboard
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)

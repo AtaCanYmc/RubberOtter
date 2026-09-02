@@ -1,7 +1,11 @@
-# Master-Key Bluetooth HID Bridge (RubberOtterWeb)
+<p align="center">
+  <img src="docs/assets/banner.jpg" alt="RubberOtterWeb Banner" width="100%" />
+</p>
 
-[![CI Pipeline](https://github.com/USERNAME/RubberOtterWeb/actions/workflows/ci.yml/badge.svg)](https://github.com/USERNAME/RubberOtterWeb/actions/workflows/ci.yml)
-[![Deploy PWA](https://github.com/USERNAME/RubberOtterWeb/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/USERNAME/RubberOtterWeb/actions/workflows/cd-github-pages.yml)
+# 🦦 RubberOtterWeb — Web Bluetooth PWA Controller
+
+[![CI Pipeline](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml)
+[![Deploy PWA](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Built with React & Vite](https://img.shields.io/badge/Stack-Vite%20%7C%20React%2018%20%7C%20TS-cyan)](https://vitejs.dev)
 
