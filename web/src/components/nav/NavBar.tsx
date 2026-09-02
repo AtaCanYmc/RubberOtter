@@ -2,7 +2,6 @@ import React from 'react';
 import { useSettings } from '../../context/SettingsContext';
 import { Translations } from '../../i18n/translations';
 import {
-  Radar,
   Type,
   Music,
   Presentation,
@@ -14,7 +13,6 @@ import {
 } from 'lucide-react';
 
 export type TabId =
-  | 'scanner'
   | 'text'
   | 'media'
   | 'reader'
@@ -36,7 +34,6 @@ interface TabItem {
 }
 
 export const tabItems: TabItem[] = [
-  { id: 'scanner', labelKey: 'nav.scanner', icon: Radar },
   { id: 'text', labelKey: 'nav.text', icon: Type },
   { id: 'media', labelKey: 'nav.media', icon: Music },
   { id: 'reader', labelKey: 'nav.presenter', icon: Presentation },
@@ -84,7 +81,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`btn-tactile flex flex-col items-center justify-center min-w-[58px] py-1.5 px-1 rounded-lg transition-all border ${
+                className={`btn-tactile flex flex-col items-center justify-center min-w-[62px] py-1.5 px-1 rounded-lg transition-all border ${
                   isActive
                     ? 'bg-otter-500/10 dark:bg-otter-950/40 text-otter-900 dark:text-otter-200 font-semibold border-otter-500 dark:border-otter-500/80 shadow-sm'
                     : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'

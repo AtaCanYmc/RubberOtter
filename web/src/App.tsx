@@ -3,7 +3,6 @@ import { SettingsProvider } from './context/SettingsContext';
 import { BluetoothProvider } from './context/BluetoothContext';
 import { Header } from './components/header/Header';
 import { NavBar, TabId } from './components/nav/NavBar';
-import { ScannerPanel } from './components/scanner/ScannerPanel';
 import { TextPanel } from './components/text/TextPanel';
 import { MediaPanel } from './components/media/MediaPanel';
 import { PresentationPanel } from './components/presentation/PresentationPanel';
@@ -14,7 +13,7 @@ import { ConsolePanel } from './components/console/ConsolePanel';
 import { SettingsPanel } from './components/settings/SettingsPanel';
 
 export const AppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('scanner');
+  const [activeTab, setActiveTab] = useState<TabId>('text');
 
   return (
     <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-obsidian-950 text-zinc-900 dark:text-zinc-100 select-none transition-colors">
@@ -28,7 +27,6 @@ export const AppContent: React.FC = () => {
 
         {/* Panel Viewport Container */}
         <div className="flex-1 flex flex-col">
-          {activeTab === 'scanner' && <ScannerPanel />}
           {activeTab === 'text' && <TextPanel />}
           {activeTab === 'media' && <MediaPanel />}
           {activeTab === 'reader' && <PresentationPanel />}
