@@ -17,25 +17,28 @@ export const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('scanner');
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-cyber-dark text-slate-100 select-none">
-      {/* Sticky Top Header */}
+    <div className="min-h-screen flex flex-col bg-obsidian-950 text-zinc-100 select-none">
+      {/* Sticky Hardware Header */}
       <Header />
 
-      {/* Tab View Pane Container */}
-      <main className="flex-1 max-w-md w-full mx-auto p-4 flex flex-col">
-        {activeTab === 'scanner' && <ScannerPanel />}
-        {activeTab === 'text' && <TextPanel />}
-        {activeTab === 'media' && <MediaPanel />}
-        {activeTab === 'reader' && <PresentationPanel />}
-        {activeTab === 'security' && <SecurityPanel />}
-        {activeTab === 'gaming' && <GamingPanel />}
-        {activeTab === 'trackpad' && <TrackpadPanel />}
-        {activeTab === 'console' && <ConsolePanel />}
-        {activeTab === 'settings' && <SettingsPanel />}
-      </main>
+      {/* Main Responsive Workstation Container */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col">
+        {/* Desktop / Tablet Nav Pill Bar */}
+        <NavBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Sticky Bottom Navigation Bar */}
-      <NavBar activeTab={activeTab} setActiveTab={setActiveTab} />
+        {/* Panel Viewport Container */}
+        <div className="flex-1 flex flex-col">
+          {activeTab === 'scanner' && <ScannerPanel />}
+          {activeTab === 'text' && <TextPanel />}
+          {activeTab === 'media' && <MediaPanel />}
+          {activeTab === 'reader' && <PresentationPanel />}
+          {activeTab === 'security' && <SecurityPanel />}
+          {activeTab === 'gaming' && <GamingPanel />}
+          {activeTab === 'trackpad' && <TrackpadPanel />}
+          {activeTab === 'console' && <ConsolePanel />}
+          {activeTab === 'settings' && <SettingsPanel />}
+        </div>
+      </main>
     </div>
   );
 };

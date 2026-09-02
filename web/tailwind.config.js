@@ -8,36 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#ecfeff',
-          100: '#cffafe',
-          400: '#22d3ee',
-          500: '#06b6d4',
-          600: '#0891b2',
-          900: '#164e63',
+        obsidian: {
+          950: '#09090b',
+          900: '#121215',
+          850: '#18181b',
+          800: '#27272a',
+          700: '#3f3f46',
         },
-        cyber: {
-          dark: '#070a12',
-          card: '#0f172a',
-          accent: '#38bdf8',
-          neon: '#10b981',
-          rose: '#f43f5e',
+        otter: {
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488',
+          900: '#134e4a',
+        },
+        accent: {
+          cyan: '#06b6d4',
+          indigo: '#6366f1',
+          emerald: '#10b981',
           amber: '#f59e0b',
+          rose: '#f43f5e',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
-      animation: {
-        'pulse-glow': 'pulseGlow 2s infinite ease-in-out',
-        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-      },
-      keyframes: {
-        pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 15px rgba(6, 182, 212, 0.4)' },
-          '50%': { boxShadow: '0 0 25px rgba(6, 182, 212, 0.8)' },
-        }
+      boxShadow: {
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.4)',
+        'tactile': '0 2px 4px -1px rgba(0, 0, 0, 0.6), 0 1px 2px -1px rgba(0, 0, 0, 0.4)',
+        'elevated': '0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8)',
       }
     },
   },

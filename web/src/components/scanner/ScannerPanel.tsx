@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
-import { Radar, Bluetooth, RefreshCw, Signal, CheckCircle2, AlertCircle, ShieldCheck, ArrowRight, Zap } from 'lucide-react';
+import {
+  Radar,
+  Bluetooth,
+  RefreshCw,
+  Signal,
+  CheckCircle2,
+  AlertCircle,
+  ShieldCheck,
+  ArrowRight,
+  Radio,
+  Cpu
+} from 'lucide-react';
 
 interface ScannedDevice {
   id: string;
@@ -22,7 +33,6 @@ export const ScannerPanel: React.FC = () => {
   const [hasLeScanSupport, setHasLeScanSupport] = useState(false);
 
   useEffect(() => {
-    // Check if experimental requestLEScan is available in browser
     if (typeof navigator !== 'undefined' && 'bluetooth' in navigator && 'requestLEScan' in (navigator.bluetooth as any)) {
       setHasLeScanSupport(true);
     }
@@ -34,10 +44,9 @@ export const ScannerPanel: React.FC = () => {
 
     try {
       if (typeof navigator === 'undefined' || !navigator.bluetooth) {
-        throw new Error('Web Bluetooth API is not supported in this browser.');
+        throw new Error('Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or Opera.');
       }
 
-      // 1. Trigger Native Web Bluetooth Picker Scan
       const device = await navigator.bluetooth.requestDevice({
         filters: [
           { namePrefix: 'Otter' },
@@ -52,7 +61,6 @@ export const ScannerPanel: React.FC = () => {
           '00001800-0000-1000-8000-00805f9b34fb'
         ]
       }).catch(async () => {
-        // Fallback scan accepting all devices
         return await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: [
@@ -67,9 +75,9 @@ export const ScannerPanel: React.FC = () => {
         const newDevice: ScannedDevice = {
           id: device.id,
           name: device.name || 'Unnamed BLE Device',
-          rssi: -65, // Typical indoor BLE RSSI estimate
+          rssi: -62,
           serviceUuids: [settings.serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb'],
-          lastSeen: new Date().toLocaleTimeString(),
+          lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
           isConnected: connectionState === 'connected'
         };
 
@@ -78,7 +86,6 @@ export const ScannerPanel: React.FC = () => {
           return [newDevice, ...filtered];
         });
 
-        // Trigger connection
         await connect();
       }
     } catch (err: any) {
@@ -91,95 +98,70 @@ export const ScannerPanel: React.FC = () => {
   };
 
   const getRssiColor = (rssi?: number) => {
-    if (!rssi) return 'text-slate-400';
-    if (rssi >= -60) return 'text-emerald-400';
-    if (rssi >= -75) return 'text-amber-400';
+    if (!rssi) return 'text-zinc-500';
+    if (rssi >= -65) return 'text-emerald-400';
+    if (rssi >= -78) return 'text-amber-400';
     return 'text-rose-400';
   };
 
-  const getRssiLabel = (rssi?: number) => {
-    if (!rssi) return 'Unknown';
-    if (rssi >= -60) return 'Excellent (-60 dBm)';
-    if (rssi >= -75) return 'Good (-75 dBm)';
-    return 'Weak (-90 dBm)';
-  };
-
   return (
-    <div className="flex-1 flex flex-col space-y-5">
-      {/* Header Banner */}
-      <div className="glass-card rounded-2xl p-5 shadow-xl flex items-center justify-between border-brand-500/20">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
-            <Radar className={`w-5 h-5 ${isScanning ? 'animate-spin text-brand-400' : ''}`} />
+    <div className="flex-1 flex flex-col space-y-4">
+      {/* Action Header Card */}
+      <div className="instrument-card rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-otter-400 shadow-subtle">
+            <Radio className={`w-5 h-5 ${isScanning ? 'animate-spin text-otter-400' : ''}`} />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base font-bold text-slate-100">BLE Device Scanner</h2>
-              <span className="px-2 py-0.5 rounded bg-brand-500/20 border border-brand-500/40 text-[9px] font-mono font-bold text-brand-300 flex items-center space-x-1">
-                <Zap className="w-2.5 h-2.5 text-brand-400" />
-                <span>BLE Only (GATT)</span>
+              <h2 className="text-sm font-semibold text-zinc-100">BLE Device Scanner</h2>
+              <span className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/50 text-[10px] font-mono text-zinc-300">
+                GATT 0xFFE0
               </span>
             </div>
-            <p className="text-xs text-slate-400">Scan Bluetooth Low Energy hardware (HM-10 / ESP32 BLE)</p>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Discover and pair with HM-10, BT05, or ESP32 Bluetooth Low Energy modules
+            </p>
           </div>
         </div>
 
         <button
           onClick={handleStartScan}
           disabled={isScanning}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 active:scale-95 transition-all flex items-center space-x-2 disabled:opacity-50"
+          className="btn-tactile px-4 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
           <span>{isScanning ? 'Scanning...' : 'Start Scan'}</span>
         </button>
       </div>
 
-      {/* Experimental Scanner Banner */}
+      {/* Experimental Advertisements Banner */}
       {hasLeScanSupport && (
-        <div className="glass-card rounded-xl p-3 flex items-center space-x-3 border-emerald-500/30 bg-emerald-500/5">
+        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
           <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-          <p className="text-[11px] text-emerald-300">
-            Web Bluetooth LE Advertisement Scanning API is supported in your browser!
-          </p>
+          <span>Web Bluetooth LE Advertisement Scanning API is supported in your browser.</span>
         </div>
       )}
 
-      {/* Error Message Alert */}
+      {/* Error Message */}
       {errorMessage && (
-        <div className="glass-card rounded-xl p-3 flex items-center space-x-3 border-rose-500/30 bg-rose-500/10">
+        <div className="rounded-lg p-3 flex items-center space-x-2.5 bg-rose-950/30 border border-rose-500/30 text-rose-300 text-xs font-medium">
           <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-          <p className="text-xs text-rose-300">{errorMessage}</p>
+          <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* Radar Visual Animation Area */}
-      {isScanning && (
-        <div className="glass-card rounded-2xl p-8 text-center flex flex-col items-center justify-center space-y-4 border-brand-500/30 relative overflow-hidden">
-          <div className="relative w-24 h-24 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-brand-500/40 animate-ping" />
-            <div className="absolute inset-2 rounded-full border border-indigo-500/30 animate-pulse" />
-            <div className="w-12 h-12 rounded-full bg-brand-500/20 border border-brand-400/50 flex items-center justify-center text-brand-300 shadow-xl">
-              <Bluetooth className="w-6 h-6 animate-pulse" />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-200">Searching Nearby BLE Devices...</h3>
-            <p className="text-xs text-slate-400 mt-1">Listening for HM-10, Otter & ESP32 BLE beacons</p>
-          </div>
-        </div>
-      )}
-
-      {/* Discovered Devices List */}
+      {/* Discovered Devices Container */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-            <Bluetooth className="w-3.5 h-3.5 text-brand-400" />
-            <span>Discovered BLE Devices ({devices.length})</span>
+          <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center space-x-2">
+            <Bluetooth className="w-3.5 h-3.5 text-otter-400" />
+            <span>Discovered Hardware ({devices.length})</span>
           </h3>
           {devices.length > 0 && (
             <button
               onClick={() => setDevices([])}
-              className="text-[10px] text-slate-400 hover:text-slate-200 transition-colors"
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
             >
               Clear List
             </button>
@@ -187,59 +169,59 @@ export const ScannerPanel: React.FC = () => {
         </div>
 
         {devices.length === 0 && !isScanning ? (
-          <div className="glass-card rounded-2xl p-8 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700 mx-auto flex items-center justify-center text-slate-500">
-              <Radar className="w-6 h-6" />
+          <div className="instrument-card rounded-xl p-8 text-center space-y-3">
+            <div className="w-11 h-11 rounded-lg bg-zinc-900 border border-zinc-800 mx-auto flex items-center justify-center text-zinc-500">
+              <Radar className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-300">No BLE Devices Discovered Yet</h4>
-              <p className="text-[11px] text-slate-500 max-w-xs mx-auto mt-1">
-                Tap <strong>Start Scan</strong> above to discover surrounding HM-10, Otter or ESP32 Bluetooth Low Energy modules.
+              <h4 className="text-xs font-semibold text-zinc-300">No BLE Devices Found Yet</h4>
+              <p className="text-xs text-zinc-500 max-w-sm mx-auto mt-1">
+                Click <strong>Start Scan</strong> above to open the native Web Bluetooth picker and connect to your Rubber Otter microcontroller.
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-3">
             {devices.map((device) => {
               const isConnected = connectionState === 'connected';
               return (
                 <div
                   key={device.id}
-                  className={`glass-card rounded-2xl p-4 transition-all duration-200 border ${
+                  className={`instrument-card rounded-xl p-4 transition-all duration-150 border ${
                     isConnected
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-slate-800 hover:border-brand-500/30'
+                      ? 'border-emerald-500/40 bg-emerald-950/10'
+                      : 'border-zinc-800/80 hover:border-zinc-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center space-x-3.5">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center ${
                           isConnected
-                            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
-                            : 'bg-brand-500/10 border border-brand-500/20 text-brand-400'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-zinc-850 text-zinc-300 border border-zinc-700/60'
                         }`}
                       >
-                        <Bluetooth className="w-5 h-5" />
+                        <Cpu className="w-4 h-4" />
                       </div>
 
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="text-xs font-bold text-slate-100">{device.name}</h4>
+                          <h4 className="text-xs font-semibold text-zinc-100">{device.name}</h4>
                           {isConnected && (
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-[9px] font-bold text-emerald-400 flex items-center space-x-1">
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-[10px] font-medium text-emerald-400 flex items-center space-x-1">
                               <CheckCircle2 className="w-2.5 h-2.5" />
                               <span>Connected</span>
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center space-x-3 mt-1 text-[10px] text-slate-400 font-mono">
+                        <div className="flex items-center space-x-3 mt-1 text-[11px] text-zinc-400 font-mono">
                           <span className={`flex items-center space-x-1 ${getRssiColor(device.rssi)}`}>
                             <Signal className="w-3 h-3" />
-                            <span>{getRssiLabel(device.rssi)}</span>
+                            <span>{device.rssi} dBm</span>
                           </span>
-                          <span>•</span>
+                          <span className="text-zinc-600">•</span>
                           <span>Seen: {device.lastSeen}</span>
                         </div>
                       </div>
@@ -247,10 +229,10 @@ export const ScannerPanel: React.FC = () => {
 
                     <button
                       onClick={isConnected ? disconnect : connect}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                      className={`btn-tactile px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 border ${
                         isConnected
-                          ? 'bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/30'
-                          : 'bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 border border-brand-500/40'
+                          ? 'bg-zinc-900 hover:bg-zinc-850 text-rose-400 border-rose-500/30'
+                          : 'bg-zinc-800 hover:bg-zinc-750 text-zinc-100 border-zinc-700/60'
                       }`}
                     >
                       {isConnected ? (
@@ -258,23 +240,10 @@ export const ScannerPanel: React.FC = () => {
                       ) : (
                         <>
                           <span>Connect</span>
-                          <ArrowRight className="w-3 h-3" />
+                          <ArrowRight className="w-3 h-3 text-zinc-400" />
                         </>
                       )}
                     </button>
-                  </div>
-
-                  {/* Service Badges */}
-                  <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center space-x-2 overflow-x-auto">
-                    <span className="text-[9px] text-slate-500 font-mono uppercase">GATT Services:</span>
-                    {device.serviceUuids.map((uuid, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[9px] font-mono text-slate-400"
-                      >
-                        {uuid.slice(0, 8)}...
-                      </span>
-                    ))}
                   </div>
                 </div>
               );

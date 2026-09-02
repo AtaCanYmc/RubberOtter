@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { PROTOCOL } from '../../protocol/byteMap';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Disc } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Music } from 'lucide-react';
 
 export const MediaPanel: React.FC = () => {
   const { sendByte } = useBluetooth();
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
@@ -13,98 +13,95 @@ export const MediaPanel: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between space-y-6">
-      {/* Media Header Card */}
-      <div className="glass-card rounded-2xl p-6 text-center shadow-xl space-y-4 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-brand-600/30 to-indigo-600/30 border border-brand-500/40 flex items-center justify-center text-brand-400 shadow-lg shadow-brand-500/10 relative">
-          <Disc className={`w-10 h-10 ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '4s' }} />
+    <div className="flex-1 flex flex-col space-y-4">
+      {/* Header Deck Card */}
+      <div className="instrument-card rounded-xl p-6 text-center space-y-3">
+        <div className="w-14 h-14 mx-auto rounded-xl bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-otter-400 shadow-subtle">
+          <Music className={`w-7 h-7 ${isPlaying ? 'animate-pulse text-otter-400' : 'text-zinc-400'}`} />
         </div>
 
         <div>
-          <h2 className="text-base font-bold text-slate-100">Media Controller</h2>
-          <p className="text-xs text-slate-400">System audio & media playback</p>
+          <h2 className="text-sm font-semibold text-zinc-100">Media & Volume Deck</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">Control host OS audio playback, tracks, and sound levels</p>
         </div>
 
-        {/* Equalizer animation bars */}
-        <div className="flex items-center justify-center space-x-1 pt-1 h-6">
-          {[...Array(9)].map((_, i) => (
+        {/* Tactile Audio Bars */}
+        <div className="flex items-center justify-center space-x-1.5 pt-1 h-5">
+          {[4, 8, 14, 18, 10, 16, 12, 6].map((h, i) => (
             <div
               key={i}
-              className={`w-1 bg-brand-400 rounded-full transition-all duration-300 ${
-                isPlaying ? 'animate-pulse' : 'h-1 opacity-30'
+              className={`w-1 rounded-full transition-all duration-300 ${
+                isPlaying ? 'bg-otter-400' : 'bg-zinc-700 h-1.5'
               }`}
               style={{
-                height: isPlaying ? `${Math.floor(Math.random() * 18) + 6}px` : '4px',
-                animationDelay: `${i * 0.1}s`,
+                height: isPlaying ? `${h}px` : '4px',
               }}
             />
           ))}
         </div>
       </div>
 
-      {/* Media Main Controls */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Main Playback Deck */}
+      <div className="grid grid-cols-3 gap-3">
         {/* Prev Track */}
         <button
           onClick={() => sendByte(PROTOCOL.MEDIA_PREV_TRACK, 'subtle')}
-          className="glass-card hover:bg-slate-800/80 active:bg-brand-600/30 rounded-2xl p-5 flex flex-col items-center justify-center space-y-2 transition-all duration-150 active:scale-95 group shadow-lg"
+          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl p-5 flex flex-col items-center justify-center space-y-2 group border-zinc-800"
         >
-          <SkipBack className="w-7 h-7 text-slate-300 group-hover:text-brand-400" />
-          <span className="text-xs font-semibold text-slate-400 group-hover:text-slate-200">Prev</span>
+          <SkipBack className="w-6 h-6 text-zinc-300 group-hover:text-white" />
+          <span className="text-xs font-medium text-zinc-400 group-hover:text-zinc-200">Previous</span>
         </button>
 
-        {/* Play / Pause */}
+        {/* Play / Pause Primary Button */}
         <button
           onClick={handlePlayPause}
-          className="glass-card bg-gradient-to-tr from-brand-600/40 to-indigo-600/40 hover:from-brand-600/60 hover:to-indigo-600/60 border-brand-500/50 active:scale-95 rounded-2xl p-5 flex flex-col items-center justify-center space-y-2 transition-all duration-150 group shadow-xl shadow-brand-500/20"
+          className="btn-tactile rounded-xl p-5 flex flex-col items-center justify-center space-y-2 bg-zinc-100 hover:bg-white text-zinc-950 font-semibold border border-zinc-200 shadow-sm"
         >
           {isPlaying ? (
-            <Pause className="w-8 h-8 text-brand-300 group-hover:scale-110 transition-transform" />
+            <Pause className="w-6 h-6 text-zinc-950" />
           ) : (
-            <Play className="w-8 h-8 text-brand-300 group-hover:scale-110 transition-transform ml-0.5" />
+            <Play className="w-6 h-6 text-zinc-950 ml-0.5" />
           )}
-          <span className="text-xs font-bold text-brand-200">Play/Pause</span>
+          <span className="text-xs font-semibold">{isPlaying ? 'Pause' : 'Play'}</span>
         </button>
 
         {/* Next Track */}
         <button
           onClick={() => sendByte(PROTOCOL.MEDIA_NEXT_TRACK, 'subtle')}
-          className="glass-card hover:bg-slate-800/80 active:bg-brand-600/30 rounded-2xl p-5 flex flex-col items-center justify-center space-y-2 transition-all duration-150 active:scale-95 group shadow-lg"
+          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl p-5 flex flex-col items-center justify-center space-y-2 group border-zinc-800"
         >
-          <SkipForward className="w-7 h-7 text-slate-300 group-hover:text-brand-400" />
-          <span className="text-xs font-semibold text-slate-400 group-hover:text-slate-200">Next</span>
+          <SkipForward className="w-6 h-6 text-zinc-300 group-hover:text-white" />
+          <span className="text-xs font-medium text-zinc-400 group-hover:text-zinc-200">Next</span>
         </button>
       </div>
 
-      {/* Volume Controls */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Volume Controls Grid */}
+      <div className="grid grid-cols-3 gap-3">
         {/* Vol Down */}
         <button
           onClick={() => sendByte(PROTOCOL.MEDIA_VOL_DOWN, 'subtle')}
-          className="glass-card hover:bg-slate-800/80 active:bg-slate-700/50 rounded-2xl p-4 flex flex-col items-center justify-center space-y-1 transition-all duration-150 active:scale-95 group"
+          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-300 hover:text-white"
         >
-          <Volume1 className="w-5 h-5 text-slate-300 group-hover:text-amber-400" />
-          <span className="text-xs font-medium text-slate-400">Vol -</span>
+          <Volume1 className="w-5 h-5 text-zinc-400" />
+          <span className="text-xs font-medium">Vol Down</span>
         </button>
 
         {/* Mute */}
         <button
           onClick={() => sendByte(PROTOCOL.MEDIA_MUTE, 'alert')}
-          className="glass-card hover:bg-rose-950/40 border-rose-500/30 active:scale-95 rounded-2xl p-4 flex flex-col items-center justify-center space-y-1 transition-all duration-150 group"
+          className="btn-tactile instrument-card hover:bg-rose-950/20 hover:border-rose-500/30 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-300 hover:text-rose-400"
         >
-          <VolumeX className="w-5 h-5 text-slate-300 group-hover:text-rose-400" />
-          <span className="text-xs font-medium text-slate-400 group-hover:text-rose-300">Mute</span>
+          <VolumeX className="w-5 h-5 text-zinc-400 hover:text-rose-400" />
+          <span className="text-xs font-medium">Mute Toggle</span>
         </button>
 
         {/* Vol Up */}
         <button
           onClick={() => sendByte(PROTOCOL.MEDIA_VOL_UP, 'subtle')}
-          className="glass-card hover:bg-slate-800/80 active:bg-slate-700/50 rounded-2xl p-4 flex flex-col items-center justify-center space-y-1 transition-all duration-150 active:scale-95 group"
+          className="btn-tactile instrument-card hover:bg-zinc-850 rounded-xl p-4 flex flex-col items-center justify-center space-y-1.5 text-zinc-300 hover:text-white"
         >
-          <Volume2 className="w-5 h-5 text-slate-300 group-hover:text-emerald-400" />
-          <span className="text-xs font-medium text-slate-400">Vol +</span>
+          <Volume2 className="w-5 h-5 text-zinc-400" />
+          <span className="text-xs font-medium">Vol Up</span>
         </button>
       </div>
     </div>
