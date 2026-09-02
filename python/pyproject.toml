@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rubberotter"
+version = "1.1.0"
+description = "Comprehensive Python SDK, CLI, and Web App to discover, control, and manage Rubber Otter ATmega32U4 microcontrollers over USB CDC Serial and Bluetooth LE (BLE)."
+readme = "README.md"
+authors = [{ name = "Rubber Otter Developer", email = "developer@rubberotter.local" }]
+license = { text = "Apache-2.0" }
+keywords = ["rubberotter", "arduino", "atmega32u4", "hid", "keyboard", "mouse", "ble", "hm10", "promicro", "leonardo"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Hardware :: Hardware Drivers",
+]
+dependencies = [
+    "pyserial>=3.5",
+    "bleak>=0.20.0",
+    "flask>=3.0.0",
+]
+
+[project.scripts]
+rubberotter = "rubberotter.cli:main"
+otter-cli = "rubberotter.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/USERNAME/RubberOtterPy"
+Documentation = "https://github.com/USERNAME/RubberOtterPy#readme"

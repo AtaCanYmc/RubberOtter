@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OtterDeck — Rubber Otter Web Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+
+  <!-- Header & Navigation -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-text">
+        <h1>OtterDeck</h1>
+        <span class="brand-subtitle">Rubber Otter Bluetooth LE & Hardware Deck</span>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <div id="connectionStatusBadge" class="status-badge status-disconnected">
+        <span class="status-dot"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+      <button id="themeToggleBtn" class="btn btn-sm btn-outline" title="Toggle Theme">Theme</button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="dashboard-grid">
+    
+    <!-- Left Column: Connection, Haptics, Macros & Config -->
+    <section class="grid-column">
+      
+      <!-- Card 1: Device Discovery & Connection -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Device Connection & Discovery</h3>
+          <button id="scanBtn" class="btn btn-sm btn-secondary">Rescan</button>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="portSelect">Target Device (BLE / USB Serial):</label>
+            <div class="input-with-button">
+              <select id="portSelect" class="form-control">
+                <option value="">Scanning for devices...</option>
+              </select>
+              <button id="connectBtn" class="btn btn-primary">Connect</button>
+            </div>
+          </div>
+
+          <div class="discovered-summary" id="discoveredSummary">
+            <span class="summary-item" id="bleCount">BLE: 0 found</span>
+            <span class="summary-item" id="usbCount">USB: 0 found</span>
+          </div>
+
+          <div class="mode-toggles">
+            <label class="toggle-checkbox">
+              <input type="checkbox" id="rawCheckbox">
+              <span>Raw Mode (Un-framed strings)</span>
+            </label>
+            <label class="toggle-checkbox">
+              <input type="checkbox" id="noAckCheckbox">
+              <span>No-ACK Mode (Transmit without waiting)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Haptic Motors & Jiggler -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Haptics & Jiggler Controls</h3>
+        </div>
+        <div class="card-body">
+          
+          <div class="quick-action-grid">
+            <button id="jigglerBtn" class="btn btn-action">
+              <span class="action-label">Mouse Jiggler</span>
+              <span id="jigglerStatus" class="action-sublabel">OFF</span>
+            </button>
+
+            <button id="vibrateBtn" class="btn btn-action">
+              <span class="action-label">Vibrate Motor</span>
+              <span class="action-sublabel">150 ms</span>
+            </button>
+          </div>
+
+          <div class="slider-group">
+            <label for="vibrateDuration">Vibration Duration (ms): <span id="vibrateVal">150</span></label>
+            <input type="range" id="vibrateDuration" min="50" max="1000" step="50" value="150" class="form-range">
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Card 3: EEPROM Persistent Macro Manager -->
+      <div class="card">
+        <div class="card-header">
+          <h3>EEPROM Macro Slots (m0..m5)</h3>
+          <button id="refreshMacrosBtn" class="btn btn-sm btn-outline">Reload</button>
+        </div>
+        <div class="card-body">
+          <div class="macro-slots-grid" id="macroSlotsGrid">
+            <!-- Dynamically populated macro slots -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Media & Music Control Deck -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Media & Music Controls</h3>
+        </div>
+        <div class="card-body">
+          <div class="shortcut-buttons">
+            <button class="btn btn-outline key-btn" data-cmd="press MEDIA_PLAY_PAUSE">Play / Pause</button>
+            <button class="btn btn-outline key-btn" data-cmd="press MEDIA_NEXT_TRACK">Next Track</button>
+            <button class="btn btn-outline key-btn" data-cmd="press MEDIA_PREV_TRACK">Prev Track</button>
+            <button class="btn btn-outline key-btn" data-cmd="press VOLUME_UP">Vol Up</button>
+            <button class="btn btn-outline key-btn" data-cmd="press VOLUME_DOWN">Vol Down</button>
+            <button class="btn btn-outline key-btn" data-cmd="press VOLUME_MUTE">Mute</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: BLE Name Config -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Bluetooth Name Config</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="bleNameInput">Advertised BLE Name:</label>
+            <div class="input-with-button">
+              <input type="text" id="bleNameInput" class="form-control" placeholder="e.g. Otter_Pro">
+              <button id="setBleNameBtn" class="btn btn-secondary">Update Name</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Center Column: Mouse, Presentation, Typing & Command Executor -->
+    <section class="grid-column">
+      
+      <!-- Card 6: Virtual Mouse & Scroll Wheel -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Virtual Mouse & Scroll Deck</h3>
+        </div>
+        <div class="card-body">
+          <div class="mouse-actions">
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline mouse-btn" data-action="click" data-btn="left">Left Click</button>
+              <button class="btn btn-outline mouse-btn" data-action="click" data-btn="right">Right Click</button>
+              <button class="btn btn-outline mouse-btn" data-action="wheel" data-val="1">Scroll Up</button>
+              <button class="btn btn-outline mouse-btn" data-action="wheel" data-val="-1">Scroll Down</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7: Presentation Control Deck -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Presentation Controls (Clicker)</h3>
+        </div>
+        <div class="card-body">
+          <div class="shortcut-buttons">
+            <button class="btn btn-outline key-btn" data-cmd="press f5">Start (F5)</button>
+            <button class="btn btn-outline key-btn" data-cmd="press right">Next Slide</button>
+            <button class="btn btn-outline key-btn" data-cmd="press left">Prev Slide</button>
+            <button class="btn btn-outline key-btn" data-cmd="type &quot;b&quot;">Black Screen (B)</button>
+            <button class="btn btn-outline key-btn" data-cmd="type &quot;w&quot;">White Screen (W)</button>
+            <button class="btn btn-outline key-btn" data-cmd="escape">Exit (Esc)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8: System & Keyboard Shortcuts -->
+      <div class="card">
+        <div class="card-header">
+          <h3>System & Keyboard Shortcuts</h3>
+        </div>
+        <div class="card-body">
+          <div class="keyboard-shortcuts">
+            <label>System & OS Shortcuts:</label>
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline key-btn" data-cmd="press GUI l">Lock Screen</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI space">Cmd+Space</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI d">Show Desktop</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI c">Copy</button>
+              <button class="btn btn-outline key-btn" data-cmd="press GUI v">Paste</button>
+              <button class="btn btn-outline key-btn" data-cmd="press ALT TAB">Alt+Tab</button>
+              <button class="btn btn-outline key-btn" data-cmd="press CTRL c">Terminal Cancel</button>
+            </div>
+          </div>
+
+          <div class="keyboard-shortcuts" style="margin-top: 1rem;">
+            <label>Control & Navigation Keys:</label>
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline key-btn" data-cmd="enter">Enter</button>
+              <button class="btn btn-outline key-btn" data-cmd="tab">Tab</button>
+              <button class="btn btn-outline key-btn" data-cmd="backspace">Backspace</button>
+              <button class="btn btn-outline key-btn" data-cmd="escape">Escape</button>
+              <button class="btn btn-outline key-btn" data-cmd="space">Space</button>
+              <button class="btn btn-outline key-btn" data-cmd="up">Up</button>
+              <button class="btn btn-outline key-btn" data-cmd="down">Down</button>
+              <button class="btn btn-outline key-btn" data-cmd="left">Left</button>
+              <button class="btn btn-outline key-btn" data-cmd="right">Right</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9: Keyboard Text Typing Deck -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Keyboard Text Typing Deck</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="typeInput">Type Text Payload:</label>
+            <textarea id="typeInput" class="form-control code-font" rows="3" placeholder="Enter text string to type via USB HID..."></textarea>
+            <div class="form-actions align-right" style="margin-top: 0.5rem;">
+              <button id="typeBtn" class="btn btn-success">Execute Typing</button>
+            </div>
+          </div>
+
+          <div class="example-presets" style="margin-top: 0.8rem;">
+            <label>Quick Typing Examples:</label>
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline type-example-btn" data-type="Hello World\n">Hello World</button>
+              <button class="btn btn-outline type-example-btn" data-type="whoami &amp;&amp; uname -a\n">whoami &amp; uname</button>
+              <button class="btn btn-outline type-example-btn" data-type="curl -s https://example.com\n">curl Example</button>
+              <button class="btn btn-outline type-example-btn" data-type="python3 -c &quot;print('Otter')&quot;\n">Python One-liner</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10: Raw Command Frame Executor Deck -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Raw Command Frame Executor</h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="rawCmdInput">Raw Command Payload String:</label>
+            <div class="input-with-button">
+              <input type="text" id="rawCmdInput" class="form-control code-font" placeholder="e.g. vibrate 200">
+              <button id="sendRawBtn" class="btn btn-primary">Send Frame</button>
+            </div>
+          </div>
+
+          <div class="example-presets" style="margin-top: 0.8rem;">
+            <label>Command Payload Examples:</label>
+            <div class="shortcut-buttons">
+              <button class="btn btn-outline cmd-example-btn" data-cmd="vibrate 200">vibrate 200</button>
+              <button class="btn btn-outline cmd-example-btn" data-cmd="jiggler toggle">jiggler toggle</button>
+              <button class="btn btn-outline cmd-example-btn" data-cmd="type &quot;Hello\n&quot;">type "Hello\n"</button>
+              <button class="btn btn-outline cmd-example-btn" data-cmd="delay 500">delay 500</button>
+              <button class="btn btn-outline cmd-example-btn" data-cmd="macro list">macro list</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Bottom Log Console -->
+  <footer class="app-console">
+    <div class="console-header">
+      <span class="console-title">Live Frame & ACK Log Feed</span>
+      <button id="clearLogBtn" class="btn btn-sm btn-icon" title="Clear Logs">Clear</button>
+    </div>
+    <div class="console-body code-font" id="logConsole">
+      <div class="log-entry log-info">[SYSTEM] Rubber Otter Web Dashboard loaded. Ready for hardware framing.</div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

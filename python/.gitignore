@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / C-extension files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.dylib
+
+# C extensions & build artifacts
+build/
+bdist.*/
+sdist/
+wheels/
+*.egg-info/
+.eggs/
+
+# Distribution / packaging
+dist/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Unit test & coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+
+# IDEs & Editor configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# macOS / OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+
+# Logs & Environment variables
+*.log
+.env
+.env.*
+!.env.example
