@@ -46,7 +46,7 @@ jobs:
           cp .pio/build/${{ matrix.env }}/firmware.hex ./RubberOtter-${{ matrix.env }}.hex
 
       - name: Upload Release Firmware Assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: firmware/RubberOtter-${{ matrix.env }}.hex
