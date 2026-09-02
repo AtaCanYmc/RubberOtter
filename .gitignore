@@ -1,62 +1,102 @@
-# IDE / Editor
-.idea/
-.vscode/
-*.iml
-*.swp
-*.swo
-*~
+# ==============================================================================
+# 🦦 Rubber Otter Monorepo — Master .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Operating System & Filesystem
+# ------------------------------------------------------------------------------
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
 
-# PlatformIO / Firmware build artifacts
-.pio/
-.pioenvs/
-firmware/.pio/
-firmware/.pioenvs/
-firmware/cmake-build-*/
+# ------------------------------------------------------------------------------
+# 2. IDEs, Editors & Tooling
+# ------------------------------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.iml
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# ------------------------------------------------------------------------------
+# 3. C++ / Arduino / PlatformIO Firmware Build Artifacts
+# ------------------------------------------------------------------------------
+**/.pio/
+**/.pioenvs/
+**/cmake-build-*/
+**/build/
 *.elf
 *.hex
 *.bin
 *.o
+*.obj
 *.eep
 *.map
 *.a
+*.tmp
+*.bak
 
-# Python build & virtual environments
-__pycache__/
+# ------------------------------------------------------------------------------
+# 4. Python SDK, Virtual Environments & Packaging Artifacts
+# ------------------------------------------------------------------------------
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
 *.dylib
-build/
-dist/
-*.egg-info/
-*.egg
-.venv/
-venv/
-env/
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
+**/*.egg-info/
+**/*.egg
+**/dist/
+**/build/
+**/bdist.*/
+**/sdist/
+**/wheels/
+**/.eggs/
+**/.venv/
+**/venv/
+**/env/
+**/ENV/
+**/.pytest_cache/
+**/.coverage
+**/.coverage.*
+**/htmlcov/
+**/.tox/
+**/.nox/
+**/.hypothesis/
 
-# Node / Web build & dependencies
-node_modules/
-web/node_modules/
-web/dist/
-web/.cache/
+# ------------------------------------------------------------------------------
+# 5. Node.js, Web PWA & Frontend Build Artifacts
+# ------------------------------------------------------------------------------
+**/node_modules/
+**/dist/
+**/out-tsc/
+**/.cache/
+/.pnp
+.pnp.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Logs & Secrets
+# ------------------------------------------------------------------------------
+# 6. Logs, Secrets & Environment Variables
+# ------------------------------------------------------------------------------
 *.log
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 secrets.json
+credentials.json

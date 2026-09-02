@@ -1,3 +1,0 @@
-[console_scripts]
-otter-cli = rubberotter.cli:main
-rubberotter = rubberotter.cli:main
