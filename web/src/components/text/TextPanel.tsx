@@ -68,10 +68,11 @@ export const TextPanel: React.FC = () => {
   };
 
   const handlePresetClick = (presetText: string) => {
-    setText((prev) => (prev ? `${prev}\n${presetText}` : presetText));
+    setText(presetText);
   };
 
   const handleCopyText = () => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -79,15 +80,15 @@ export const TextPanel: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col space-y-4">
-      {/* Action Header Card */}
+      {/* Header Info Card */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 flex items-center justify-between">
         <div className="flex items-center space-x-3.5">
-          <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-otter-400 shadow-subtle">
-            <Type className="w-5 h-5 text-otter-400" />
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center text-otter-600 dark:text-otter-400 shadow-subtle">
+            <Type className="w-5 h-5 text-otter-600 dark:text-otter-400" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-zinc-100">Keyboard Keystroke Injector</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Keystroke Injector</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Transmit text, macros, and command strings directly via USB HID
             </p>
           </div>
@@ -96,7 +97,7 @@ export const TextPanel: React.FC = () => {
         {text && (
           <button
             onClick={() => setText('')}
-            className="btn-tactile p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 transition-colors"
+            className="btn-tactile p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-500 hover:text-rose-500 dark:text-zinc-400 dark:hover:text-rose-400 border border-zinc-200 dark:border-zinc-800 transition-colors"
             title="Clear"
           >
             <Trash2 className="w-4 h-4" />
@@ -106,12 +107,12 @@ export const TextPanel: React.FC = () => {
 
       {/* Editor & Payload Input Card */}
       <div className="instrument-card rounded-xl p-4 space-y-3">
-        <div className="flex items-center justify-between text-xs text-zinc-400 pb-1">
-          <span className="font-semibold text-zinc-300 flex items-center space-x-1.5">
-            <Terminal className="w-3.5 h-3.5 text-otter-400" />
+        <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pb-1">
+          <span className="font-semibold text-zinc-700 dark:text-zinc-300 flex items-center space-x-1.5">
+            <Terminal className="w-3.5 h-3.5 text-otter-600 dark:text-otter-400" />
             <span>Payload Content</span>
           </span>
-          <span className="font-mono text-[11px] text-zinc-500">
+          <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
             {text.length} chars • ~{Math.max(1, Math.ceil(text.length * 0.04))}s duration
           </span>
         </div>
@@ -121,40 +122,40 @@ export const TextPanel: React.FC = () => {
           onChange={(e) => setText(e.target.value)}
           placeholder="Type or paste automated keystroke payloads, code, or terminal commands..."
           rows={5}
-          className="w-full bg-zinc-950/80 border border-zinc-800 rounded-lg p-3 text-xs font-mono text-zinc-200 focus:outline-none focus:border-otter-500/80 focus:ring-1 focus:ring-otter-500/30 resize-none transition-all placeholder:text-zinc-600"
+          className="w-full bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 text-xs font-mono text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-otter-500 focus:ring-1 focus:ring-otter-500/30 resize-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
         />
 
         {/* Toolbar & Options */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-zinc-800/80">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-zinc-200 dark:border-zinc-800/80">
           <button
             onClick={handleCopyText}
             disabled={!text}
-            className="btn-tactile px-2.5 py-1 rounded-md bg-zinc-900 hover:bg-zinc-850 text-xs font-medium text-zinc-300 border border-zinc-800 flex items-center space-x-1.5 disabled:opacity-40"
+            className="btn-tactile px-2.5 py-1 rounded-md bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-xs font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1.5 disabled:opacity-40"
           >
-            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-400" />}
+            {copied ? <Check className="w-3 h-3 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
           <div className="flex items-center space-x-4 text-xs">
-            <label className="flex items-center space-x-1.5 cursor-pointer text-zinc-300">
+            <label className="flex items-center space-x-1.5 cursor-pointer text-zinc-700 dark:text-zinc-300">
               <input
                 type="checkbox"
                 checked={autoEnter}
                 onChange={(e) => setAutoEnter(e.target.checked)}
-                className="rounded border-zinc-700 bg-zinc-900 text-otter-500 focus:ring-otter-500"
+                className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-otter-500 focus:ring-otter-500"
               />
               <span className="text-xs font-medium flex items-center space-x-1">
+                <span>+Enter</span>
                 <CornerDownLeft className="w-3 h-3 text-zinc-400" />
-                <span>+ Enter</span>
               </span>
             </label>
 
-            <label className="flex items-center space-x-1.5 cursor-pointer text-zinc-300">
+            <label className="flex items-center space-x-1.5 cursor-pointer text-zinc-700 dark:text-zinc-300">
               <input
                 type="checkbox"
                 checked={clearOnSend}
                 onChange={(e) => setClearOnSend(e.target.checked)}
-                className="rounded border-zinc-700 bg-zinc-900 text-otter-500 focus:ring-otter-500"
+                className="rounded border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-otter-500 focus:ring-otter-500"
               />
               <span className="text-xs font-medium">Clear on send</span>
             </label>
@@ -164,8 +165,8 @@ export const TextPanel: React.FC = () => {
 
       {/* Quick Macro Presets */}
       <div className="instrument-card rounded-xl p-4 space-y-2.5">
-        <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center space-x-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-otter-400" />
+        <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center space-x-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-otter-600 dark:text-otter-400" />
           <span>Quick Snippets</span>
         </h3>
 
@@ -174,9 +175,9 @@ export const TextPanel: React.FC = () => {
             <button
               key={idx}
               onClick={() => handlePresetClick(preset.text)}
-              className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-zinc-100 flex items-center space-x-1.5"
+              className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100 flex items-center space-x-1.5"
             >
-              <span className="text-zinc-500">+</span>
+              <span className="text-zinc-400 dark:text-zinc-500">+</span>
               <span>{preset.label}</span>
             </button>
           ))}
@@ -185,7 +186,7 @@ export const TextPanel: React.FC = () => {
 
       {/* Status Feedback */}
       {statusText && (
-        <div className="rounded-lg p-2.5 text-center bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-300">
+        <div className="rounded-lg p-2.5 text-center bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300">
           <span>{statusText}</span>
         </div>
       )}
@@ -196,8 +197,8 @@ export const TextPanel: React.FC = () => {
         disabled={!text.trim() || isSending || connectionState !== 'connected'}
         className={`btn-tactile w-full py-3 rounded-xl font-semibold text-xs flex items-center justify-center space-x-2 border shadow-sm ${
           connectionState === 'connected' && text.trim()
-            ? 'bg-zinc-100 hover:bg-white text-zinc-950 border-zinc-200'
-            : 'bg-zinc-900 text-zinc-500 border-zinc-800 cursor-not-allowed'
+            ? 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 border-zinc-900 dark:border-zinc-200'
+            : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 border-zinc-200 dark:border-zinc-800 cursor-not-allowed'
         }`}
       >
         <Send className={`w-3.5 h-3.5 ${isSending ? 'animate-bounce' : ''}`} />

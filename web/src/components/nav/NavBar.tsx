@@ -51,10 +51,10 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`btn-tactile flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+              className={`btn-tactile flex items-center space-x-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap border ${
                 isActive
-                  ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm border border-zinc-200 dark:border-zinc-700/60 font-semibold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-850/60'
+                  ? 'bg-otter-500/10 dark:bg-otter-950/40 text-otter-900 dark:text-otter-200 border-otter-500 dark:border-otter-500/80 shadow-sm font-semibold'
+                  : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-850/60'
               }`}
             >
               <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-500 dark:text-zinc-400'}`} />
@@ -74,13 +74,13 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`btn-tactile flex flex-col items-center justify-center min-w-[58px] py-1.5 px-1 rounded-lg transition-all ${
+                className={`btn-tactile flex flex-col items-center justify-center min-w-[58px] py-1.5 px-1 rounded-lg transition-all border ${
                   isActive
-                    ? 'bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-semibold border border-zinc-300 dark:border-zinc-700/60 shadow-sm'
-                    : 'text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
+                    ? 'bg-otter-500/10 dark:bg-otter-950/40 text-otter-900 dark:text-otter-200 font-semibold border-otter-500 dark:border-otter-500/80 shadow-sm'
+                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
-                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-400 dark:text-zinc-400'}`} />
+                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-otter-600 dark:text-otter-400' : 'text-zinc-500 dark:text-zinc-400'}`} />
                 <span className="text-[10px] tracking-tight">{tab.label}</span>
               </button>
             );
