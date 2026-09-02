@@ -17,6 +17,9 @@ export type RxDataListener = (data: Uint8Array) => void;
 class UniversalBleService {
   private isNative: boolean = false;
   private isInitialized: boolean = false;
+  private isBleSupported: boolean = true;
+  private bleInitError: string | null = null;
+
   private connectedDeviceId: string | null = null;
   private webBluetoothDevice: BluetoothDevice | null = null;
   private webCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
@@ -43,22 +46,32 @@ class UniversalBleService {
   }
 
   public supportsBluetooth(): boolean {
-    if (this.isNative) return true;
+    if (this.isNative) return this.isBleSupported;
     return typeof navigator !== 'undefined' && 'bluetooth' in navigator && !!navigator.bluetooth;
   }
 
-  public async initialize(): Promise<void> {
-    if (this.isInitialized) return;
+  public async initialize(): Promise<boolean> {
+    if (this.isInitialized) return this.isBleSupported;
 
     if (this.isNative) {
       try {
         await BleClient.initialize();
         this.isInitialized = true;
-      } catch (err) {
-        console.warn('Capacitor BleClient initialization error:', err);
+        this.isBleSupported = true;
+        this.bleInitError = null;
+        return true;
+      } catch (err: any) {
+        this.isInitialized = true;
+        this.isBleSupported = false;
+        const msg = err?.message || String(err);
+        this.bleInitError = msg;
+        console.warn('Capacitor BleClient initialization status:', msg);
+        return false;
       }
     } else {
       this.isInitialized = true;
+      this.isBleSupported = typeof navigator !== 'undefined' && 'bluetooth' in navigator && !!navigator.bluetooth;
+      return this.isBleSupported;
     }
   }
 
@@ -83,9 +96,17 @@ class UniversalBleService {
     serviceUuid: string,
     onDeviceFound: (device: UniversalBleDevice) => void
   ): Promise<void> {
-    await this.initialize();
+    const isAvailable = await this.initialize();
 
     if (this.isNative) {
+      if (!isAvailable) {
+        const errorText = this.bleInitError?.toLowerCase().includes('unsupported')
+          ? 'Bluetooth LE is not available in the Xcode iOS Simulator (no virtual radio). Please test on a physical iPhone / iPad device.'
+          : 'Bluetooth is turned off or unavailable. Please enable Bluetooth in iOS Settings / Control Center.';
+        this.notifyState('error', errorText);
+        throw new Error(errorText);
+      }
+
       try {
         await BleClient.requestLEScan(
           {
@@ -124,7 +145,7 @@ class UniversalBleService {
   }
 
   public async stopScan(): Promise<void> {
-    if (this.isNative) {
+    if (this.isNative && this.isBleSupported) {
       try {
         await BleClient.stopLEScan();
       } catch {
@@ -137,9 +158,17 @@ class UniversalBleService {
    * Request / Pair with a device using either Native BLE or Web Bluetooth API
    */
   public async requestDevice(serviceUuid: string): Promise<UniversalBleDevice> {
-    await this.initialize();
+    const isAvailable = await this.initialize();
 
     if (this.isNative) {
+      if (!isAvailable) {
+        const errorText = this.bleInitError?.toLowerCase().includes('unsupported')
+          ? 'Bluetooth LE is not available in the Xcode iOS Simulator (no virtual radio). Please test on a physical iPhone / iPad device.'
+          : 'Bluetooth is turned off or unavailable. Please enable Bluetooth in iOS Settings / Control Center.';
+        this.notifyState('error', errorText);
+        throw new Error(errorText);
+      }
+
       // Native Capacitor BLE (CoreBluetooth on iOS, Android BLE)
       try {
         const device: BleDevice = await BleClient.requestDevice({
@@ -219,10 +248,18 @@ class UniversalBleService {
     serviceUuid: string,
     characteristicUuid: string
   ): Promise<void> {
-    await this.initialize();
+    const isAvailable = await this.initialize();
     this.notifyState('connecting', 'Connecting to BLE device...');
 
     if (this.isNative) {
+      if (!isAvailable) {
+        const errorText = this.bleInitError?.toLowerCase().includes('unsupported')
+          ? 'Bluetooth LE is not available in the Xcode iOS Simulator. Please test on a physical iPhone / iPad device.'
+          : 'Bluetooth is unavailable or disabled. Please enable Bluetooth in iOS Settings.';
+        this.notifyState('error', errorText);
+        throw new Error(errorText);
+      }
+
       try {
         await BleClient.connect(deviceId, (disconnectedDeviceId) => {
           if (disconnectedDeviceId === this.connectedDeviceId) {
