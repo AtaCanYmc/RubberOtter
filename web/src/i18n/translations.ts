@@ -37,6 +37,9 @@ export interface Translations {
   'scanner.seen': string;
   'scanner.connectBtn': string;
   'scanner.disconnectBtn': string;
+  'scanner.iosNoticeTitle': string;
+  'scanner.iosNoticeDesc': string;
+  'scanner.iosOpenBluefy': string;
 
   // Text
   'text.title': string;
@@ -198,6 +201,9 @@ export const translations: Record<Language, Translations> = {
     'scanner.seen': 'Seen',
     'scanner.connectBtn': 'Connect',
     'scanner.disconnectBtn': 'Disconnect',
+    'scanner.iosNoticeTitle': 'iOS Bluetooth Compatibility',
+    'scanner.iosNoticeDesc': 'Apple iOS Safari does not support the Web Bluetooth API. To connect on iPhone or iPad, use the Rubber Otter Native iOS App or open this page inside the Bluefy Web Bluetooth Browser.',
+    'scanner.iosOpenBluefy': 'Open in Bluefy Browser',
 
     'text.title': 'Keystroke Injector',
     'text.description': 'Transmit text, macros, and command strings directly via USB HID',
@@ -350,6 +356,9 @@ export const translations: Record<Language, Translations> = {
     'scanner.seen': 'Görülme',
     'scanner.connectBtn': 'Bağlan',
     'scanner.disconnectBtn': 'Bağlantıyı Kes',
+    'scanner.iosNoticeTitle': 'iOS Bluetooth Uyumluluğu',
+    'scanner.iosNoticeDesc': "Apple iOS Safari, Web Bluetooth API'sini standart tarayıcıda desteklememektedir. iPhone veya iPad'de bağlanmak için Rubber Otter Native iOS Uygulamasını kullanabilir veya bu sayfayı Bluefy Web Bluetooth Tarayıcısında açabilirsiniz.",
+    'scanner.iosOpenBluefy': 'Bluefy Tarayıcısında Aç',
 
     'text.title': 'Tuş Enjektörü',
     'text.description': 'USB HID üzerinden doğrudan metin, makro ve terminal komutları gönderin',
@@ -502,6 +511,9 @@ export const translations: Record<Language, Translations> = {
     'scanner.seen': 'Gesehen',
     'scanner.connectBtn': 'Verbinden',
     'scanner.disconnectBtn': 'Trennen',
+    'scanner.iosNoticeTitle': 'iOS Bluetooth-Kompatibilität',
+    'scanner.iosNoticeDesc': 'Apple iOS Safari unterstützt die Web-Bluetooth-API nicht direkt. Nutzen Sie die native iOS-App oder öffnen Sie diese Seite im Bluefy Web-Bluetooth-Browser.',
+    'scanner.iosOpenBluefy': 'In Bluefy öffnen',
 
     'text.title': 'Tasten-Injektor',
     'text.description': 'Text, Makros und Befehle direkt über USB HID übertragen',
@@ -654,6 +666,9 @@ export const translations: Record<Language, Translations> = {
     'scanner.seen': 'Vu',
     'scanner.connectBtn': 'Connecter',
     'scanner.disconnectBtn': 'Déconnecter',
+    'scanner.iosNoticeTitle': 'Compatibilité Bluetooth iOS',
+    'scanner.iosNoticeDesc': "Apple iOS Safari ne prend pas en charge l'API Web Bluetooth. Utilisez l'application iOS native ou ouvrez cette page dans le navigateur Bluefy.",
+    'scanner.iosOpenBluefy': 'Ouvrir dans Bluefy',
 
     'text.title': 'Injecteur de frappes',
     'text.description': 'Transmettez du texte, des macros et des commandes directement via USB HID',
@@ -806,6 +821,9 @@ export const translations: Record<Language, Translations> = {
     'scanner.seen': 'Visto',
     'scanner.connectBtn': 'Conectar',
     'scanner.disconnectBtn': 'Desconectar',
+    'scanner.iosNoticeTitle': 'Compatibilidad Bluetooth iOS',
+    'scanner.iosNoticeDesc': 'Apple iOS Safari no es compatible con Web Bluetooth API. Usa la app nativa de iOS o abre esta página en el navegador Bluefy.',
+    'scanner.iosOpenBluefy': 'Abrir en Bluefy',
 
     'text.title': 'Inyector de pulsaciones',
     'text.description': 'Transmita texto, macros y comandos directamente a través de USB HID',

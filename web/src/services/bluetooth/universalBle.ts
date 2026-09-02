@@ -32,6 +32,21 @@ class UniversalBleService {
     return this.isNative;
   }
 
+  public isIosDevice(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent || navigator.vendor || '';
+    return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  public isIosWebWithoutBle(): boolean {
+    return !this.isNative && this.isIosDevice() && (typeof navigator === 'undefined' || !('bluetooth' in navigator));
+  }
+
+  public supportsBluetooth(): boolean {
+    if (this.isNative) return true;
+    return typeof navigator !== 'undefined' && 'bluetooth' in navigator && !!navigator.bluetooth;
+  }
+
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
@@ -62,13 +77,70 @@ class UniversalBleService {
   }
 
   /**
+   * Start native continuous BLE scanning or request device
+   */
+  public async startScan(
+    serviceUuid: string,
+    onDeviceFound: (device: UniversalBleDevice) => void
+  ): Promise<void> {
+    await this.initialize();
+
+    if (this.isNative) {
+      try {
+        await BleClient.requestLEScan(
+          {
+            services: [serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb'],
+            allowDuplicates: false,
+          },
+          (result: ScanResult) => {
+            const devName = result.localName || result.device.name || 'Rubber Otter BLE';
+            const devId = result.device.deviceId;
+            const dev: UniversalBleDevice = {
+              id: devId,
+              name: devName,
+              rssi: result.rssi,
+              serviceUuids: [serviceUuid],
+              lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            };
+            onDeviceFound(dev);
+          }
+        );
+      } catch (err: any) {
+        // Fallback to requestDevice dialog if background scan is unavailable
+        const dev = await this.requestDevice(serviceUuid);
+        onDeviceFound(dev);
+      }
+    } else {
+      if (!this.supportsBluetooth()) {
+        if (this.isIosDevice()) {
+          throw new Error('iOS Safari does not support the Web Bluetooth API. Please install the Rubber Otter iOS native app (via Capacitor/TestFlight) or open this page in the Bluefy Web Bluetooth browser.');
+        }
+        throw new Error('Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or Opera.');
+      }
+
+      const dev = await this.requestDevice(serviceUuid);
+      onDeviceFound(dev);
+    }
+  }
+
+  public async stopScan(): Promise<void> {
+    if (this.isNative) {
+      try {
+        await BleClient.stopLEScan();
+      } catch {
+        // Ignore stop error if not actively scanning
+      }
+    }
+  }
+
+  /**
    * Request / Pair with a device using either Native BLE or Web Bluetooth API
    */
   public async requestDevice(serviceUuid: string): Promise<UniversalBleDevice> {
     await this.initialize();
 
     if (this.isNative) {
-      // Native Capacitor BLE
+      // Native Capacitor BLE (CoreBluetooth on iOS, Android BLE)
       try {
         const device: BleDevice = await BleClient.requestDevice({
           services: [serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb'],
@@ -76,11 +148,11 @@ class UniversalBleService {
           optionalServices: [
             serviceUuid,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
-            '00001800-0000-1000-8000-00805f9b34fb'
-          ]
+            '00001800-0000-1000-8000-00805f9b34fb',
+          ],
         }).catch(async () => {
           return await BleClient.requestDevice({
-            optionalServices: [serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb']
+            optionalServices: [serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb'],
           });
         });
 
@@ -89,14 +161,17 @@ class UniversalBleService {
           name: device.name || 'Rubber Otter BLE',
           rssi: -60,
           serviceUuids: [serviceUuid],
-          lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         };
       } catch (err: any) {
-        throw new Error(err.message || 'Native BLE device request failed');
+        throw new Error(err.message || 'Native CoreBluetooth device request failed');
       }
     } else {
       // Standard Web Bluetooth API
-      if (typeof navigator === 'undefined' || !navigator.bluetooth) {
+      if (!this.supportsBluetooth()) {
+        if (this.isIosDevice()) {
+          throw new Error('iOS Safari does not support Web Bluetooth in standard browser mode. Use the Native iOS App or the Bluefy Bluetooth browser.');
+        }
         throw new Error('Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or install the native app.');
       }
 
@@ -106,21 +181,21 @@ class UniversalBleService {
           { namePrefix: 'RubberOtter' },
           { namePrefix: 'HM-10' },
           { namePrefix: 'Master-Key' },
-          { services: [serviceUuid] }
+          { services: [serviceUuid] },
         ],
         optionalServices: [
           serviceUuid,
           '0000ffe0-0000-1000-8000-00805f9b34fb',
-          '00001800-0000-1000-8000-00805f9b34fb'
-        ]
+          '00001800-0000-1000-8000-00805f9b34fb',
+        ],
       }).catch(async () => {
         return await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: [
             serviceUuid,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
-            '00001800-0000-1000-8000-00805f9b34fb'
-          ]
+            '00001800-0000-1000-8000-00805f9b34fb',
+          ],
         });
       });
 
@@ -131,7 +206,7 @@ class UniversalBleService {
         name: device.name || 'Rubber Otter Web BLE',
         rssi: -60,
         serviceUuids: [serviceUuid],
-        lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       };
     }
   }

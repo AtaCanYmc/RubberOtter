@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useBluetooth } from '../../context/BluetoothContext';
 import { useSettings } from '../../context/SettingsContext';
 import { Language } from '../../@types/bluetooth';
+import { universalBle } from '../../services/bluetooth/universalBle';
 import {
   Settings,
   Volume2,
@@ -24,7 +25,9 @@ import {
   Cpu,
   CheckCircle2,
   Signal,
-  ArrowRight
+  ArrowRight,
+  ExternalLink,
+  Info
 } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '../../services/storage/macroStore';
 
@@ -46,6 +49,8 @@ export const SettingsPanel: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasLeScanSupport, setHasLeScanSupport] = useState(false);
 
+  const isIosWebWithoutBle = universalBle.isIosWebWithoutBle();
+
   useEffect(() => {
     if (typeof navigator !== 'undefined' && 'bluetooth' in navigator && 'requestLEScan' in (navigator.bluetooth as any)) {
       setHasLeScanSupport(true);
@@ -65,49 +70,21 @@ export const SettingsPanel: React.FC = () => {
     setIsScanning(true);
 
     try {
-      if (typeof navigator === 'undefined' || !navigator.bluetooth) {
-        throw new Error('Web Bluetooth API is not supported in this browser. Please use Chrome, Edge, or Opera.');
-      }
-
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [
-          { namePrefix: 'Otter' },
-          { namePrefix: 'RubberOtter' },
-          { namePrefix: 'HM-10' },
-          { namePrefix: 'Master-Key' },
-          { services: [settings.serviceUuid] }
-        ],
-        optionalServices: [
-          settings.serviceUuid,
-          '0000ffe0-0000-1000-8000-00805f9b34fb',
-          '00001800-0000-1000-8000-00805f9b34fb'
-        ]
-      }).catch(async () => {
-        return await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: [
-            settings.serviceUuid,
-            '0000ffe0-0000-1000-8000-00805f9b34fb',
-            '00001800-0000-1000-8000-00805f9b34fb'
-          ]
+      await universalBle.startScan(settings.serviceUuid, (newDevice) => {
+        setDevices((prev) => {
+          const filtered = prev.filter((d) => d.id !== newDevice.id);
+          return [
+            {
+              ...newDevice,
+              isConnected: connectionState === 'connected'
+            },
+            ...filtered
+          ];
         });
       });
 
-      if (device) {
-        const newDevice: ScannedDevice = {
-          id: device.id,
-          name: device.name || 'Unnamed BLE Device',
-          rssi: -62,
-          serviceUuids: [settings.serviceUuid, '0000ffe0-0000-1000-8000-00805f9b34fb'],
-          lastSeen: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-          isConnected: connectionState === 'connected'
-        };
-
-        setDevices((prev) => {
-          const filtered = prev.filter((d) => d.id !== newDevice.id);
-          return [newDevice, ...filtered];
-        });
-
+      // On Web Bluetooth, startScan resolves after device selection; auto-trigger connection
+      if (!universalBle.isNativeApp()) {
         await connect();
       }
     } catch (err: any) {
@@ -174,6 +151,11 @@ export const SettingsPanel: React.FC = () => {
                 <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] font-mono text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                   GATT 0xFFE0
                 </span>
+                {universalBle.isNativeApp() && (
+                  <span className="px-1.5 py-0.5 rounded bg-otter-500/10 text-[10px] font-mono font-medium text-otter-600 dark:text-otter-400 border border-otter-500/30">
+                    Native CoreBluetooth
+                  </span>
+                )}
               </div>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('scanner.description')}</p>
             </div>
@@ -215,6 +197,37 @@ export const SettingsPanel: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Special iOS Safari Web Bluetooth Assistant Card */}
+        {isIosWebWithoutBle && (
+          <div className="rounded-xl p-3.5 bg-amber-500/10 dark:bg-amber-950/30 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-2.5">
+            <div className="flex items-start space-x-2.5">
+              <Apple className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="text-xs font-semibold text-amber-900 dark:text-amber-200">{t('scanner.iosNoticeTitle')}</h4>
+                <p className="text-[11px] text-amber-800 dark:text-amber-300/90 leading-relaxed mt-0.5">
+                  {t('scanner.iosNoticeDesc')}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-amber-500/20">
+              <a
+                href="https://apps.apple.com/app/bluefy-web-ble-browser/id1492822055"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-tactile inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shadow-sm transition-colors"
+              >
+                <span>{t('scanner.iosOpenBluefy')}</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+
+              <span className="text-[10px] text-amber-700 dark:text-amber-400 font-mono">
+                • Or run <code className="bg-amber-500/20 px-1 py-0.5 rounded">make mobile-ios</code> for Native CoreBluetooth App
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Advertisements API Badge */}
         {hasLeScanSupport && (
