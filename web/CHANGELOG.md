@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.3.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.2.0...web-v2.3.0) (2026-09-02)
+
+
+### Features
+
+* **capacitor:** integrate Ionic Capacitor with native iOS and Android packaging, CoreBluetooth and Haptics bridge ([4f2d65e](https://github.com/AtaCanYmc/RubberOtter/commit/4f2d65eb3df8aaca1add3c14b8073fa6817e92ea))
+
+
+### Bug Fixes
+
+* **ble:** guard iOS simulator BLE unsupported state and prevent CBCentralManager API MISUSE ([78501ca](https://github.com/AtaCanYmc/RubberOtter/commit/78501ca8cfa225fca198b198844d05824e856847))
+* **ble:** resolve iOS Web Bluetooth compatibility with native CoreBluetooth fallback & Bluefy browser assistant ([254faea](https://github.com/AtaCanYmc/RubberOtter/commit/254faeac40524d60bea7ba71fd49acf8e1b23d4d))
+* **theme:** resolve iOS dark mode specificity, safe area background bounce, and WebKit form styles ([ad7898a](https://github.com/AtaCanYmc/RubberOtter/commit/ad7898a199442ffc5ee3db8ae18dbed702f82e7e))
+
+
+### Documentation
+
+* update root and web READMEs with Capacitor native packaging and precision workstation features ([f3a54ad](https://github.com/AtaCanYmc/RubberOtter/commit/f3a54ada41f951320c361a10925e86a96bd9266b))
+
 ## [2.2.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.1.0...web-v2.2.0) (2026-09-02)
 
 

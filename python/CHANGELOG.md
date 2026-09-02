@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/AtaCanYmc/RubberOtter/compare/python-v1.2.0...python-v1.3.0) (2026-09-02)
+
+
+### Features
+
+* **mcp:** add Model Context Protocol server, AI agent tool registry, and CLI integration ([3009d7f](https://github.com/AtaCanYmc/RubberOtter/commit/3009d7ffadf39e1c18a16b884fb9619bf8a57bf1))
+
 ## [1.2.0](https://github.com/AtaCanYmc/RubberOtter/compare/python-v1.1.0...python-v1.2.0) (2026-09-02)
 
 
