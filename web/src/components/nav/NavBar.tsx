@@ -44,7 +44,6 @@ export const tabItems: TabItem[] = [
   { id: 'gaming', labelKey: 'nav.macros', icon: Gamepad2 },
   { id: 'trackpad', labelKey: 'nav.trackpad', icon: MousePointer },
   { id: 'console', labelKey: 'nav.console', icon: Terminal },
-  { id: 'flasher', labelKey: 'nav.flasher', icon: Cpu, desktopOnly: true },
   { id: 'settings', labelKey: 'nav.settings', icon: Settings },
 ];
 
@@ -59,7 +58,7 @@ export const NavBar: React.FC<NavBarProps> = ({ activeTab, setActiveTab }) => {
       <div className="flex items-center justify-between space-x-1 overflow-x-auto no-scrollbar">
         {mobileTabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = activeTab === tab.id || (activeTab === 'flasher' && tab.id === 'settings');
           return (
             <button
               key={tab.id}

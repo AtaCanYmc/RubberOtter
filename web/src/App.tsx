@@ -35,8 +35,8 @@ export const AppContent: React.FC = () => {
           {activeTab === 'gaming' && <GamingPanel />}
           {activeTab === 'trackpad' && <TrackpadPanel />}
           {activeTab === 'console' && <ConsolePanel />}
-          {activeTab === 'flasher' && <FlasherPanel />}
-          {activeTab === 'settings' && <SettingsPanel />}
+          {activeTab === 'flasher' && <FlasherPanel onBack={() => setActiveTab('settings')} />}
+          {activeTab === 'settings' && <SettingsPanel onOpenFlasher={() => setActiveTab('flasher')} />}
         </div>
       </main>
     </div>

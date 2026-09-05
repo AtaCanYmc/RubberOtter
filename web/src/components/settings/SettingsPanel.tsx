@@ -40,9 +40,18 @@ interface ScannedDevice {
   isConnected: boolean;
 }
 
-export const SettingsPanel: React.FC = () => {
+interface SettingsPanelProps {
+  onOpenFlasher?: () => void;
+}
+
+export const SettingsPanel: React.FC<SettingsPanelProps> = ({ onOpenFlasher }) => {
   const { connectionState, connect, disconnect } = useBluetooth();
   const { settings, updateSettings, t, setLanguage } = useSettings();
+
+  const isFlasherSupported =
+    typeof navigator !== 'undefined' &&
+    'serial' in navigator &&
+    !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const [isScanning, setIsScanning] = useState(false);
   const [devices, setDevices] = useState<ScannedDevice[]>([]);
@@ -337,6 +346,39 @@ export const SettingsPanel: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Hardware Firmware Flasher (Desktop / Laptop Only with Web Serial) */}
+      {isFlasherSupported && onOpenFlasher && (
+        <div className="instrument-card rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-otter-500/30 bg-gradient-to-r from-otter-500/5 to-transparent">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-center text-otter-600 dark:text-otter-400 shadow-subtle flex-shrink-0">
+              <Cpu className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                  {t('settings.flasherTitle')}
+                </h3>
+                <span className="px-1.5 py-0.5 rounded bg-otter-500/10 text-[10px] font-mono font-medium text-otter-600 dark:text-otter-400 border border-otter-500/30">
+                  USB Serial
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                {t('settings.flasherDesc')}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenFlasher}
+            className="btn-tactile px-4 py-2 rounded-lg bg-otter-600 hover:bg-otter-500 text-white text-xs font-semibold shadow-sm flex items-center justify-center space-x-1.5 transition-all self-start sm:self-auto flex-shrink-0"
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span>{t('settings.openFlasher')}</span>
+            <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+          </button>
+        </div>
+      )}
 
       {/* 2. Language Selector */}
       <div className="instrument-card rounded-xl p-4 sm:p-5 space-y-3">

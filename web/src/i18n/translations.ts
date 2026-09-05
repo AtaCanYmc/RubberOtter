@@ -189,6 +189,12 @@ export interface Translations {
   'flasher.unsupportedDesc': string;
   'flasher.terminalLogs': string;
   'flasher.clearLogs': string;
+  'flasher.backToSettings': string;
+
+  // Settings Flasher Section
+  'settings.flasherTitle': string;
+  'settings.flasherDesc': string;
+  'settings.openFlasher': string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -369,6 +375,11 @@ export const translations: Record<Language, Translations> = {
     'flasher.unsupportedDesc': 'Hardware flashing requires Web Serial API. Please use a desktop browser such as Chrome, Edge, or Brave on Windows, macOS, or Linux.',
     'flasher.terminalLogs': 'Serial Log Terminal',
     'flasher.clearLogs': 'Clear Logs',
+    'flasher.backToSettings': 'Back to Settings',
+
+    'settings.flasherTitle': 'Hardware Flasher & Web Serial Tools',
+    'settings.flasherDesc': 'Flash ATmega32U4 / ESP32 firmware directly over USB via Web Serial API (Desktop / Laptop).',
+    'settings.openFlasher': 'Launch Flasher',
   },
 
   tr: {
@@ -548,6 +559,11 @@ export const translations: Record<Language, Translations> = {
     'flasher.unsupportedDesc': 'Donanım flashlama Web Serial API gerektirir. Lütfen masaüstü Chrome, Edge veya Brave tarayıcısı kullanın.',
     'flasher.terminalLogs': 'Seri Port Terminal Kayıtları',
     'flasher.clearLogs': 'Kayıtları Temizle',
+    'flasher.backToSettings': 'Ayarlara Dön',
+
+    'settings.flasherTitle': 'Donanım Flasher & Web Serial Araçları',
+    'settings.flasherDesc': 'ATmega32U4 / ESP32 donanımını Web Serial API ile USB üzerinden doğrudan güncelleyin (Masaüstü / Laptop).',
+    'settings.openFlasher': 'Flasher\'ı Başlat',
   },
 
   de: {
@@ -727,6 +743,11 @@ export const translations: Record<Language, Translations> = {
     'flasher.unsupportedDesc': 'Hardware-Flashen erfordert die Web Serial API. Bitte einen Desktop-Browser (Chrome/Edge/Brave) verwenden.',
     'flasher.terminalLogs': 'Serielles Terminal-Protokoll',
     'flasher.clearLogs': 'Protokolle löschen',
+    'flasher.backToSettings': 'Zurück zu den Einstellungen',
+
+    'settings.flasherTitle': 'Hardware-Flasher & Web-Serial-Tools',
+    'settings.flasherDesc': 'ATmega32U4 / ESP32-Firmware direkt über USB mit der Web Serial API flashen (Desktop / Laptop).',
+    'settings.openFlasher': 'Flasher starten',
   },
 
   fr: {
@@ -906,6 +927,11 @@ export const translations: Record<Language, Translations> = {
     'flasher.unsupportedDesc': 'Le flashage nécessite l\'API Web Serial. Veuillez utiliser un navigateur de bureau (Chrome/Edge/Brave).',
     'flasher.terminalLogs': 'Journal du terminal série',
     'flasher.clearLogs': 'Effacer les journaux',
+    'flasher.backToSettings': 'Retour aux paramètres',
+
+    'settings.flasherTitle': 'Flasheur Matériel & Outils Web Serial',
+    'settings.flasherDesc': 'Flashez le firmware ATmega32U4 / ESP32 directement par USB via l\'API Web Serial (Ordinateur / PC portable).',
+    'settings.openFlasher': 'Lancer le Flasheur',
   },
 
   es: {
@@ -1085,5 +1111,10 @@ export const translations: Record<Language, Translations> = {
     'flasher.unsupportedDesc': 'El flasheo requiere la Web Serial API. Utiliza un navegador de escritorio (Chrome/Edge/Brave).',
     'flasher.terminalLogs': 'Registro del terminal serie',
     'flasher.clearLogs': 'Borrar registros',
+    'flasher.backToSettings': 'Volver a ajustes',
+
+    'settings.flasherTitle': 'Flasheador de Hardware & Herramientas Web Serial',
+    'settings.flasherDesc': 'Flashea firmware ATmega32U4 / ESP32 directamente por USB con la API Web Serial (Ordenador / Portátil).',
+    'settings.openFlasher': 'Abrir Flasheador',
   }
 };

@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
         <nav className="hidden md:flex items-center space-x-1 p-1 rounded-xl bg-zinc-100/90 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 overflow-x-auto">
           {tabItems.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+            const isActive = activeTab === tab.id || (activeTab === 'flasher' && tab.id === 'settings');
             return (
               <button
                 key={tab.id}

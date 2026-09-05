@@ -11,7 +11,8 @@ import {
   Copy,
   Upload,
   Radio,
-  Check
+  Check,
+  ArrowLeft
 } from 'lucide-react';
 
 interface SerialLogEntry {
@@ -20,7 +21,11 @@ interface SerialLogEntry {
   message: string;
 }
 
-export const FlasherPanel: React.FC = () => {
+interface FlasherPanelProps {
+  onBack?: () => void;
+}
+
+export const FlasherPanel: React.FC<FlasherPanelProps> = ({ onBack }) => {
   const { t } = useSettings();
 
   // Web Serial API capability check
@@ -225,8 +230,19 @@ export const FlasherPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Port Connect/Disconnect Button */}
+        {/* Action Buttons */}
         <div className="flex items-center space-x-2">
+          {onBack && (
+            <button
+              onClick={onBack}
+              disabled={isFlashing}
+              className="btn-tactile px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-850 text-zinc-700 dark:text-zinc-300 text-xs font-semibold border border-zinc-200 dark:border-zinc-800 flex items-center space-x-1.5 transition-all disabled:opacity-40"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>{t('flasher.backToSettings')}</span>
+            </button>
+          )}
+
           {isConnected ? (
             <button
               onClick={handleDisconnect}
