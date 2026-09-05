@@ -17,6 +17,7 @@
 ## 🌟 Ecosystem Highlights
 
 - **🌐 Precision Web Workstation & PWA**: React 18 + Vite + TypeScript interface with header-integrated desktop navigation and responsive mobile touch bar.
+- **⚡ Zero-Install Web Flasher (Web Serial API)**: Flash ATmega32U4 Pro Micro or ESP32 firmware directly from any desktop Chromium browser via **Settings > Hardware Flasher & Web Serial Tools** with zero toolchain setup.
 - **📱 Native Mobile Packaging (Ionic Capacitor 6+)**: Packaged natively for **iOS (Apple App Store / TestFlight)** with direct **CoreBluetooth** and **Android (Google Play Store)** with native BLE & Taptic Engine haptics.
 - **🐍 Python SDK & OtterDeck Dashboard**: Asynchronous Bleak & PySerial client library, rich CLI terminal tools, and an embedded Flask local web dashboard.
 - **⚡ ATmega32U4 Firmware**: Highly optimized Arduino / PlatformIO C++ firmware with non-blocking mouse jiggler, hardware ring buffers, and STX/ETX XOR-checksum framing.
@@ -30,7 +31,7 @@
 ```mermaid
 graph TD
     subgraph Clients["1. Client Layer"]
-        WEB["🌐 Web PWA (web/)<br/>React 18 + Vite + Tailwind<br/>Web Bluetooth API"]
+        WEB["🌐 Web PWA (web/)<br/>React 18 + Vite + Tailwind<br/>Web Bluetooth & Web Serial"]
         IOS["🍎 iOS App (Capacitor)<br/>Native CoreBluetooth + Taptic Engine"]
         AND["🤖 Android App (Capacitor)<br/>Native Android BLE + Vibrator"]
         PY_SDK["🐍 Python SDK & CLI (python/)<br/>Bleak + PySerial<br/>OtterDeck Local Web Deck"]
@@ -62,6 +63,7 @@ graph TD
     end
 
     WEB -->|"Web Bluetooth"| BLE
+    WEB -.->|"Web Serial (USB Flash)"| FirmwareLayer
     IOS -->|"CoreBluetooth"| BLE
     AND -->|"Android BLE"| BLE
     PY_SDK -->|"BLE / USB Serial"| BLE
@@ -158,14 +160,30 @@ with RubberOtter() as otter:
     otter.jiggler_toggle()
 ```
 
-### 3. ⚡ ATmega32U4 Firmware (`firmware/`)
-Compile and flash the firmware using [PlatformIO](https://platformio.org/):
+### 3. ⚡ Firmware Flashing (`firmware/`)
+
+You can flash the Rubber Otter firmware onto your **ATmega32U4 (Pro Micro / Leonardo)** or **ESP32** board using either the in-browser Web Flasher or command-line PlatformIO:
+
+#### 🚀 Option A: Zero-Install Web Flasher (Recommended)
+No compilers, Python, or toolchain installations required!
+1. Connect your ATmega32U4 / ESP32 board to your computer via USB.
+2. Open the [Rubber Otter Web Workstation](https://atacanymc.github.io/RubberOtter/) in a desktop Chromium browser (**Google Chrome**, **Microsoft Edge**, or **Brave**).
+3. Navigate to **⚙️ Settings** ➔ **Hardware Flasher & Web Serial Tools** and click **Launch Flasher**.
+4. Click **Connect USB Device** and select your board's USB serial port from the browser picker.
+5. Select your target board (*ATmega32U4* or *ESP32*) and firmware source (Official release or custom `.hex`/`.bin` file).
+6. Click **Flash Firmware to Device**. For ATmega32U4 Pro Micro boards, use the **Trigger Bootloader (1200 bps)** button if you need to force reset the MCU into Caterina bootloader mode.
+
+#### 🛠️ Option B: PlatformIO CLI (For Developers)
+Compile and upload the C++ firmware manually:
 
 ```bash
 cd firmware
 
 # Flash to Arduino Leonardo / Pro Micro 5V
 platformio run -e pro_micro -t upload
+
+# Or monitor hardware serial logs:
+platformio device monitor
 ```
 
 ---
