@@ -10,6 +10,7 @@ export interface Translations {
   'nav.macros': string;
   'nav.trackpad': string;
   'nav.console': string;
+  'nav.flasher': string;
   'nav.settings': string;
 
   // Header
@@ -164,6 +165,30 @@ export interface Translations {
   'settings.gattTitle': string;
   'settings.serviceUuid': string;
   'settings.charUuid': string;
+
+  // Flasher
+  'flasher.title': string;
+  'flasher.subtitle': string;
+  'flasher.connect': string;
+  'flasher.disconnect': string;
+  'flasher.connected': string;
+  'flasher.disconnected': string;
+  'flasher.targetBoard': string;
+  'flasher.firmwareSource': string;
+  'flasher.officialFirmware': string;
+  'flasher.customFirmware': string;
+  'flasher.uploadFile': string;
+  'flasher.baudRate': string;
+  'flasher.startFlash': string;
+  'flasher.flashing': string;
+  'flasher.success': string;
+  'flasher.error': string;
+  'flasher.bootloaderReset': string;
+  'flasher.bootloaderDesc': string;
+  'flasher.unsupportedTitle': string;
+  'flasher.unsupportedDesc': string;
+  'flasher.terminalLogs': string;
+  'flasher.clearLogs': string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -176,6 +201,7 @@ export const translations: Record<Language, Translations> = {
     'nav.macros': 'Macros',
     'nav.trackpad': 'Trackpad',
     'nav.console': 'Console',
+    'nav.flasher': 'Flasher',
     'nav.settings': 'Settings',
 
     'header.bleBridge': 'BLE HID Bridge',
@@ -320,6 +346,29 @@ export const translations: Record<Language, Translations> = {
     'settings.gattTitle': 'HM-10 GATT UUID Parameters',
     'settings.serviceUuid': 'GATT Service UUID',
     'settings.charUuid': 'Characteristic UUID',
+
+    'flasher.title': 'Hardware Flasher & Serial Tools',
+    'flasher.subtitle': 'Flash firmware and communicate via Web Serial API directly over USB.',
+    'flasher.connect': 'Connect USB Device',
+    'flasher.disconnect': 'Disconnect USB',
+    'flasher.connected': 'USB Device Connected',
+    'flasher.disconnected': 'No USB Device Connected',
+    'flasher.targetBoard': 'Target Board',
+    'flasher.firmwareSource': 'Firmware Source',
+    'flasher.officialFirmware': 'Official RubberOtter v2.1.0',
+    'flasher.customFirmware': 'Custom Firmware File',
+    'flasher.uploadFile': 'Choose .hex / .bin file',
+    'flasher.baudRate': 'Baud Rate',
+    'flasher.startFlash': 'Flash Firmware to Device',
+    'flasher.flashing': 'Flashing Firmware...',
+    'flasher.success': 'Firmware flashed successfully!',
+    'flasher.error': 'Flashing failed. Check connection and try again.',
+    'flasher.bootloaderReset': 'Trigger Bootloader (1200 bps)',
+    'flasher.bootloaderDesc': 'Reset ATmega32U4 Pro Micro into Caterina bootloader mode.',
+    'flasher.unsupportedTitle': 'Web Serial API Not Supported',
+    'flasher.unsupportedDesc': 'Hardware flashing requires Web Serial API. Please use a desktop browser such as Chrome, Edge, or Brave on Windows, macOS, or Linux.',
+    'flasher.terminalLogs': 'Serial Log Terminal',
+    'flasher.clearLogs': 'Clear Logs',
   },
 
   tr: {
@@ -331,6 +380,7 @@ export const translations: Record<Language, Translations> = {
     'nav.macros': 'Makrolar',
     'nav.trackpad': 'İzleme Dörtgeni',
     'nav.console': 'Konsol',
+    'nav.flasher': 'Flasher',
     'nav.settings': 'Ayarlar',
 
     'header.bleBridge': 'BLE HID Köprüsü',
@@ -475,6 +525,29 @@ export const translations: Record<Language, Translations> = {
     'settings.gattTitle': 'HM-10 GATT UUID Parametreleri',
     'settings.serviceUuid': 'GATT Servis UUID',
     'settings.charUuid': 'Karakteristik UUID',
+
+    'flasher.title': 'Donanım Flasher & Seri Port Araçları',
+    'flasher.subtitle': 'Web Serial API ile USB üzerinden doğrudan firmware yükleyin ve haberleşin.',
+    'flasher.connect': 'USB Cihazını Bağla',
+    'flasher.disconnect': 'USB Bağlantısını Kes',
+    'flasher.connected': 'USB Cihazı Bağlandı',
+    'flasher.disconnected': 'USB Cihazı Bağlı Değil',
+    'flasher.targetBoard': 'Hedef Kart',
+    'flasher.firmwareSource': 'Firmware Kaynağı',
+    'flasher.officialFirmware': 'Resmi RubberOtter v2.1.0',
+    'flasher.customFirmware': 'Özel Firmware Dosyası',
+    'flasher.uploadFile': '.hex / .bin dosyası seçin',
+    'flasher.baudRate': 'Baud Hızı',
+    'flasher.startFlash': 'Firmware\'i Cihaza Yaz',
+    'flasher.flashing': 'Firmware Yazılıyor...',
+    'flasher.success': 'Firmware başarıyla yüklendi!',
+    'flasher.error': 'Yazma başarısız oldu. Bağlantıyı kontrol edin.',
+    'flasher.bootloaderReset': 'Bootloader Tetikle (1200 bps)',
+    'flasher.bootloaderDesc': 'ATmega32U4 Pro Micro kartını Caterina bootloader moduna geçirir.',
+    'flasher.unsupportedTitle': 'Web Serial API Desteklenmiyor',
+    'flasher.unsupportedDesc': 'Donanım flashlama Web Serial API gerektirir. Lütfen masaüstü Chrome, Edge veya Brave tarayıcısı kullanın.',
+    'flasher.terminalLogs': 'Seri Port Terminal Kayıtları',
+    'flasher.clearLogs': 'Kayıtları Temizle',
   },
 
   de: {
@@ -486,6 +559,7 @@ export const translations: Record<Language, Translations> = {
     'nav.macros': 'Makros',
     'nav.trackpad': 'Trackpad',
     'nav.console': 'Konsole',
+    'nav.flasher': 'Flasher',
     'nav.settings': 'Einstellungen',
 
     'header.bleBridge': 'BLE HID-Brücke',
@@ -630,6 +704,29 @@ export const translations: Record<Language, Translations> = {
     'settings.gattTitle': 'HM-10 GATT UUID-Parameter',
     'settings.serviceUuid': 'GATT Service UUID',
     'settings.charUuid': 'Characteristic UUID',
+
+    'flasher.title': 'Hardware-Flasher & Seriell-Tools',
+    'flasher.subtitle': 'Firmware direkt über USB mit der Web Serial API flashen.',
+    'flasher.connect': 'USB-Gerät verbinden',
+    'flasher.disconnect': 'USB trennen',
+    'flasher.connected': 'USB-Gerät verbunden',
+    'flasher.disconnected': 'Kein USB-Gerät verbunden',
+    'flasher.targetBoard': 'Ziel-Board',
+    'flasher.firmwareSource': 'Firmware-Quelle',
+    'flasher.officialFirmware': 'Offizielle RubberOtter v2.1.0',
+    'flasher.customFirmware': 'Eigene Firmware-Datei',
+    'flasher.uploadFile': '.hex / .bin Datei auswählen',
+    'flasher.baudRate': 'Baudrate',
+    'flasher.startFlash': 'Firmware auf Gerät flashen',
+    'flasher.flashing': 'Firmware wird geflasht...',
+    'flasher.success': 'Firmware erfolgreich geflasht!',
+    'flasher.error': 'Flashen fehlgeschlagen. Verbindung prüfen.',
+    'flasher.bootloaderReset': 'Bootloader auslösen (1200 bps)',
+    'flasher.bootloaderDesc': 'Setzt ATmega32U4 Pro Micro in den Caterina-Bootloader-Modus zurück.',
+    'flasher.unsupportedTitle': 'Web Serial API nicht unterstützt',
+    'flasher.unsupportedDesc': 'Hardware-Flashen erfordert die Web Serial API. Bitte einen Desktop-Browser (Chrome/Edge/Brave) verwenden.',
+    'flasher.terminalLogs': 'Serielles Terminal-Protokoll',
+    'flasher.clearLogs': 'Protokolle löschen',
   },
 
   fr: {
@@ -641,6 +738,7 @@ export const translations: Record<Language, Translations> = {
     'nav.macros': 'Macros',
     'nav.trackpad': 'Pavé tactile',
     'nav.console': 'Console',
+    'nav.flasher': 'Flasher',
     'nav.settings': 'Paramètres',
 
     'header.bleBridge': 'Pont BLE HID',
@@ -785,6 +883,29 @@ export const translations: Record<Language, Translations> = {
     'settings.gattTitle': 'Paramètres UUID GATT HM-10',
     'settings.serviceUuid': 'UUID de service GATT',
     'settings.charUuid': 'UUID de caractéristique',
+
+    'flasher.title': 'Flasheur Matériel & Outils Série',
+    'flasher.subtitle': 'Flashez le firmware directement via USB avec l\'API Web Serial.',
+    'flasher.connect': 'Connecter le périphérique USB',
+    'flasher.disconnect': 'Déconnecter l\'USB',
+    'flasher.connected': 'Périphérique USB connecté',
+    'flasher.disconnected': 'Aucun périphérique USB connecté',
+    'flasher.targetBoard': 'Carte cible',
+    'flasher.firmwareSource': 'Source du firmware',
+    'flasher.officialFirmware': 'RubberOtter v2.1.0 officiel',
+    'flasher.customFirmware': 'Fichier firmware personnalisé',
+    'flasher.uploadFile': 'Choisir un fichier .hex / .bin',
+    'flasher.baudRate': 'Vitesse en bauds',
+    'flasher.startFlash': 'Flasher le firmware',
+    'flasher.flashing': 'Flashage en cours...',
+    'flasher.success': 'Firmware flashé avec succès !',
+    'flasher.error': 'Échec du flashage. Vérifiez la connexion.',
+    'flasher.bootloaderReset': 'Déclencher Bootloader (1200 bps)',
+    'flasher.bootloaderDesc': 'Réinitialise l\'ATmega32U4 Pro Micro en mode Caterina bootloader.',
+    'flasher.unsupportedTitle': 'Web Serial API non prise en charge',
+    'flasher.unsupportedDesc': 'Le flashage nécessite l\'API Web Serial. Veuillez utiliser un navigateur de bureau (Chrome/Edge/Brave).',
+    'flasher.terminalLogs': 'Journal du terminal série',
+    'flasher.clearLogs': 'Effacer les journaux',
   },
 
   es: {
@@ -796,6 +917,7 @@ export const translations: Record<Language, Translations> = {
     'nav.macros': 'Macros',
     'nav.trackpad': 'Panel táctil',
     'nav.console': 'Consola',
+    'nav.flasher': 'Flasher',
     'nav.settings': 'Ajustes',
 
     'header.bleBridge': 'Puente BLE HID',
@@ -940,5 +1062,28 @@ export const translations: Record<Language, Translations> = {
     'settings.gattTitle': 'Parámetros UUID GATT HM-10',
     'settings.serviceUuid': 'UUID de servicio GATT',
     'settings.charUuid': 'UUID de característica',
+
+    'flasher.title': 'Flasheador de Hardware & Herramientas Serie',
+    'flasher.subtitle': 'Flashea firmware directamente por USB con la API Web Serial.',
+    'flasher.connect': 'Conectar dispositivo USB',
+    'flasher.disconnect': 'Desconectar USB',
+    'flasher.connected': 'Dispositivo USB conectado',
+    'flasher.disconnected': 'Ningún dispositivo USB conectado',
+    'flasher.targetBoard': 'Placa de destino',
+    'flasher.firmwareSource': 'Origen del firmware',
+    'flasher.officialFirmware': 'RubberOtter v2.1.0 oficial',
+    'flasher.customFirmware': 'Archivo de firmware personalizado',
+    'flasher.uploadFile': 'Seleccionar archivo .hex / .bin',
+    'flasher.baudRate': 'Velocidad en baudios',
+    'flasher.startFlash': 'Flashear firmware al dispositivo',
+    'flasher.flashing': 'Flasheando firmware...',
+    'flasher.success': '¡Firmware flasheado con éxito!',
+    'flasher.error': 'Fallo al flashear. Comprueba la conexión.',
+    'flasher.bootloaderReset': 'Activar Bootloader (1200 bps)',
+    'flasher.bootloaderDesc': 'Reinicia ATmega32U4 Pro Micro en modo bootloader Caterina.',
+    'flasher.unsupportedTitle': 'Web Serial API no soportada',
+    'flasher.unsupportedDesc': 'El flasheo requiere la Web Serial API. Utiliza un navegador de escritorio (Chrome/Edge/Brave).',
+    'flasher.terminalLogs': 'Registro del terminal serie',
+    'flasher.clearLogs': 'Borrar registros',
   }
 };

@@ -10,6 +10,7 @@ import { SecurityPanel } from './components/security/SecurityPanel';
 import { GamingPanel } from './components/gaming/GamingPanel';
 import { TrackpadPanel } from './components/trackpad/TrackpadPanel';
 import { ConsolePanel } from './components/console/ConsolePanel';
+import { FlasherPanel } from './components/flasher/FlasherPanel';
 import { SettingsPanel } from './components/settings/SettingsPanel';
 
 export const AppContent: React.FC = () => {
@@ -34,6 +35,7 @@ export const AppContent: React.FC = () => {
           {activeTab === 'gaming' && <GamingPanel />}
           {activeTab === 'trackpad' && <TrackpadPanel />}
           {activeTab === 'console' && <ConsolePanel />}
+          {activeTab === 'flasher' && <FlasherPanel />}
           {activeTab === 'settings' && <SettingsPanel />}
         </div>
       </main>
