@@ -72,14 +72,19 @@ make mobile-android
 
 ### Production Release (APK & Google Play AAB)
 ```bash
-cd web/android
+# Fast build from root repository:
+make build-android
+
+# Or manually in android directory:
+cd android
 ./gradlew bundleRelease # Generates Google Play .aab bundle
 # or
 ./gradlew assembleRelease # Generates standalone .apk
 ```
 Output files will be generated under:
-- `web/android/app/build/outputs/bundle/release/app-release.aab` (For Google Play Store Console)
-- `web/android/app/build/outputs/apk/release/app-release-unsigned.apk`
+- `dist/android/RubberOtter-debug.apk` (and `android/dist/`)
+- `android/app/build/outputs/bundle/release/app-release.aab` (For Google Play Store Console)
+- `android/app/build/outputs/apk/release/app-release-unsigned.apk`
 
 ---
 

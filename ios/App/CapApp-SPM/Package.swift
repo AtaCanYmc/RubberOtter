@@ -12,11 +12,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.5.1"),
-        .package(name: "CapacitorCommunityBluetoothLe", path: "../../../node_modules/@capacitor-community/bluetooth-le"),
-        .package(name: "CapacitorApp", path: "../../../node_modules/@capacitor/app"),
-        .package(name: "CapacitorHaptics", path: "../../../node_modules/@capacitor/haptics"),
-        .package(name: "CapacitorKeyboard", path: "../../../node_modules/@capacitor/keyboard"),
-        .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar")
+        .package(name: "CapacitorCommunityBluetoothLe", path: "../../../web/node_modules/@capacitor-community/bluetooth-le"),
+        .package(name: "CapacitorApp", path: "../../../web/node_modules/@capacitor/app"),
+        .package(name: "CapacitorHaptics", path: "../../../web/node_modules/@capacitor/haptics"),
+        .package(name: "CapacitorKeyboard", path: "../../../web/node_modules/@capacitor/keyboard"),
+        .package(name: "CapacitorStatusBar", path: "../../../web/node_modules/@capacitor/status-bar")
     ],
     targets: [
         .target(

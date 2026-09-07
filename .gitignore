@@ -100,3 +100,20 @@ pnpm-debug.log*
 !.env.example
 secrets.json
 credentials.json
+
+# ------------------------------------------------------------------------------
+# 7. Native Mobile (iOS & Android) & Monorepo Build Artifacts
+# ------------------------------------------------------------------------------
+/dist/
+dist/
+**/android/.gradle/
+**/android/app/build/
+**/android/build/
+**/android/dist/
+*.apk
+*.aab
+**/ios/build/
+**/ios/dist/
+**/ios/DerivedData/
+*.ipa
+*.xcarchive

@@ -50,5 +50,11 @@ sequenceDiagram
 
 ### 3. Web PWA (`web/`)
 - **Technology**: React 18, TypeScript, Tailwind CSS, Vite.
-- **Web Bluetooth Manager**: Connects via `navigator.bluetooth` to HM-10 GATT service `0xFFE0` / characteristic `0xFFE1`.
-- **Panels**: Media Remote, Presentation Remote, Security & Shortcuts, CS Buy / Custom Macro builder, Virtual Trackpad with multi-touch gestures, Live Packet Terminal.
+- **Web Bluetooth & Web Serial**: Connects via `navigator.bluetooth` to HM-10 GATT service `0xFFE0` / characteristic `0xFFE1`, and `navigator.serial` for zero-install direct USB hardware flashing.
+- **Panels**: Media Remote, Presentation Remote, Security & Shortcuts, CS Buy / Custom Macro builder, Virtual Trackpad with multi-touch gestures, Hardware Flasher, Live Packet Terminal.
+
+### 4. Native Mobile Applications (`ios/`, `android/`)
+- **Framework**: Ionic Capacitor with standalone root native projects.
+- **iOS (`ios/`)**: Native Swift workspace with Swift Package Manager plugins, direct CoreBluetooth, and Apple Taptic Engine haptics.
+- **Android (`android/`)**: Native Gradle/Kotlin Android Studio project with Android Bluetooth LE and Vibrator services.
+- **Build Output**: Automated builds produce unified binaries in `dist/web/`, `dist/android/` (`.apk`), and `dist/ios/` (`.app`).

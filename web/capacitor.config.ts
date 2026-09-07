@@ -5,6 +5,12 @@ const config: CapacitorConfig = {
   appName: 'Rubber Otter',
   webDir: 'dist',
   backgroundColor: '#09090b',
+  android: {
+    path: '../android'
+  },
+  ios: {
+    path: '../ios'
+  },
   server: {
     androidScheme: 'https',
     cleartext: true

@@ -84,6 +84,20 @@ graph TD
 
 ```text
 RubberOtter/
+├── android/                      # 🤖 Native Android Studio project (Gradle / Kotlin)
+│   ├── app/                     # Android app module & native manifest
+│   └── build.gradle             # Android build & SDK configuration
+│
+├── ios/                          # 🍎 Native Xcode project (Swift / SPM)
+│   ├── App/App.xcodeproj        # Xcode project & workspace configuration
+│   └── App/CapApp-SPM           # Swift Package Manager Capacitor dependencies
+│
+├── web/                          # 🌐 React 18 + Vite PWA Workstation
+│   ├── src/                     # Workstation components (Text, Media, Trackpad, Macros)
+│   ├── src/i18n/                # Localization engine (EN, TR, DE, FR, ES)
+│   ├── capacitor.config.ts      # Native Capacitor bridge configuration
+│   └── vite.config.ts           # Vite build & PWA configuration
+│
 ├── firmware/                     # ⚡ C++ / PlatformIO / Arduino Firmware (ATmega32U4)
 │   ├── platformio.ini           # PlatformIO multi-environment configuration
 │   ├── src/                     # Modular firmware source (Parser, Executor, Store)
@@ -94,14 +108,7 @@ RubberOtter/
 │   ├── rubberotter/             # Core Python package (client, transports, cli, dashboard)
 │   └── tests/                   # Unittest suite (15 passing tests)
 │
-├── web/                          # 🌐 React 18 + Vite PWA + 📱 Capacitor Mobile Apps
-│   ├── src/                     # Workstation components (Text, Media, Trackpad, Macros)
-│   ├── src/i18n/                # Localization engine (EN, TR, DE, FR, ES)
-│   ├── ios/                     # 🍎 Native Xcode project (Capacitor)
-│   ├── android/                 # 🤖 Native Android Studio project (Capacitor)
-│   ├── capacitor.config.ts      # Native Capacitor app configuration
-│   └── vite.config.ts           # Vite build & PWA configuration
-│
+├── dist/                         # 📦 Centralized Build Outputs (web/, android/, ios/)
 ├── docs/                         # 📖 Ecosystem Technical Documentation
 │   ├── protocol-spec.md         # STX/ETX Framed Binary & Hex Command Specification
 │   ├── hardware-wiring.md       # HM-10 BLE & Pro Micro wiring schematics
@@ -124,6 +131,12 @@ Run the Progressive Web App in any browser or build for mobile:
 cd web
 npm install
 npm run dev
+
+# Platform build pipelines (outputs to dist/<platform>/ & <platform>/dist/):
+npm run build:web        # Web PWA -> dist/web/ & web/dist/
+npm run build:android    # Android APK -> dist/android/ & android/dist/
+npm run build:ios        # iOS Native App -> dist/ios/ & ios/dist/
+npm run build:all        # Build all platforms sequentially
 
 # Sync distribution to native iOS & Android:
 npm run cap:sync
@@ -195,8 +208,13 @@ The root `Makefile` automates all environment setups, testing, and multi-platfor
 ```bash
 make install          # Set up virtual environment and install Web & Python dependencies
 make test             # Run 15 Python unit tests and Web TypeScript validation
-make build            # Build Web PWA, Python package, and PlatformIO firmware
-make mobile-sync      # Sync Web bundle to iOS and Android Capacitor projects
+make build            # Build Web bundle, Python package, and PlatformIO firmware
+make build-web        # Build Web PWA -> dist/web/ & web/dist/
+make build-android    # Build Android APK -> dist/android/ & android/dist/
+make build-ios        # Build iOS Native App -> dist/ios/ & ios/dist/
+make build-mobile     # Build both Android and iOS native targets
+make build-all        # Build all components across web, mobile, python & firmware
+make mobile-sync      # Sync Web bundle to native iOS & Android projects
 make mobile-android   # Launch Android Studio directly with Rubber Otter project
 make mobile-ios       # Launch Xcode directly with Rubber Otter iOS project
 make dev-web          # Start Web PWA Vite local development server

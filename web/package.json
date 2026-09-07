@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:web": "npm run build && mkdir -p ../dist/web && cp -R dist/* ../dist/web/",
+    "build:android": "npm run cap:sync && (cd ../android && ./gradlew assembleDebug 2>/dev/null && mkdir -p ../dist/android dist && cp app/build/outputs/apk/debug/app-debug.apk ../dist/android/RubberOtter-debug.apk 2>/dev/null && cp app/build/outputs/apk/debug/app-debug.apk dist/RubberOtter-debug.apk 2>/dev/null || echo 'ℹ️ To build Android APK, install Java SDK or run in Android Studio.')",
+    "build:ios": "npm run cap:sync && xcodebuild -project ../ios/App/App.xcodeproj -scheme App -configuration Release -destination 'generic/platform=iOS' -derivedDataPath ../ios/build build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO && mkdir -p ../dist/ios ../ios/dist && cp -R ../ios/build/Build/Products/Release-iphoneos/App.app ../dist/ios/RubberOtter.app && cp -R ../ios/build/Build/Products/Release-iphoneos/App.app ../ios/dist/RubberOtter.app",
+    "build:all": "npm run build:web && npm run build:android && npm run build:ios",
     "lint": "tsc",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync",
