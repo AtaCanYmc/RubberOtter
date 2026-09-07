@@ -26,6 +26,16 @@
 
 ---
 
+## 📲 Download Mobile Apps (Android & iOS)
+
+Pre-compiled, ready-to-install mobile app packages are published directly with each release on **[GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases/latest)**:
+
+| Platform | Download Artifact | Installation Guide |
+| :--- | :--- | :--- |
+| **🤖 Android** | [`RubberOtter-Android.apk`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) | Download `.apk` directly to your Android device and tap to install (allow *"Install unknown apps"* when prompted). |
+| **🍎 iOS** | [`RubberOtter-iOS.app.zip`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) <br/> [`RubberOtter-iOS-unsigned.ipa`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) | Sideload via **AltStore**, **Sideloadly**, or **TrollStore**; or extract `.app` and install into iOS Simulator (`xcrun simctl install booted RubberOtter.app`). |
+| **🌐 Web PWA** | [Launch Web Workstation](https://atacanymc.github.io/RubberOtter/) | Zero installation. Operates directly in Chrome/Edge with Web Bluetooth & Web Serial hardware flashing. |
+
 ## 📐 System Architecture
 
 ```mermaid

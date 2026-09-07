@@ -1,4 +1,4 @@
-.PHONY: help venv install test build build-web build-android build-ios build-mobile build-all dev-web dev-python build-firmware mobile-sync mobile-android mobile-ios clean
+.PHONY: help venv install test build build-web build-android build-ios build-mobile package-ios package-mobile build-all dev-web dev-python build-firmware mobile-sync mobile-android mobile-ios clean
 
 PYTHON ?= python3
 VENV ?= python/.venv
@@ -16,6 +16,8 @@ help:
 	@echo "  make build-android  - Build Android APK -> dist/android/ & android/dist/"
 	@echo "  make build-ios      - Build iOS App -> dist/ios/ & ios/dist/"
 	@echo "  make build-mobile   - Build both Android APK and iOS native App"
+	@echo "  make package-ios    - Package iOS App into ZIP & unsigned IPA for release"
+	@echo "  make package-mobile - Package all mobile release artifacts (APK, ZIP, IPA)"
 	@echo "  make build-all      - Build all components (Web, Android, iOS, Python, Firmware)"
 	@echo "  make dev-web        - Run Web PWA development server (Vite)"
 	@echo "  make dev-python     - Install Python package in editable mode"
@@ -75,6 +77,19 @@ build-ios:
 	@echo "✅ iOS build completed -> dist/ios/RubberOtter.app & ios/dist/RubberOtter.app"
 
 build-mobile: build-android build-ios
+
+package-ios: build-ios
+	@echo "📦 Packaging iOS App into ZIP and unsigned IPA..."
+	@mkdir -p dist/ios
+	@(cd ios/build/Build/Products/Release-iphoneos && \
+		zip -rq ../../../../../dist/ios/RubberOtter-iOS.app.zip App.app && \
+		mkdir -p Payload && cp -R App.app Payload/ && \
+		zip -rq ../../../../../dist/ios/RubberOtter-iOS-unsigned.ipa Payload && \
+		rm -rf Payload)
+	@echo "✅ iOS packaging completed -> dist/ios/RubberOtter-iOS.app.zip & dist/ios/RubberOtter-iOS-unsigned.ipa"
+
+package-mobile: package-ios build-android
+	@echo "🎉 Mobile packages ready in dist/ios/ and dist/android/ for GitHub Releases!"
 
 build: venv build-web
 	@echo "📦 Building Python distribution package..."
