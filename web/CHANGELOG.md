@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.4.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.3.0...web-v2.4.0) (2026-09-07)
+
+
+### Features
+
+* **web:** add desktop-exclusive hardware flasher tab with Web Serial API support ([3460bbd](https://github.com/AtaCanYmc/RubberOtter/commit/3460bbdbcec016abb83687cb69e951b02b84fa0e))
+
+
+### Code Refactoring
+
+* **monorepo:** separate web, ios, and android directories with dedicated build outputs ([65ee67f](https://github.com/AtaCanYmc/RubberOtter/commit/65ee67f68a862c0e5af4bd63c888a1a65819e2c5))
+* **web:** move hardware flasher access to settings and remove from header ([4bab30d](https://github.com/AtaCanYmc/RubberOtter/commit/4bab30d2b63b009a2e4a2a0be8750994f7fcad9a))
+
 ## [2.3.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.2.0...web-v2.3.0) (2026-09-02)
 
 
