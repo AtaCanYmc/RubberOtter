@@ -45,6 +45,38 @@
         { "type": "docs", "section": "Documentation" },
         { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
       ]
+    },
+    "android": {
+      "release-type": "simple",
+      "package-name": "rubber-otter-android",
+      "changelog-path": "CHANGELOG.md",
+      "component": "android",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Code Refactoring" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
+      ]
+    },
+    "ios": {
+      "release-type": "simple",
+      "package-name": "rubber-otter-ios",
+      "changelog-path": "CHANGELOG.md",
+      "component": "ios",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "changelog-sections": [
+        { "type": "feat", "section": "Features" },
+        { "type": "fix", "section": "Bug Fixes" },
+        { "type": "perf", "section": "Performance Improvements" },
+        { "type": "refactor", "section": "Code Refactoring" },
+        { "type": "docs", "section": "Documentation" },
+        { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
+      ]
     }
   }
 }

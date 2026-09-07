@@ -26,15 +26,15 @@
 
 ---
 
-## 📲 Download Mobile Apps (Android & iOS)
+## 📲 Platform Releases & Downloads
 
-Pre-compiled, ready-to-install mobile app packages are published directly with each release on **[GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases/latest)**:
+Dedicated, independent releases are published for each platform on **[GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases)**:
 
-| Platform | Download Artifact | Installation Guide |
-| :--- | :--- | :--- |
-| **🤖 Android** | [`RubberOtter-Android.apk`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) | Download `.apk` directly to your Android device and tap to install (allow *"Install unknown apps"* when prompted). |
-| **🍎 iOS** | [`RubberOtter-iOS.app.zip`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) <br/> [`RubberOtter-iOS-unsigned.ipa`](https://github.com/AtaCanYmc/RubberOtter/releases/latest) | Sideload via **AltStore**, **Sideloadly**, or **TrollStore**; or extract `.app` and install into iOS Simulator (`xcrun simctl install booted RubberOtter.app`). |
-| **🌐 Web PWA** | [Launch Web Workstation](https://atacanymc.github.io/RubberOtter/) | Zero installation. Operates directly in Chrome/Edge with Web Bluetooth & Web Serial hardware flashing. |
+| Platform | Channel / Release | Download Artifacts | Installation Guide |
+| :--- | :--- | :--- | :--- |
+| **🤖 Android** | [Android Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=android) | [`RubberOtter-Android.apk`](https://github.com/AtaCanYmc/RubberOtter/releases?q=android) | Download `.apk` directly to Android and tap to install (allow *"Install unknown apps"*). |
+| **🍎 iOS** | [iOS Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) | [`RubberOtter-iOS.app.zip`](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) <br/> [`RubberOtter-iOS-unsigned.ipa`](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) | Sideload via **AltStore**, **Sideloadly**, or **TrollStore**; or extract `.app` into iOS Simulator (`xcrun simctl install booted RubberOtter.app`). |
+| **🌐 Web PWA** | [Web Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=web) | [Launch Web Workstation](https://atacanymc.github.io/RubberOtter/) <br/> [`RubberOtter-Web-PWA.zip`](https://github.com/AtaCanYmc/RubberOtter/releases?q=web) | Zero-install live PWA in Chrome/Edge, or host the offline ZIP bundle locally. |
 
 ## 📐 System Architecture
 

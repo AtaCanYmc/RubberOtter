@@ -1,4 +1,4 @@
-.PHONY: help venv install test build build-web build-android build-ios build-mobile package-ios package-mobile build-all dev-web dev-python build-firmware mobile-sync mobile-android mobile-ios clean
+.PHONY: help venv install test build build-web build-android build-ios build-mobile package-web package-android package-ios package-all build-all dev-web dev-python build-firmware mobile-sync mobile-android mobile-ios clean
 
 PYTHON ?= python3
 VENV ?= python/.venv
@@ -16,8 +16,10 @@ help:
 	@echo "  make build-android  - Build Android APK -> dist/android/ & android/dist/"
 	@echo "  make build-ios      - Build iOS App -> dist/ios/ & ios/dist/"
 	@echo "  make build-mobile   - Build both Android APK and iOS native App"
+	@echo "  make package-web    - Package Web PWA into ZIP for distribution -> dist/web/"
+	@echo "  make package-android- Package Android APK for release -> dist/android/"
 	@echo "  make package-ios    - Package iOS App into ZIP & unsigned IPA for release"
-	@echo "  make package-mobile - Package all mobile release artifacts (APK, ZIP, IPA)"
+	@echo "  make package-all    - Package Web, Android, and iOS release bundles"
 	@echo "  make build-all      - Build all components (Web, Android, iOS, Python, Firmware)"
 	@echo "  make dev-web        - Run Web PWA development server (Vite)"
 	@echo "  make dev-python     - Install Python package in editable mode"
@@ -78,6 +80,23 @@ build-ios:
 
 build-mobile: build-android build-ios
 
+package-web: build-web
+	@echo "📦 Packaging Web PWA into ZIP..."
+	@mkdir -p dist/web
+	@(cd web/dist && zip -rq ../../dist/web/RubberOtter-Web-PWA.zip .)
+	@echo "✅ Web packaging completed -> dist/web/RubberOtter-Web-PWA.zip"
+
+package-android: build-android
+	@echo "📦 Staging Android APK for release..."
+	@mkdir -p dist/android
+	@if [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then \
+		cp android/app/build/outputs/apk/debug/app-debug.apk dist/android/RubberOtter-Android.apk; \
+		echo "✅ Android packaging completed -> dist/android/RubberOtter-Android.apk"; \
+	elif [ -f dist/android/RubberOtter-debug.apk ]; then \
+		cp dist/android/RubberOtter-debug.apk dist/android/RubberOtter-Android.apk; \
+		echo "✅ Android packaging completed -> dist/android/RubberOtter-Android.apk"; \
+	fi
+
 package-ios: build-ios
 	@echo "📦 Packaging iOS App into ZIP and unsigned IPA..."
 	@mkdir -p dist/ios
@@ -88,8 +107,8 @@ package-ios: build-ios
 		rm -rf Payload)
 	@echo "✅ iOS packaging completed -> dist/ios/RubberOtter-iOS.app.zip & dist/ios/RubberOtter-iOS-unsigned.ipa"
 
-package-mobile: package-ios build-android
-	@echo "🎉 Mobile packages ready in dist/ios/ and dist/android/ for GitHub Releases!"
+package-all: package-web package-android package-ios
+	@echo "🎉 All release packages ready in dist/ (web, android, ios) for GitHub Releases!"
 
 build: venv build-web
 	@echo "📦 Building Python distribution package..."
