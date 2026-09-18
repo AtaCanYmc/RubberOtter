@@ -2,7 +2,7 @@
   <img src="docs/assets/banner.jpg" alt="Rubber Otter Banner" width="100%" />
 </p>
 
-# 🦦 Rubber Otter — Unified Bluetooth HID Ecosystem
+# Rubber Otter
 
 [![Firmware CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml)
 [![Python SDK CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml)
@@ -10,54 +10,45 @@
 [![Deploy PWA](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-**Rubber Otter** is a complete, modular, and open-source **wireless USB HID automation ecosystem**. It empowers you to control target host computers (Windows, macOS, Linux) with precision keystroke injection, virtual multi-touch mouse trackpad movements, media controls, presentation clicker timers, and persistent EEPROM macros over Bluetooth Low Energy (HM-10 / ESP32) and USB CDC Serial.
+Rubber Otter is an open-source wireless USB Human Interface Device (HID) automation ecosystem. It allows client devices to inject keystrokes, execute relative mouse cursor movements, trigger media playback controls, run presentation timers, and store non-volatile macros on target host computers (Windows, macOS, Linux) over Bluetooth Low Energy (HM-10 or ESP32) and USB CDC Serial.
 
----
+## Table of Contents
 
-## 🌟 Ecosystem Highlights
+- [System Architecture](#system-architecture)
+- [Monorepo Layout](#monorepo-layout)
+- [Platform Releases and Artifacts](#platform-releases-and-artifacts)
+- [Quick Start Guides](#quick-start-guides)
+  - [Web Workstation and Native Mobile](#1-web-workstation-and-native-mobile-web)
+  - [Python SDK, CLI, and MCP Server](#2-python-sdk-cli-and-mcp-server-python)
+  - [Firmware Flashing](#3-firmware-flashing-firmware)
+- [Root Automation Commands](#root-automation-commands)
+- [Protocol Specification Summary](#protocol-specification-summary)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [Governance and Contributing](#governance-and-contributing)
+- [License](#license)
 
-- **🌐 Precision Web Workstation & PWA**: React 18 + Vite + TypeScript interface with header-integrated desktop navigation and responsive mobile touch bar.
-- **⚡ Zero-Install Web Flasher (Web Serial API)**: Flash ATmega32U4 Pro Micro or ESP32 firmware directly from any desktop Chromium browser via **Settings > Hardware Flasher & Web Serial Tools** with zero toolchain setup.
-- **📱 Native Mobile Packaging (Ionic Capacitor 6+)**: Packaged natively for **iOS (Apple App Store / TestFlight)** with direct **CoreBluetooth** and **Android (Google Play Store)** with native BLE & Taptic Engine haptics.
-- **🐍 Python SDK & OtterDeck Dashboard**: Asynchronous Bleak & PySerial client library, rich CLI terminal tools, and an embedded Flask local web dashboard.
-- **⚡ ATmega32U4 Firmware**: Highly optimized Arduino / PlatformIO C++ firmware with non-blocking mouse jiggler, hardware ring buffers, and STX/ETX XOR-checksum framing.
-- **🌍 5 Interface Languages**: English (🇬🇧), Türkçe (🇹🇷), Deutsch (🇩🇪), Français (🇫🇷), and Español (🇪🇸).
-- **🌓 Adaptive Dual-Theme Engine**: Obsidian Dark (`#09090b`), Clean White (`#ffffff`), and OS System sync.
-
----
-
-## 📲 Platform Releases & Downloads
-
-Dedicated, independent releases are published for each platform on **[GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases)**:
-
-| Platform | Channel / Release | Download Artifacts | Installation Guide |
-| :--- | :--- | :--- | :--- |
-| **🤖 Android** | [Android Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=android) | [`RubberOtter-Android.apk`](https://github.com/AtaCanYmc/RubberOtter/releases?q=android) | Download `.apk` directly to Android and tap to install (allow *"Install unknown apps"*). |
-| **🍎 iOS** | [iOS Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) | [`RubberOtter-iOS.app.zip`](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) <br/> [`RubberOtter-iOS-unsigned.ipa`](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) | Sideload via **AltStore**, **Sideloadly**, or **TrollStore**; or extract `.app` into iOS Simulator (`xcrun simctl install booted RubberOtter.app`). |
-| **🌐 Web PWA** | [Web Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=web) | [Launch Web Workstation](https://atacanymc.github.io/RubberOtter/) <br/> [`RubberOtter-Web-PWA.zip`](https://github.com/AtaCanYmc/RubberOtter/releases?q=web) | Zero-install live PWA in Chrome/Edge, or host the offline ZIP bundle locally. |
-
-## 📐 System Architecture
+## System Architecture
 
 ```mermaid
-graph TD
+flowchart TD
     subgraph Clients["1. Client Layer"]
-        WEB["🌐 Web PWA (web/)<br/>React 18 + Vite + Tailwind<br/>Web Bluetooth & Web Serial"]
-        IOS["🍎 iOS App (Capacitor)<br/>Native CoreBluetooth + Taptic Engine"]
-        AND["🤖 Android App (Capacitor)<br/>Native Android BLE + Vibrator"]
-        PY_SDK["🐍 Python SDK & CLI (python/)<br/>Bleak + PySerial<br/>OtterDeck Local Web Deck"]
+        WEB["Web PWA (web/)<br/>React 18 + Vite + Tailwind<br/>Web Bluetooth & Web Serial"]
+        IOS["iOS App (ios/)<br/>Capacitor + CoreBluetooth<br/>Taptic Engine Integration"]
+        AND["Android App (android/)<br/>Capacitor + Android BLE<br/>Vibrator System Service"]
+        PY["Python SDK & CLI (python/)<br/>Bleak + PySerial + Flask<br/>Model Context Protocol (MCP)"]
     end
 
-    subgraph Transport["2. Transport Layer (Wireless / Serial)"]
-        BLE["HM-10 / ESP32 BLE Module<br/>GATT Service 0xFFE0 / Char 0xFFE1"]
-        UART["Serial1 UART @ 9600 Baud<br/>Hardware Ring Buffer"]
-        BLE -->|"Wireless Link"| UART
+    subgraph Transport["2. Transport Layer"]
+        BLE["HM-10 / ESP32 BLE Peripheral<br/>GATT Service 0xFFE0 / Char 0xFFE1"]
+        UART["Serial1 UART @ 9600 Baud<br/>Hardware Ring Buffer (512 Bytes)"]
+        BLE -->|"Wireless BLE Stream"| UART
     end
 
-    subgraph FirmwareLayer["3. Firmware Layer (firmware/)"]
-        PARSER["Packet Parser & State Machine<br/>STX/ETX Framed & Single-Byte HEX"]
-        EXEC["Command Executor<br/>Macro Store & Jiggler Engine"]
+    subgraph Firmware["3. MCU Firmware Layer (firmware/)"]
+        PARSER["Packet Parser & State Machine<br/>STX/ETX Framed + XOR Checksum"]
+        EXEC["Command Executor<br/>Macro Store & Jiggler Task"]
         HID["USB HID Driver Stack<br/>Keyboard.h & Mouse.h"]
-        VIB["Haptic Vibration Driver<br/>Pin 2 Pulse"]
+        VIB["Haptic Driver<br/>Pin 2 Digital Pulse"]
 
         UART --> PARSER
         PARSER --> EXEC
@@ -65,206 +56,199 @@ graph TD
         EXEC --> VIB
     end
 
-    subgraph TargetPC["4. Target Host Computer"]
-        USB["USB CDC HID Device<br/>(Plug & Play - No Drivers)"]
-        OS["Host OS (Windows / macOS / Linux)"]
-        HID -->|"Emulated USB Keystrokes & Mouse"| USB
+    subgraph Target["4. Target Host Computer"]
+        USB["USB CDC HID Device Interface"]
+        OS["Operating System<br/>(Windows / macOS / Linux)"]
+        HID -->|"Standard USB Keystrokes & Mouse Events"| USB
         USB --> OS
     end
 
     WEB -->|"Web Bluetooth"| BLE
-    WEB -.->|"Web Serial (USB Flash)"| FirmwareLayer
+    WEB -.->|"Web Serial (Direct USB Flashing)"| Firmware
     IOS -->|"CoreBluetooth"| BLE
     AND -->|"Android BLE"| BLE
-    PY_SDK -->|"BLE / USB Serial"| BLE
-
-    style WEB fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#f8fafc
-    style IOS fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
-    style AND fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
-    style PY_SDK fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc
-    style BLE fill:#070a12,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
-    style UART fill:#070a12,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
-    style FirmwareLayer fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#f8fafc
-    style TargetPC fill:#701a75,stroke:#f472b6,stroke-width:2px,color:#f8fafc
+    PY -->|"BLE or USB Serial"| BLE
 ```
 
----
+## Monorepo Layout
 
-## 🗂️ Monorepo Structure
+| Directory | Scope | Primary Technologies | Documentation |
+| :--- | :--- | :--- | :--- |
+| [`firmware/`](firmware/) | Embedded C++ microcontroller firmware. | PlatformIO, Arduino, ATmega32U4, C++11 | [firmware/README.md](firmware/README.md) |
+| [`web/`](web/) | Desktop and mobile browser workstation. | React 18, TypeScript, Vite, Tailwind CSS | [web/README.md](web/README.md) |
+| [`android/`](android/) | Native Android Studio packaging project. | Capacitor 8, Kotlin, Gradle 8.11, JDK 21 | [android/README.md](android/README.md) |
+| [`ios/`](ios/) | Native Xcode iOS packaging project. | Capacitor 8, Swift Package Manager, Xcode | [ios/README.md](ios/README.md) |
+| [`python/`](python/) | Client SDK, CLI, MCP Server, and OtterDeck. | Python 3.10+, Bleak, PySerial, Flask | [python/README.md](python/README.md) |
+| [`docs/`](docs/) | Ecosystem design, wiring, and protocol specs. | Technical specifications and schematics | [docs/protocol-spec.md](docs/protocol-spec.md) |
+| [`.github/`](.github/) | CI/CD matrix and automation workflows. | GitHub Actions, Release Please, Dependabot | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
-```text
-RubberOtter/
-├── android/                      # 🤖 Native Android Studio project (Gradle / Kotlin)
-│   ├── app/                     # Android app module & native manifest
-│   └── build.gradle             # Android build & SDK configuration
-│
-├── ios/                          # 🍎 Native Xcode project (Swift / SPM)
-│   ├── App/App.xcodeproj        # Xcode project & workspace configuration
-│   └── App/CapApp-SPM           # Swift Package Manager Capacitor dependencies
-│
-├── web/                          # 🌐 React 18 + Vite PWA Workstation
-│   ├── src/                     # Workstation components (Text, Media, Trackpad, Macros)
-│   ├── src/i18n/                # Localization engine (EN, TR, DE, FR, ES)
-│   ├── capacitor.config.ts      # Native Capacitor bridge configuration
-│   └── vite.config.ts           # Vite build & PWA configuration
-│
-├── firmware/                     # ⚡ C++ / PlatformIO / Arduino Firmware (ATmega32U4)
-│   ├── platformio.ini           # PlatformIO multi-environment configuration
-│   ├── src/                     # Modular firmware source (Parser, Executor, Store)
-│   └── tests/                   # Native & Host integration tests
-│
-├── python/                       # 🐍 Python SDK, CLI Tool & OtterDeck Dashboard
-│   ├── pyproject.toml           # PEP 517/668 packaging definition
-│   ├── rubberotter/             # Core Python package (client, transports, cli, dashboard)
-│   └── tests/                   # Unittest suite (15 passing tests)
-│
-├── dist/                         # 📦 Centralized Build Outputs (web/, android/, ios/)
-├── docs/                         # 📖 Ecosystem Technical Documentation
-│   ├── protocol-spec.md         # STX/ETX Framed Binary & Hex Command Specification
-│   ├── hardware-wiring.md       # HM-10 BLE & Pro Micro wiring schematics
-│   ├── MOBILE_PACKAGING.md      # iOS App Store & Android Google Play packaging guide
-│   └── architecture.md          # Architectural deep-dive
-│
-├── .github/workflows/            # 🚀 Unified Matrix CI/CD Workflows
-├── Makefile                      # 🛠️ Monorepo developer automation commands
-└── release-please-config.json    # 🏷️ Semantic release configuration
-```
+## Platform Releases and Artifacts
 
----
+Standalone artifacts are published automatically on [GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases) via dedicated workflow dispatchers:
 
-## 🚀 Quick Starts
+| Platform | Channel | Build Artifact | Installation Method |
+| :--- | :--- | :--- | :--- |
+| **Android** | [Android Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=android) | `RubberOtter-Android.apk` | Download APK to device and allow installation from unknown sources. |
+| **iOS** | [iOS Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=ios) | `RubberOtter-iOS-unsigned.ipa`<br/>`RubberOtter-iOS.app.zip` | Install via AltStore, Sideloadly, TrollStore, or deploy to booted iOS Simulator. |
+| **Web PWA** | [Web Releases](https://github.com/AtaCanYmc/RubberOtter/releases?q=web) | Hosted PWA<br/>`RubberOtter-Web-PWA.zip` | Open [https://atacanymc.github.io/RubberOtter/](https://atacanymc.github.io/RubberOtter/) or extract ZIP to a local HTTP server. |
+| **Python** | [PyPI Release](https://pypi.org/project/rubberotter/) | `rubberotter-*.tar.gz`<br/>`rubberotter-*.whl` | Install via `pip install rubberotter`. |
 
-### 1. 🌐 Web Client & 📱 Mobile App (`web/`)
-Run the Progressive Web App in any browser or build for mobile:
+## Quick Start Guides
+
+### 1. Web Workstation and Native Mobile (`web/`)
+
+Run the Progressive Web App locally or build native mobile packages:
 
 ```bash
 cd web
 npm install
 npm run dev
 
-# Platform build pipelines (outputs to dist/<platform>/ & <platform>/dist/):
-npm run build:web        # Web PWA -> dist/web/ & web/dist/
-npm run build:android    # Android APK -> dist/android/ & android/dist/
-npm run build:ios        # iOS Native App -> dist/ios/ & ios/dist/
-npm run build:all        # Build all platforms sequentially
+# Compile platform build distributions:
+npm run build:web        # Staged in dist/web/
+npm run build:android    # Builds APK via Gradle into dist/android/
+npm run build:ios        # Builds iOS bundle via xcodebuild into dist/ios/
 
-# Sync distribution to native iOS & Android:
+# Synchronize web assets to native mobile projects:
 npm run cap:sync
 
-# Open in native IDEs:
-npm run cap:open:ios      # Opens in Xcode
-npm run cap:open:android  # Opens in Android Studio
+# Open projects in native IDEs:
+npm run cap:open:android
+npm run cap:open:ios
 ```
 
-### 2. 🐍 Python SDK & CLI (`python/`)
-Install and use the Python client tool:
+### 2. Python SDK, CLI, and MCP Server (`python/`)
+
+Install the client package in development mode:
 
 ```bash
 cd python
 pip install -e .
 
-# Scan for BLE Rubber Otter devices
+# Scan for nearby BLE peripherals and USB CDC serial ports
 rubberotter scan
 
-# Type automated keystrokes
-rubberotter type "Hello from Rubber Otter!"
+# Type automated keystroke string on host computer
+rubberotter type "Hello from Rubber Otter\n"
 
-# Launch the embedded OtterDeck local web dashboard
-rubberotter dashboard --port 8080
+# Start Model Context Protocol (MCP) server for Claude Desktop or Cursor
+rubberotter mcp
+
+# Launch local OtterDeck web control panel
+rubberotter serve --web-port 8080
 ```
 
-#### Python Scripting Example:
+#### Scripting Example
+
 ```python
 from rubberotter import RubberOtter
 
 with RubberOtter() as otter:
     otter.vibrate(100)
-    otter.type("echo 'Hello World!'\n")
+    otter.type("echo 'Rubber Otter Active'\n")
     otter.jiggler_toggle()
 ```
 
-### 3. ⚡ Firmware Flashing (`firmware/`)
+### 3. Firmware Flashing (`firmware/`)
 
-You can flash the Rubber Otter firmware onto your **ATmega32U4 (Pro Micro / Leonardo)** or **ESP32** board using either the in-browser Web Flasher or command-line PlatformIO:
+#### Option A: Zero-Install Web Flasher (Chromium Browsers)
+1. Connect your ATmega32U4 board (SparkFun Pro Micro or Arduino Leonardo) via USB.
+2. Open the [Rubber Otter Web Workstation](https://atacanymc.github.io/RubberOtter/) in Google Chrome, Microsoft Edge, or Brave.
+3. Open **Settings > Hardware Flasher & Web Serial Tools** and click **Launch Flasher**.
+4. Select your USB serial port from the browser device picker.
+5. Select target board and click **Flash Firmware**. If the board does not respond, click **Trigger Bootloader (1200 bps)** to enter Caterina flash mode.
 
-#### 🚀 Option A: Zero-Install Web Flasher (Recommended)
-No compilers, Python, or toolchain installations required!
-1. Connect your ATmega32U4 / ESP32 board to your computer via USB.
-2. Open the [Rubber Otter Web Workstation](https://atacanymc.github.io/RubberOtter/) in a desktop Chromium browser (**Google Chrome**, **Microsoft Edge**, or **Brave**).
-3. Navigate to **⚙️ Settings** ➔ **Hardware Flasher & Web Serial Tools** and click **Launch Flasher**.
-4. Click **Connect USB Device** and select your board's USB serial port from the browser picker.
-5. Select your target board (*ATmega32U4* or *ESP32*) and firmware source (Official release or custom `.hex`/`.bin` file).
-6. Click **Flash Firmware to Device**. For ATmega32U4 Pro Micro boards, use the **Trigger Bootloader (1200 bps)** button if you need to force reset the MCU into Caterina bootloader mode.
-
-#### 🛠️ Option B: PlatformIO CLI (For Developers)
-Compile and upload the C++ firmware manually:
+#### Option B: PlatformIO CLI
 
 ```bash
 cd firmware
 
-# Flash to Arduino Leonardo / Pro Micro 5V
+# Compile and upload to SparkFun Pro Micro 5V 16MHz
 platformio run -e pro_micro -t upload
 
-# Or monitor hardware serial logs:
-platformio device monitor
+# Monitor serial diagnostics at 9600 baud
+platformio device monitor -b 9600
 ```
 
----
+## Root Automation Commands
 
-## 🛠️ Developer Make Commands
+The root `Makefile` provides unified targets for environment management, builds, and release packaging:
 
-The root `Makefile` automates all environment setups, testing, and multi-platform compilation:
+| Make Target | Description |
+| :--- | :--- |
+| `make install` | Creates Python virtual environment and installs npm and Python dependencies. |
+| `make test` | Executes Python unit tests and performs Web TypeScript type-checking. |
+| `make build-web` | Compiles Web PWA bundle and stages assets in `dist/web/`. |
+| `make build-android` | Synchronizes Capacitor and compiles Android debug APK via Gradle. |
+| `make build-ios` | Synchronizes Capacitor and compiles unsigned iOS application bundle via xcodebuild. |
+| `make package-all` | Stages zip bundles and APK/IPA distributions in `dist/` for GitHub Releases. |
+| `make build-firmware` | Compiles ATmega32U4 C++ firmware using PlatformIO Core. |
+| `make mobile-sync` | Builds web application and syncs assets to both `android/` and `ios/`. |
+| `make clean` | Deletes build outputs, virtualenvs, and intermediate compiler caches. |
 
-```bash
-make install          # Set up virtual environment and install Web & Python dependencies
-make test             # Run 15 Python unit tests and Web TypeScript validation
-make build            # Build Web bundle, Python package, and PlatformIO firmware
-make build-web        # Build Web PWA -> dist/web/ & web/dist/
-make build-android    # Build Android APK -> dist/android/ & android/dist/
-make build-ios        # Build iOS Native App -> dist/ios/ & ios/dist/
-make build-mobile     # Build both Android and iOS native targets
-make build-all        # Build all components across web, mobile, python & firmware
-make mobile-sync      # Sync Web bundle to native iOS & Android projects
-make mobile-android   # Launch Android Studio directly with Rubber Otter project
-make mobile-ios       # Launch Xcode directly with Rubber Otter iOS project
-make dev-web          # Start Web PWA Vite local development server
-make clean            # Clean all build artifacts, caches, and virtualenvs
-```
+## Protocol Specification Summary
 
----
+Commands are transmitted inside framed binary packets or single-byte hexadecimal control codes.
 
-## 🗺️ Protocol Command Mapping
+### Frame Format (Host to Device)
 
-| Category | Action | Hex Code | Host Execution |
+| Offset | Field | Size | Description |
 | :--- | :--- | :--- | :--- |
-| **Media** | Play / Pause | `0x11` | Media Play/Pause toggle |
-| | Next Track | `0x12` | Media Next Track |
-| | Previous Track | `0x13` | Media Previous Track |
-| | Volume Up / Down | `0x14` / `0x15` | Media Volume step |
-| | Mute Toggle | `0x16` | Media Mute |
-| **Presentation** | Next / Prev Slide | `0x21` / `0x22` | Right / Left Arrow (`KEY_RIGHT_ARROW`) |
-| | Fullscreen / Black | `0x23` / `0x24` | F5 (`KEY_F5`) / 'B' |
-| **Security** | Lock Screen | `0x31` | `Win + L` / `Ctrl + Cmd + Q` |
-| | Mouse Jiggler | `0x32` | Non-blocking periodic micro-movements |
-| | Task Manager | `0x33` | `Ctrl + Shift + Esc` / `Cmd + Opt + Esc` |
-| | Show Desktop | `0x34` | `Win + D` / `Cmd + F3` |
-| | Vibration Pulse | `0x35` | Pin 2 haptic pulse |
-| **Gaming** | CS Buy Armor+Helm | `0x41` | Buy chain (`'b' -> 4 -> 2`) |
-| **Trackpad** | Move Vector | `0x80` | `[0x80, deltaX, deltaY]` relative move |
-| | Left / Right Click | `0x81` / `0x82` | `Mouse.click(MOUSE_LEFT / RIGHT)` |
-| | Scroll Up / Down | `0x84` / `0x85` | `Mouse.move(0, 0, 1 / -1)` |
+| `0` | `STX` | 1 byte | Delimiter byte `0x02`. |
+| `1` | `VERSION` | 1 byte | Protocol version `0x01`. |
+| `2` | `SEQ` | 1 byte | Host packet sequence counter. |
+| `3` | `LEN_HI` | 1 byte | High byte of payload length. |
+| `4` | `LEN_LO` | 1 byte | Low byte of payload length. |
+| `5` | `PAYLOAD` | `N` bytes | Command string (maximum 384 bytes). |
+| `5 + N` | `CHECKSUM` | 1 byte | XOR reduction over all `N` payload bytes. |
+| `6 + N` | `ETX` | 1 byte | Delimiter byte `0x03`. |
 
----
+### Single-Byte Immediate Control Codes
 
-## 📖 Further Documentation
+| Code | Category | Action | Host Emulation |
+| :--- | :--- | :--- | :--- |
+| `0x11` | Media | Play / Pause | Media Play/Pause toggle key. |
+| `0x12` | Media | Next Track | Media Next Track key. |
+| `0x13` | Media | Previous Track | Media Previous Track key. |
+| `0x14` | Media | Volume Up | Media Volume Increment. |
+| `0x15` | Media | Volume Down | Media Volume Decrement. |
+| `0x16` | Media | Mute | Media Mute toggle. |
+| `0x21` | Presentation | Next Slide | Right Arrow key (`KEY_RIGHT_ARROW`). |
+| `0x22` | Presentation | Previous Slide | Left Arrow key (`KEY_LEFT_ARROW`). |
+| `0x23` | Presentation | Start / Fullscreen | F5 key (`KEY_F5`). |
+| `0x24` | Presentation | Black Screen | 'B' key. |
+| `0x31` | Security | Workstation Lock | `Win + L` (Windows) or `Ctrl + Cmd + Q` (macOS). |
+| `0x32` | Security | Mouse Jiggler | Periodic background micro-movements. |
+| `0x33` | Security | Task Manager | `Ctrl + Shift + Esc` (Windows) or `Cmd + Opt + Esc` (macOS). |
+| `0x34` | Security | Show Desktop | `Win + D` (Windows) or `Cmd + F3` (macOS). |
+| `0x35` | Haptics | Vibration Burst | Triggers 100ms pulse on Pin 2. |
+| `0x80` | Trackpad | Relative Move | Relative vector `[0x80, deltaX, deltaY]`. |
+| `0x81` | Trackpad | Left Click | Left mouse button click. |
+| `0x82` | Trackpad | Right Click | Right mouse button click. |
+| `0x84` | Trackpad | Scroll Up | Vertical mouse wheel increment. |
+| `0x85` | Trackpad | Scroll Down | Vertical mouse wheel decrement. |
 
-- [📱 Native Mobile Packaging & Store Release (iOS & Android)](docs/MOBILE_PACKAGING.md)
-- [📦 Protocol Framing Specification (STX/ETX & Hex Codes)](docs/protocol-spec.md)
-- [🔌 Hardware Wiring & Safety Guide](docs/hardware-wiring.md)
-- [🏗️ Full System Architecture Deep-Dive](docs/architecture.md)
+## Frequently Asked Questions
 
----
+#### Why use a custom BLE GATT service instead of the standard Bluetooth HID Profile?
+Standard Bluetooth HID requires operating-system level Bluetooth pairing directly with the target host computer. Rubber Otter connects to the target computer strictly via physical USB CDC hardware. The BLE radio communicates with the operator's controller (phone, tablet, or secondary computer). This prevents the target computer from detecting wireless pairing activity in its Bluetooth settings.
 
-## 📄 License
+#### How does the Caterina 1200bps bootloader reset mechanism operate over Web Serial?
+ATmega32U4 microcontrollers running the Caterina bootloader monitor the USB CDC serial connection. When a client opens the serial port at 1200 baud and then immediately closes it, the firmware triggers a software reset into the Caterina bootloader. The bootloader exposes a temporary CDC port for 8 seconds, allowing the Web Serial flasher or PlatformIO to upload new firmware without requiring physical reset button presses.
 
-This project is open source and licensed under the [Apache 2.0 License](LICENSE).
+#### What are the electrical safety requirements for the HM-10 module and vibration motor?
+The HM-10 BLE module operates on 3.3V logic. Connecting a 5V MCU TX pin directly to HM-10 RX risks hardware degradation; a 1kΩ / 2kΩ resistive voltage divider is required. Furthermore, inductive DC vibration motors draw more current than the 40mA maximum GPIO limit of the ATmega32U4. The motor must be driven by an external N-channel MOSFET or transistor with a reverse-biased flyback diode across the motor terminals.
+
+#### How does the firmware recover from dropped or corrupted UART bytes?
+The firmware packet parser implements a ring buffer state machine. If corrupted bytes or invalid checksums occur, the parser transitions to an error state, transmits a negative acknowledgment (ACK code `3`), and seeks forward to the next valid `STX` delimiter byte (`0x02`) to regain synchronization.
+
+## Governance and Contributing
+
+- [Contributing Guidelines](CONTRIBUTING.md): Conventional Commits format, testing requirements, and PR checklists.
+- [Code of Conduct](CODE_OF_CONDUCT.md): Contributor standards and enforcement procedures.
+- [Security Policy](SECURITY.md): Vulnerability disclosure procedures, SLA, and threat boundaries.
+- [Engineering Roadmap](ROADMAP.md): Project milestones and planned technical enhancements.
+
+## License
+
+Rubber Otter is open-source software licensed under the [Apache License, Version 2.0](LICENSE).

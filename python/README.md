@@ -1,143 +1,137 @@
-<p align="center">
-  <img src="../docs/assets/banner.jpg" alt="RubberOtterPy Banner" width="100%" />
-</p>
+[← Back to Root Repository](../README.md)
 
-# 🦦 RubberOtterPy — Python SDK, CLI, MCP Server & AI Agent Tools
+# Rubber Otter Python SDK and CLI
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](../LICENSE)
-[![MCP](https://img.shields.io/badge/Protocol-MCP%202024--11--05-purple.svg)](https://modelcontextprotocol.io/)
-[![Bluetooth LE](https://img.shields.io/badge/BLE-HM--10%20%2F%20ESP32-blueviolet.svg)](https://en.wikipedia.org/wiki/Bluetooth_Low_Energy)
+Python client library, command-line interface, Model Context Protocol (MCP) server, and OtterDeck local web controller for the Rubber Otter USB HID ecosystem.
 
-**RubberOtterPy** is a modular, production-grade Python package that provides an **async/sync Python SDK**, a feature-rich **CLI tool**, a **Model Context Protocol (MCP) Server**, an **AI Agent Tool Registry**, and an embedded **Web Dashboard (`OtterDeck`)** for discovering, controlling, and managing Rubber Otter microcontrollers (SparkFun Pro Micro / Arduino Leonardo / ATmega32U4) over **Bluetooth LE (HM-10 / ESP32)** and USB CDC Serial.
+## Table of Contents
 
----
+- [Overview](#overview)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Model Context Protocol (MCP) Server](#model-context-protocol-mcp-server)
+- [AI Agent Tool Registry](#ai-agent-tool-registry)
+- [Python SDK Reference](#python-sdk-reference)
+- [CLI Command Reference](#cli-command-reference)
+- [OtterDeck Web Dashboard](#otterdeck-web-dashboard)
+- [Testing](#testing)
+- [Türkçe Özet](#türkçe-özet)
 
-## 📌 Table of Contents
+## Overview
 
-- [🚀 Quick Start](#-quick-start)
-- [🤖 Model Context Protocol (MCP) Server](#-model-context-protocol-mcp-server)
-- [🧠 AI Agent Tool Registry (OpenAI / Claude / LangChain)](#-ai-agent-tool-registry-openai--claude--langchain)
-- [✨ Key Capabilities](#-key-capabilities)
-- [🐍 Python SDK Examples](#-python-sdk-examples)
-- [🛠️ CLI Subcommands Guide](#%EF%B8%8F-cli-subcommands-guide)
-- [🌐 Web Dashboard (`OtterDeck`)](#-web-dashboard-otterdeck)
-- [🧪 Running Unit Tests](#-running-unit-tests)
-- [📖 Documentation Links](#-documentation-links)
-- [🇹🇷 Türkçe Açıklama](#-türkçe-açıklama)
+`rubberotter` communicates with Rubber Otter microcontrollers across two primary transport mechanisms:
+1. **Bluetooth Low Energy (BLE)**: Connects to HM-10 or ESP32 peripherals using Bleak. Auto-discovers devices by advertising name and GATT service UUID `0xFFE0`.
+2. **USB CDC Serial**: Connects directly to MCU serial endpoints using PySerial.
 
----
+The library encapsulates packet framing, sequence counting, checksum generation, and ACK validation.
 
-## 🚀 Quick Start
+## Installation
 
-### Installation
+Install directly in editable development mode:
 
 ```bash
 cd python
 pip install -e .
 ```
 
----
+Or install dependencies from `requirements.txt`:
 
-## 🤖 Model Context Protocol (MCP) Server
-
-Rubber Otter includes a native **JSON-RPC 2.0 stdio MCP Server** compatible with **Claude Desktop**, **Cursor**, **Windsurf**, **Antigravity**, and autonomous LLM agents.
-
-### Start the MCP Server
 ```bash
-# Run server over stdio
-rubberotter mcp
-
-# Generate Claude Desktop configuration
-rubberotter mcp --config-claude
-
-# Generate Cursor / Windsurf configuration
-rubberotter mcp --config-cursor
-
-# List all 13 available MCP tools
-rubberotter mcp --list-tools
+pip install -r requirements.txt
 ```
 
-### Claude Desktop Configuration Example
-Add the following snippet to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+### Runtime Requirements
+- Python 3.10 or higher.
+- `bleak >= 0.20.0`
+- `pyserial >= 3.5`
+- `flask >= 3.0.0`
+
+## Quick Start
+
+```bash
+# Scan for nearby BLE devices and USB ports
+rubberotter scan
+
+# Type text via USB HID
+rubberotter type "Hello from Rubber Otter\n"
+
+# Trigger a 150ms vibration pulse
+rubberotter vibrate 150
+
+# Toggle background mouse jiggler
+rubberotter jiggler toggle
+```
+
+## Model Context Protocol (MCP) Server
+
+Rubber Otter implements a JSON-RPC 2.0 stdio Model Context Protocol (MCP) server for integration with AI assistants such as Claude Desktop, Cursor, and Antigravity.
+
+### Running the Server
+
+```bash
+# Start the stdio MCP server
+rubberotter mcp
+
+# Inspect registered MCP tools
+rubberotter mcp --list-tools
+
+# Output Claude Desktop configuration snippet
+rubberotter mcp --config-claude
+
+# Output Cursor configuration snippet
+rubberotter mcp --config-cursor
+```
+
+### Claude Desktop Integration
+
+Add the following block to your `claude_desktop_config.json`:
+
 ```json
 {
   "mcpServers": {
     "rubberotter": {
-      "command": "python",
-      "args": ["-m", "rubberotter.mcp.server"]
+      "command": "rubberotter",
+      "args": ["mcp"]
     }
   }
 }
 ```
 
----
+## AI Agent Tool Registry
 
-## 🧠 AI Agent Tool Registry (OpenAI / Claude / LangChain)
-
-Use Rubber Otter tools directly within autonomous AI agents:
+Export tool schemas directly to OpenAI function calling format or Anthropic tool definitions:
 
 ```python
 from rubberotter.ai.tools import RubberOtterToolRegistry
 
 registry = RubberOtterToolRegistry()
 
-# 1. Export schemas for OpenAI Function Calling
-openai_tools = [t.to_openai_tool() for t in registry.list_tools()]
+# Export schemas for OpenAI Function Calling
+openai_tools = [tool.to_openai_tool() for tool in registry.list_tools()]
 
-# 2. Export schemas for Anthropic Claude Tools
-claude_tools = [t.to_anthropic_tool() for t in registry.list_tools()]
+# Export schemas for Anthropic Claude Tools
+claude_tools = [tool.to_anthropic_tool() for tool in registry.list_tools()]
 
-# 3. Direct Tool Execution
-result = registry.execute("rubberotter_type", {"text": "echo 'Hello from AI Agent!'", "auto_enter": True})
+# Execute tool programmatically
+result = registry.execute("rubberotter_type", {"text": "make test\n", "auto_enter": True})
 print(result)
 ```
 
----
-
-## ✨ Key Capabilities
-
-| Category | Features & Commands | Description |
-| :--- | :--- | :--- |
-| **Transport** | `BLE Direct`, `USB Serial`, `--raw`, `--no-ack` | Direct wireless BLE connection over HM-10/ESP32 GATT or USB CDC Serial. Supports un-framed text payloads and no-ACK modes. |
-| **AI / MCP** | `rubberotter mcp`, `AI Tool Registry` | 13 typed AI tools conforming to Model Context Protocol (MCP) and function calling schemas. |
-| **Haptics** | `vibrate <ms>` | Triggers vibration motor haptic bursts (50ms - 1000ms). |
-| **Keyboard** | `type "<text>"`, `press <key>`, `combo <keys>` | USB HID Keyboard emulation with unescaping (`\n`, `\t`) and key shortcuts (Spotlight, Lock Screen, Copy/Paste). |
-| **Mouse** | `mouse left/right`, `mouse move`, `mouse wheel` | Virtual mouse clicker, relative movement, and scroll wheel. |
-| **Jiggler** | `jiggler start/stop/toggle` | Background non-blocking USB Mouse Jiggler mode. |
-| **Media** | `Play/Pause`, `Next/Prev`, `Vol Up/Down`, `Mute` | Dedicated media and volume controls. |
-| **Clicker** | `Start (F5)`, `Next/Prev Slide`, `Black/White Screen` | Dedicated presenter clicker deck. |
-| **Macros** | `macro list`, `macro save`, `macro run` | Persistent EEPROM macro slot storage (`m0`..`m5`). |
-
----
-
-## 🐍 Python SDK Examples
+## Python SDK Reference
 
 ### Synchronous Client (`RubberOtter`)
 
 ```python
 from rubberotter import RubberOtter
 
-# Connects via BLE auto-detection to nearby Rubber Otter device
+# Auto-discovers BLE device or USB serial port
 with RubberOtter() as otter:
-    # 1. Type text via USB HID Keyboard
-    otter.type("Hello from RubberOtterPy!\n")
-
-    # 2. Delay execution on MCU
-    otter.delay(200)
-
-    # 3. Trigger vibration motor haptics (150ms)
     otter.vibrate(150)
-
-    # 4. Control virtual mouse clicker & scroll wheel
+    otter.type("git status\n")
+    otter.delay(100)
     otter.mouse_click("left")
-    otter.mouse_move(wheel=1)
-
-    # 5. Toggle background Mouse Jiggler
     otter.jiggler_toggle()
-
-    # 6. Save & Run persistent EEPROM macro
-    otter.macro_save("m0", 'vibrate 150 && type "pass123\n"')
+    otter.macro_save("m0", 'vibrate 100 && type "echo done\n"')
     otter.macro_run("m0")
 ```
 
@@ -147,89 +141,52 @@ with RubberOtter() as otter:
 import asyncio
 from rubberotter import AsyncRubberOtter
 
-async def main():
+async def run():
     async with AsyncRubberOtter(use_ble=True) as otter:
-        res = await otter.type_async("Async typing payload over BLE\n")
-        print("ACK Response:", res)
+        ack = await otter.type_async("Async execution\n")
+        print("ACK Response:", ack)
         await otter.vibrate_async(200)
 
-asyncio.run(main())
+asyncio.run(run())
 ```
 
----
+## CLI Command Reference
 
-## 🛠️ CLI Subcommands Guide
+| Command | Arguments | Description |
+| :--- | :--- | :--- |
+| `rubberotter scan` | `[--json]` | Scans for USB serial ports and BLE peripherals. |
+| `rubberotter type` | `"<text>"` | Sends keystroke injection payload. |
+| `rubberotter send` | `"<command>"` | Sends a raw framed protocol command string. |
+| `rubberotter vibrate` | `<ms>` | Triggers vibration motor for duration in milliseconds. |
+| `rubberotter jiggler` | `on \| off \| toggle` | Controls background mouse jiggler mode. |
+| `rubberotter macro` | `list \| run \| save` | Manages EEPROM non-volatile macro slots. |
+| `rubberotter serve` | `[--web-port 8080]` | Launches local OtterDeck web control panel. |
+| `rubberotter mcp` | `[--list-tools]` | Starts Model Context Protocol stdio server. |
 
-Execute via `rubberotter` or `python3 -m rubberotter`:
+## OtterDeck Web Dashboard
 
-```bash
-# Discover BLE devices & USB Serial ports
-rubberotter scan
-
-# Start MCP Server for AI Assistants (Claude, Cursor)
-rubberotter mcp
-rubberotter mcp --config-claude
-rubberotter mcp --list-tools
-
-# Direct BLE command (auto-detects BLE device or use --ble-address / -b)
-rubberotter vibrate 200
-
-# Send typing and framed commands over BLE
-rubberotter type "Hello World\n"
-rubberotter send "delay 100"
-
-# Control Mouse Jiggler & Vibration
-rubberotter jiggler toggle
-rubberotter vibrate 200
-
-# EEPROM Macro Management
-rubberotter macro list
-rubberotter macro save m0 'type "pass123\n"'
-rubberotter macro run m0
-
-# Launch Web Dashboard Server
-rubberotter serve --web-port 8080
-```
-
----
-
-## 🌐 Web Dashboard (`OtterDeck`)
-
-Launch the embedded single page web application:
+The package embeds a lightweight Flask dashboard for controlling the device through a local web interface:
 
 ```bash
 rubberotter serve --web-port 8080
 ```
-Open **[http://127.0.0.1:8080](http://127.0.0.1:8080)** in your web browser.
 
----
+Access the interface at `http://127.0.0.1:8080`.
 
-## 🧪 Running Unit Tests
+## Testing
+
+Run the Python unit test suite:
 
 ```bash
-python -m unittest discover -s tests -p "test_*.py"
+python3 -m unittest discover -s tests -p "test_*.py"
 ```
 
----
+## Türkçe Özet
 
-## 📖 Documentation Links
+Rubber Otter Python paketi, ATmega32U4 tabanlı Rubber Otter donanımını Bluetooth LE (HM-10 / ESP32) ve USB Seri Port üzerinden yönetmek için tasarlanmış istemci kütüphanesi, terminal aracı ve Model Context Protocol (MCP) sunucusudur.
 
-- 🤖 **[Model Context Protocol (MCP) & AI Agent Guide](../docs/MCP_AND_AI_TOOLS.md)**
-- 📱 **[Mobile Packaging Guide (iOS & Android)](../docs/MOBILE_PACKAGING.md)**
-- 📦 **[Protocol Framing Specification](../docs/protocol-spec.md)**
-- 🔌 **[Hardware Wiring & Schematics](../docs/hardware-wiring.md)**
-
----
-
-## 🇹🇷 Türkçe Açıklama
-
-**RubberOtterPy**, ATmega32U4 mikrodenetleyicisi üzerindeki Rubber Otter donanımını **Bluetooth LE (HM-10 / ESP32)** ve USB Seri Port üzerinden kablosuz yönetmenizi sağlayan, **Model Context Protocol (MCP)** ve **Yapay Zeka Ajan Araçları** ile güçlendirilmiş bir Python paketidir.
-
-### Neler Yapılabilir?
-1. **Model Context Protocol (MCP) Sunucusu:** Claude Desktop, Cursor, Antigravity ve Windsurf gibi yapay zeka araçlarına doğrudan bağlanarak yapay zekanın bilgisayarınızı kablosuz yönetmesini sağlar (`rubberotter mcp`).
-2. **Yapay Zeka Ajan Araçları (OpenAI / Claude / LangChain):** Otonom ajanlar için 13 adet hazır şemalandırılmış ve doğrulanmış araç seti sunar.
-3. **Kablosuz Bluetooth LE (BLE) Bağlantısı:** USB kablosu takılı olmasa bile cihazla doğrudan GATT üzerinden haberleşir.
-4. **Titreme & Haptik Geri Bildirim:** `vibrate 200` ile Pin 2 üzerindeki titreşim motorunu milisaniye bazında çalıştırır.
-5. **USB HID Klavye & Fare Emülasyonu:** Ekrana metin yazar (`type`), özel kısayolları çalıştırır, sanal fare tıklaması ve kaydırma yapar.
-6. **Mouse Jiggler Modu:** Bilgisayarın uykuya geçmesini önleyen arka plan fare hareketini açar/kapatır (`jiggler toggle`).
-7. **Web Dashboard (`OtterDeck`):** `rubberotter serve` komutuyla başlatılan gelişmiş tarayıcı arayüzü ve REST API desteği.
+Temel Yetenekler:
+1. **Model Context Protocol (MCP)**: Claude Desktop, Cursor ve yapay zeka ajanlarının işletim sistemi üzerinde doğrudan fare/klavye komutları yürütmesini sağlar.
+2. **Yapay Zeka Araç Kaydı**: OpenAI ve Anthropic formatında otomatik araç şemaları üretir.
+3. **Senkron ve Asenkron API**: Python betikleri için `RubberOtter` ve `AsyncRubberOtter` istemcileri sunar.
+4. **OtterDeck Arayüzü**: Dahili Flask sunucusu ile web üzerinden anlık test ve yönetim imkanı verir.

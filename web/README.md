@@ -1,91 +1,104 @@
-<p align="center">
-  <img src="../docs/assets/banner.jpg" alt="RubberOtterWeb Banner" width="100%" />
-</p>
+[← Back to Root Repository](../README.md)
 
-# 🦦 RubberOtterWeb — Precision Bluetooth HID Workstation & Mobile App
+# Rubber Otter Web Workstation and Mobile Bridge
 
-[![CI Pipeline](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-web.yml)
-[![Deploy PWA](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../LICENSE)
-[![Built with React & Vite](https://img.shields.io/badge/Stack-Vite%20%7C%20React%2018%20%7C%20TS-cyan)](https://vitejs.dev)
-[![Capacitor Native](https://img.shields.io/badge/Mobile-Capacitor%206%2B%20(iOS%20%26%20Android)-blue)](https://capacitorjs.com)
+Progressive Web Application (PWA) and native mobile frontend for the Rubber Otter ecosystem, built with React 18, Vite, TypeScript, Tailwind CSS, and Ionic Capacitor 8.
 
-**RubberOtterWeb** is a high-performance **Progressive Web Application (PWA)** and **Native Mobile App (iOS & Android)** built with **Vite, React 18, TypeScript, Tailwind CSS, and Ionic Capacitor 6+**.
+## Table of Contents
 
-It interfaces directly with the **Rubber Otter ATmega32U4 microcontroller** over Bluetooth Low Energy (HM-10 / ESP32 GATT Service `0xFFE0`) to wirelessly control host PCs (Windows, macOS, Linux) via plug-and-play USB HID keyboard and mouse emulation.
+- [Overview](#overview)
+- [Architecture and Transport Bridge](#architecture-and-transport-bridge)
+- [Workstation Features](#workstation-features)
+- [Development Setup](#development-setup)
+- [Build and Packaging Commands](#build-and-packaging-commands)
+- [Single-Byte Protocol Mapping](#single-byte-protocol-mapping)
+- [License](#license)
 
----
+## Overview
 
-## 🌟 Key Features
+Rubber Otter Web connects Chromium desktop browsers directly to HM-10 or ESP32 Bluetooth Low Energy modules using the Web Bluetooth API. When packaged natively through Capacitor, the interface bridges to iOS CoreBluetooth and Android BLE without relying on Web Bluetooth support in mobile WebViews.
 
-- 🎯 **Header-Integrated Navigation**: Modern single-pane desktop tab switching seamlessly built into the sticky header + ergonomic mobile bottom touch bar.
-- 📱 **Native Mobile Packaging (Capacitor 6+)**:
-  - **Apple iOS**: Native **CoreBluetooth** engine (bypassing Safari WKWebView limitations) + **Apple Taptic Engine** haptics.
-  - **Google Android**: Native Android BLE + Vibrator service.
-- 🌍 **5 Language Localizations**: Instant zero-reload switching between **English (🇬🇧)**, **Türkçe (🇹🇷)**, **Deutsch (🇩🇪)**, **Français (🇫🇷)**, and **Español (🇪🇸)**.
-- 🌓 **Adaptive Dual-Theme Engine**: Obsidian Dark (`#09090b`), Clean White (`#ffffff`), and system auto-sync with edge-to-edge mobile status bar theming.
-- ⌨️ **Keystroke Injector**: Fast typing stream injector, auto-enter toggle, snippet presets (Spotlight, Notepad, System Info), and duration estimation.
-- 🎵 **Media Control Deck**: Big tactile buttons for Play/Pause, Next/Prev Track, Volume Up/Down, and Mute with animated audio spectrum bars.
-- 📊 **Presentation Controller**: Slide navigation clicker (Left/Right Arrows), Fullscreen toggle (`F5`), Blank screen (`B`), and an integrated presentation stopwatch timer.
-- 🔒 **Security & Workstation Lock**: Workstation lock (`Win+L` / `Ctrl+Cmd+Q`), non-blocking mouse jiggler toggle, Task Manager shortcut (`Ctrl+Shift+Esc` / `Cmd+Opt+Esc`), and Show Desktop.
-- 🎮 **Gaming & Custom Macro Builder**: Built-in CS Buy sequence (`0x41`) + interactive custom macro creator saved in persistent `localStorage`.
-- 🖱️ **Precision Virtual Trackpad**: Multi-touch gestures (tap for Left Click, 2-finger tap for Right Click), cursor position indicator, scroll triggers, and sensitivity multiplier (1.0x - 5.0x).
-- 📜 **GATT Packet Terminal**: Real-time packet telemetry console with byte counter, timestamp, Hex payload formatting, and copy log export.
-
----
-
-## 📐 Architecture & Platform Bridge
+## Architecture and Transport Bridge
 
 ```mermaid
-graph TD
-    UI[React 18 + Tailwind PWA UI] --> Bridge[Universal Platform Bridge (universalBle.ts)]
-    Bridge -->|Desktop / Android Chrome| WebBLE[Web Bluetooth API + Web Vibration]
-    Bridge -->|iOS Native App| CoreBT[Capacitor CoreBluetooth + Taptic Engine]
-    Bridge -->|Android Native App| AndroidBLE[Capacitor Android BLE + Vibrator]
-    
-    WebBLE --> BLE[HM-10 / ESP32 GATT Service 0xFFE0]
+flowchart TD
+    UI["React 18 + Tailwind PWA UI"] --> Bridge["Universal Platform Bridge (universalBle.ts)"]
+    Bridge -->|"Desktop / Android Chrome"| WebBLE["Web Bluetooth API + Web Vibration"]
+    Bridge -->|"iOS Native App"| CoreBT["Capacitor CoreBluetooth + Taptic Engine"]
+    Bridge -->|"Android Native App"| AndroidBLE["Capacitor Android BLE + Vibrator"]
+
+    WebBLE --> BLE["HM-10 / ESP32 GATT Service 0xFFE0"]
     CoreBT --> BLE
     AndroidBLE --> BLE
-    BLE --> MCU[ATmega32U4 USB HID Controller]
-    MCU --> PC[Target Host PC]
+    BLE --> MCU["ATmega32U4 USB HID Controller"]
+    MCU --> PC["Target Host PC"]
 ```
 
----
+## Workstation Features
 
-## ⚡ Quick Start
+- **Header-Integrated Navigation**: Desktop multi-pane switching built into the navigation bar with an ergonomic mobile bottom navigation bar.
+- **Native Mobile Packaging**: Direct CoreBluetooth support on iOS and native Android BLE service integration.
+- **Five Interface Localizations**: Zero-reload runtime language selection across English, Turkish, German, French, and Spanish.
+- **Adaptive Dual-Theme Engine**: Obsidian Dark (`#09090b`), Clean White (`#ffffff`), and system theme synchronization.
+- **Keystroke Stream Injector**: Real-time typing injection, auto-enter toggle, snippet shortcuts, and execution duration calculation.
+- **Media Deck**: Controls for Play/Pause, Next/Previous Track, Volume Adjustments, and Mute.
+- **Presentation Clicker**: Next/Previous slide triggers, fullscreen presentation mode (`F5`), blank display toggle (`B`), and integrated stopwatch timer.
+- **Virtual Trackpad**: Relative mouse cursor tracking with multi-touch gestures (tap for left click, two-finger tap for right click), vertical scroll wheel, and sensitivity adjustment.
+- **Zero-Install Web Flasher**: Web Serial API firmware uploader with 1200bps Caterina bootloader trigger for ATmega32U4 Pro Micro and Leonardo boards.
+- **Packet Terminal**: Real-time hex telemetry monitor displaying sent and received bytes, timestamps, and copyable debug buffers.
 
-### 1. Web Development
+## Development Setup
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+### Local Dev Server
+
 ```bash
 # Install dependencies
 npm install
 
-# Start Vite local development server
+# Start Vite development server
 npm run dev
 ```
-Open `http://localhost:3000` in Google Chrome, Microsoft Edge, or Opera.
 
-### 2. Native Mobile Sync & IDE Launch
+Open `http://localhost:3000` in Google Chrome, Microsoft Edge, or another Chromium browser with Web Bluetooth enabled.
+
+## Build and Packaging Commands
+
 ```bash
-# Compile and sync to iOS & Android native projects
+# Type check and build web distribution bundle
+npm run build
+
+# Build web distribution and stage in ../dist/web/
+npm run build:web
+
+# Sync web build to native iOS and Android projects
 npm run cap:sync
 
-# Open in Xcode (iOS)
-npm run cap:open:ios
+# Build native Android APK (requires JDK 21)
+npm run build:android
 
-# Open in Android Studio (Android)
+# Build native iOS app bundle (requires macOS and Xcode)
+npm run build:ios
+
+# Open native projects in IDEs
 npm run cap:open:android
+npm run cap:open:ios
 ```
 
----
+## Single-Byte Protocol Mapping
 
-## 🗺️ Single-Byte Protocol Map
+The web client emits single-byte hex commands for quick actions:
 
-| Category | Action | Hex Code | Host HID Execution |
+| Category | Action | Hex Code | Host Execution |
 | :--- | :--- | :--- | :--- |
 | **Media** | Play / Pause | `0x11` | Media Play/Pause key |
 | | Next Track | `0x12` | Media Next Track |
 | | Previous Track | `0x13` | Media Previous Track |
-| | Volume Up / Down | `0x14` / `0x15` | Media Volume Up / Down |
+| | Volume Up / Down | `0x14` / `0x15` | Media Volume step |
 | | Mute Toggle | `0x16` | Media Mute |
 | **Presentation** | Next / Prev Slide | `0x21` / `0x22` | Right / Left Arrow |
 | | Fullscreen / Black | `0x23` / `0x24` | F5 / 'B' |
@@ -94,13 +107,11 @@ npm run cap:open:android
 | | Task Manager | `0x33` | `Ctrl + Shift + Esc` / `Cmd + Opt + Esc` |
 | | Show Desktop | `0x34` | `Win + D` / `Cmd + F3` |
 | | Vibration Pulse | `0x35` | Pin 2 haptic pulse |
-| **Gaming** | CS Buy Macro | `0x41` | Buy chain (`'b' -> 4 -> 2`) |
-| **Trackpad** | Move Packet | `0x80` | `[0x80, deltaX, deltaY]` relative vector |
+| **Gaming** | CS Buy Macro | `0x41` | Buy sequence (`'b' -> 4 -> 2`) |
+| **Trackpad** | Move Vector | `0x80` | `[0x80, deltaX, deltaY]` relative move |
 | | Left / Right Click | `0x81` / `0x82` | `Mouse.click(MOUSE_LEFT / RIGHT)` |
 | | Scroll Up / Down | `0x84` / `0x85` | `Mouse.move(0, 0, 1 / -1)` |
 
----
+## License
 
-## 📜 License
-
-This project is licensed under the [Apache License 2.0](../LICENSE).
+This project is licensed under the Apache License, Version 2.0. See [LICENSE](../LICENSE) for details.
