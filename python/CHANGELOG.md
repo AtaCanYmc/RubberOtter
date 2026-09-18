@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/AtaCanYmc/RubberOtter/compare/python-v1.3.0...python-v1.3.1) (2026-09-18)
+
+
+### Documentation
+
+* **governance:** professionalize repository documentation with well-document ([fa616fa](https://github.com/AtaCanYmc/RubberOtter/commit/fa616fa1cf9b330d4e649fa9d2ab83376576aaff))
+
 ## [1.3.0](https://github.com/AtaCanYmc/RubberOtter/compare/python-v1.2.0...python-v1.3.0) (2026-09-02)
 
 

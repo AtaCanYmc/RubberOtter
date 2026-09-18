@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.4.0...web-v2.4.1) (2026-09-18)
+
+
+### Documentation
+
+* **governance:** professionalize repository documentation with well-document ([fa616fa](https://github.com/AtaCanYmc/RubberOtter/commit/fa616fa1cf9b330d4e649fa9d2ab83376576aaff))
+
 ## [2.4.0](https://github.com/AtaCanYmc/RubberOtter/compare/web-v2.3.0...web-v2.4.0) (2026-09-07)
 
 
