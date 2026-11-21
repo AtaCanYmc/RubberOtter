@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RubberOtter | ATmega32U4 Caterina 1200 bps Web Serial Flasher</title>
+  <meta name="description" content="Browser Web Serial flasher and 1200 bps Caterina bootloader reset utility for RubberOtter ATmega32U4 + HM-10/ESP32 hardware." />
+  <meta name="theme-color" content="#09090b" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="brand-name">RUBBEROTTER</span>
+        <span class="badge mono">FLASHER</span>
+      </div>
+      <nav class="nav mono" aria-label="Primary">
+        <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer">CONTROL PWA (RUBBERDECK)</a>
+        <a href="https://github.com/AtaCanYmc/RubberOtter" target="_blank" rel="noopener noreferrer">GITHUB</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="card notice">
+      <div>
+        <h1>ATmega32U4 Caterina 1200 bps Web Serial Flasher</h1>
+        <p class="muted">
+          Hardware-only flashing utility for RubberOtter (ATmega32U4 Pro Micro / Leonardo + HM-10/ESP32).
+          For BLE/USB HID control, use the dedicated control PWA:
+          <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer">RubberDeck</a>.
+        </p>
+      </div>
+      <div class="actions">
+        <button type="button" id="connectBtn" class="btn btn-primary">Connect USB Serial</button>
+        <button type="button" id="disconnectBtn" class="btn" hidden>Disconnect</button>
+      </div>
+    </section>
+
+    <div id="unsupportedBanner" class="card warning mono" hidden>
+      Web Serial API is not supported in this browser. Use Chromium, Chrome, or Edge on desktop.
+    </div>
+
+    <div class="grid">
+      <section class="card stack">
+        <h2>Target &amp; Firmware</h2>
+
+        <label class="field">
+          <span class="mono label">Target Board</span>
+          <select id="boardSelect" class="input mono">
+            <option value="atmega32u4">ATmega32U4 (Pro Micro / Leonardo - 57600 baud)</option>
+            <option value="esp32">ESP32 Bridge (115200 baud)</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="mono label">Firmware File (.hex / .bin)</span>
+          <input type="file" id="firmwareFile" accept=".hex,.bin" class="input mono" />
+        </label>
+
+        <div class="actions">
+          <button type="button" id="bootloaderBtn" class="btn">1200 bps Caterina Reset</button>
+          <button type="button" id="flashBtn" class="btn btn-primary" disabled>Flash Firmware</button>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="mono muted status-line" id="statusLine">IDLE</div>
+      </section>
+
+      <section class="card stack">
+        <div class="row-between">
+          <h2>Serial Log</h2>
+          <button type="button" id="clearLogBtn" class="btn btn-sm">Clear</button>
+        </div>
+        <pre id="logOutput" class="log mono"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
