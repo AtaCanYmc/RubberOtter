@@ -14,6 +14,10 @@
         {
           "type": "generic",
           "path": "python/rubberotter/__init__.py"
+        },
+        {
+          "type": "generic",
+          "path": "site/index.html"
         }
       ],
       "changelog-sections": [

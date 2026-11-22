@@ -339,8 +339,9 @@
   // 7. CLI / MCP / Python SDK Usage Tabs + Invoker Command Copy Button
   const USAGE_SNIPPETS = {
     cli: {
-      code: `# Install Python SDK, CLI, and MCP server
-pip install rubberotter
+      code: `# Install via Homebrew (macOS / Linux) or PyPI
+brew install AtaCanYmc/tap/rubberotter
+# or: pip install rubberotter
 
 # Scan nearby BLE 0xFFE0 peripherals and USB serial ports
 rubberotter scan
@@ -353,7 +354,7 @@ rubberotter vibrate 150
 
 # Toggle background mouse jiggler
 rubberotter jiggler toggle`,
-      meta: "Install via pip install rubberotter. Supports BLE 0xFFE0 via Bleak and USB CDC via PySerial."
+      meta: "Install via brew install AtaCanYmc/tap/rubberotter or pip install rubberotter. Supports BLE 0xFFE0 via Bleak and USB CDC via PySerial."
     },
     mcp: {
       code: `// Add to Claude Desktop, Cursor, or Antigravity MCP config
