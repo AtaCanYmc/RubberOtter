@@ -1,16 +1,18 @@
-# Contributing to Rubber Otter
+# Contributing to RubberOtter
 
-Contributions to Rubber Otter are welcome. This document details development setup, Conventional Commits specifications, coding guidelines, and pull request procedures for this monorepo.
+This document defines the commit convention, local environment setup, verification commands, and pull request checklist for RubberOtter.
+
+Control PWA and Capacitor mobile contributions belong in [AtaCanYmc/RubberDeck](https://github.com/AtaCanYmc/RubberDeck).
 
 ## Code of Conduct
 
-All contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md). Please report violations through private maintainer channels.
+All contributors must follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Conventional Commits
 
-This repository enforces Conventional Commits 1.0.0. Semantic versioning, CHANGELOG generation, and release packaging are managed by Release Please based on commit structure.
+RubberOtter enforces Conventional Commits 1.0.0. Release Please generates `CHANGELOG.md`, bumps versions across `version.txt`, `python/pyproject.toml`, `python/rubberotter/__init__.py`, and `site/index.html`, and publishes GitHub Releases and PyPI packages from commit types.
 
-Commit message format:
+Format:
 
 ```text
 <type>(<scope>): <subject>
@@ -18,96 +20,58 @@ Commit message format:
 
 ### Allowed Types
 
-- `feat`: A new user-facing feature or firmware command.
-- `fix`: A bug fix in firmware, SDK, web workstation, or native apps.
-- `docs`: Documentation changes only.
-- `refactor`: Internal code changes without behavior modification.
-- `perf`: Performance improvements in memory, parsing, or transport.
-- `test`: Adding or correcting tests.
-- `ci`: Changes to GitHub Actions workflows or automation scripts.
-- `chore`: Maintenance tasks, dependency updates, or configuration.
+- `feat`: New firmware command, SDK capability, CLI option, or flasher feature.
+- `fix`: Bug fix in firmware, Python package, or static flasher site.
+- `docs`: Documentation updates.
+- `refactor`: Structural code change without behavior change.
+- `perf`: Memory, parsing, or transport performance improvement.
+- `test`: Test additions or updates.
+- `ci`: GitHub Actions workflow or release automation updates.
+- `chore`: Maintenance and dependency updates.
 
-### Monorepo Scopes
+### Scopes
 
-- `firmware`: C++ ATmega32U4 firmware in `firmware/`.
-- `web`: React 18 PWA workstation in `web/`.
-- `android`: Native Android Studio project in `android/`.
-- `ios`: Native Xcode project in `ios/`.
-- `python`: Python SDK, CLI, and OtterDeck in `python/`.
-- `protocol`: STX/ETX framing specification and hex codes.
-- `monorepo`: Root build scripts and Makefile tooling.
+- `firmware`: ATmega32U4 C++ firmware in `firmware/`.
+- `python`: `rubberotter` Python SDK, CLI, and MCP server in `python/`.
+- `site`: Static Caterina 1200 bps Web Serial Flasher in `site/`.
+- `protocol`: RubberOtter v1 framing and command specification in `docs/`.
+- `security`: Security fixes and CodeQL remediations.
 
-Example:
+Examples:
 
 ```text
-feat(firmware): implement relative mouse wheel packet parsing
-fix(python): handle Bleak disconnect during long macro execution
-docs(readme): add hardware wiring table for Pro Micro
+feat(firmware): add relative mouse wheel packet parsing
+fix(python): handle Bleak disconnect during macro execution
+docs(site): update Caterina 1200 bps reset instructions
 ```
 
 ## Local Development Setup
 
 ### Prerequisites
 
-- Node.js 20+ and npm 10+
 - Python 3.10+
-- PlatformIO Core CLI (for firmware compilation)
-- Android Studio / JDK 21 (for Android builds)
-- Xcode 15+ (macOS only, for iOS builds)
+- PlatformIO Core CLI (`pio` or `platformio`) for ATmega32U4 firmware builds
 
-### Monorepo Commands
-
-The root `Makefile` provides unified shortcuts for bootstrap, build, and test:
+### Setup and Verification Commands
 
 ```bash
-# Clone the repository
 git clone https://github.com/AtaCanYmc/RubberOtter.git
 cd RubberOtter
 
-# Bootstrap Python virtualenv and npm dependencies
+# Create virtualenv and install Python dependencies in editable mode
 make install
 
-# Run Python unit tests and TypeScript type checking
+# Run Python SDK, CLI, web dashboard, and MCP unit tests
 make test
 
-# Build Web PWA bundle
-make build-web
-
-# Sync web bundle into native mobile targets
-make mobile-sync
-```
-
-## Scoped Component Testing
-
-Before opening a pull request, run the test suites for modified components:
-
-### 1. Python SDK
-```bash
-python3 -m unittest discover -s python/tests -p "test_*.py"
-```
-
-### 2. Web Workstation
-```bash
-cd web
-npm run lint
-npm run build
-```
-
-### 3. Firmware Verification
-```bash
-cd firmware
-platformio run
+# Compile ATmega32U4 firmware across PlatformIO environments
+make build-firmware
 ```
 
 ## Pull Request Checklist
 
-1. Create a dedicated branch from `main`:
-   ```bash
-   git checkout -b feat/add-media-scancode
-   ```
-2. Implement your changes following existing code conventions and formatting.
-3. Ensure all tests pass locally.
-4. Verify no bracket placeholders or dead URLs are introduced.
-5. Push your branch and open a Pull Request targeting `main`.
-6. Confirm all GitHub Actions CI checks turn green.
-
+1. Branch from `main` using a descriptive name such as `feat/avr109-hex-stream` or `fix/ble-reconnect`.
+2. Run `make test` and verify all Python unit tests pass.
+3. Run `cd firmware && platformio run` when modifying C++ firmware files.
+4. Keep documentation free of placeholder values, dead URLs, and unverified claims.
+5. Open a pull request targeting `main` and confirm all GitHub Actions checks pass.

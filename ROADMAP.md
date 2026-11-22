@@ -1,37 +1,34 @@
 # Engineering Roadmap
 
-This document outlines delivered milestones and planned technical objectives for the Rubber Otter ecosystem.
+Delivered milestones and planned technical work for RubberOtter (`ATmega32U4` + `HM-10`/`ESP32` hardware, Web Serial flasher, and `rubberotter` Python SDK/CLI/MCP).
 
-## Milestones
+## Delivered Milestones
 
-### Phase 1: Core Hardware Emulation and Framing (Completed)
-- ATmega32U4 firmware supporting standard Keyboard.h and Mouse.h HID emulation.
-- STX/ETX binary framing with XOR checksum validation.
-- Ring buffer state machine handling UART baud rate fluctuations.
-- EEPROM non-volatile macro storage across slots m0 through m5.
-- Background non-blocking mouse jiggler task.
+### v1.0.x - v1.2.x: Core ATmega32U4 Firmware and Framing
+- ATmega32U4 firmware (`firmware/`) with USB HID keyboard and mouse emulation.
+- RubberOtter v1 binary framing (`STX`/`VER`/`SEQ`/`LEN`/`PAYLOAD`/`XOR`/`ETX`) with 6-byte ACK responses and single-byte fallback shortcuts (`0x11`..`0x85`).
+- 512-byte UART ring buffer state machine for `Serial1` (`9600` baud).
+- EEPROM non-volatile macro storage (`m0`..`m5`) and background mouse jiggler task.
 
-### Phase 2: Web Workstation and Zero-Install Flasher (Completed)
-- React 18, Vite, TypeScript, and Tailwind CSS Progressive Web Application.
-- Web Bluetooth GATT client connecting to HM-10 / ESP32 Service 0xFFE0.
-- Web Serial API firmware flasher with Caterina 1200bps bootloader reset.
-- Five interface localizations (EN, TR, DE, FR, ES) and dual-theme engine.
-- GitHub Pages automated deployment pipeline.
+### v1.3.x: Python SDK, CLI, and MCP Server
+- `rubberotter` Python package (`python/`) supporting BLE GATT (`0xFFE0`/`0xFFE1` via Bleak) and USB CDC Serial (PySerial).
+- Command-line interface (`rubberotter`, `otter-cli`) and stdio Model Context Protocol (MCP) server.
+- Automated PyPI publishing via Trusted Publishing.
 
-### Phase 3: Mobile Packaging and Automation Decoupling (Completed)
-- Native Capacitor 8 integration for Apple iOS (CoreBluetooth engine, Taptic feedback).
-- Native Capacitor 8 integration for Google Android (BLE service, Vibrator haptics).
-- Decoupled GitHub Actions release matrix for web, Android APK, and iOS unsigned IPA/App bundles.
-- Python SDK packaging with Model Context Protocol (MCP) server and CLI tool.
+### v1.4.0: Hardware-Focused Repository Split (ADR-20261122-01)
+- Decoupled control PWA and Capacitor 8 mobile apps into the standalone [RubberDeck](https://github.com/AtaCanYmc/RubberDeck) repository.
+- Extracted zero-build static Caterina 1200 bps Web Serial Flasher and live payload simulator into `site/` (GitHub Pages).
+- Unified Release Please versioning (`vX.Y.Z`) with automatic ATmega32U4 `.hex` release assets, PyPI Trusted Publishing, and Homebrew formula distribution (`AtaCanYmc/tap/rubberotter`).
+- Single-chip ESP32-S3 successor shipped separately as [RubberOrca](https://github.com/AtaCanYmc/RubberOrca).
 
-### Phase 4: Protocol Hardening and Transport Security (Planned)
-- AES-128-CTR payload encryption layer for over-the-air BLE frames.
-- Replay attack mitigation via cryptographic nonces in sequence counters.
-- BLE bonding and passkey authentication enforcement on supported BLE modules.
-- Dynamic baud rate negotiation between MCU Serial1 and BLE peripheral.
+## Planned Milestones
 
-### Phase 5: Hardware and Layout Expansion (Planned)
-- Native WebUSB direct HID fallback for environments without Bluetooth.
-- Dynamic keymap layout translation (ISO, ANSI, non-US layouts) executed in firmware.
-- Support for RP2040 and ESP32-S3 direct USB native targets.
-- Bi-directional telemetry streaming for hardware sensor readings.
+### v1.5.x: Firmware Reliability and Flasher Enhancements
+- Direct AVR109 / STK500 Intel HEX streaming inside `site/` so ATmega32U4 boards flash without external CLI tools.
+- Automated PlatformIO host-side unit tests for `PacketParser` and `CommandExecutor` in CI.
+- Configurable UART baud rate presets between ATmega32U4 `Serial1` and ESP32/HM-10 bridges.
+
+### v2.0.0: Protocol Hardening
+- Optional authenticated session layer for BLE frames on bridge modules with sufficient RAM.
+- Replay protection via monotonic sequence windows.
+- Non-US keymap translation tables selectable in firmware for ATmega32U4 targets.

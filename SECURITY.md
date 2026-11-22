@@ -2,53 +2,48 @@
 
 ## Supported Versions
 
-Security updates are applied to active release lines across repository components.
+Security fixes apply to the current unified release line (`v1.4.x`) across all components in this repository.
 
-| Component | Active Version | Supported |
-| :--- | :--- | :--- |
-| Firmware (`firmware/`) | 1.0.x | Supported |
-| Web Workstation (`web/`) | 2.4.x | Supported |
-| Android App (`android/`) | 1.0.x | Supported |
-| iOS App (`ios/`) | 1.0.x | Supported |
-| Python SDK (`python/`) | 1.3.x | Supported |
-| Legacy Builds | < 1.0.0 | Unsupported |
+| Component | Path | Active Version | Supported |
+| :--- | :--- | :--- | :--- |
+| ATmega32U4 Firmware | `firmware/` | `1.4.x` | Yes |
+| Web Serial Flasher Site | `site/` | `1.4.x` | Yes |
+| Python SDK, CLI, and MCP | `python/` | `1.4.x` | Yes |
+| Legacy Releases | All | `< 1.4.0` | No |
+
+Security issues in the standalone control PWA or Capacitor mobile apps should be reported in [AtaCanYmc/RubberDeck](https://github.com/AtaCanYmc/RubberDeck).
 
 ## Threat Model and Boundaries
 
-Rubber Otter operates as an emulated USB Human Interface Device (HID) receiving commands via Bluetooth Low Energy (HM-10 or ESP32) and USB CDC Serial. Maintainers treat the following scenarios as actionable security vulnerabilities:
+RubberOtter emulates a wired USB Human Interface Device (HID) that accepts commands over BLE GATT (`0xFFE0`/`0xFFE1`) via an HM-10 or ESP32 bridge and over USB CDC Serial. Actionable vulnerabilities include:
 
-- Buffer overflow or memory corruption in the firmware ring buffer or packet parser.
-- Arbitrary command injection or state corruption via malformed STX/ETX frames.
-- Remote denial-of-service affecting MCU responsiveness without physical access.
-- Code execution flaws within the Python SDK or OtterDeck local web service.
+- Buffer overflow or memory corruption in the ATmega32U4 UART ring buffer or packet parser.
+- Command injection or state corruption from malformed STX/ETX frames.
+- Remote denial-of-service causing MCU lockups without physical reset.
+- Code execution or exception information exposure in the Python SDK, MCP server, or local Flask API (`python/rubberotter/web/server.py`).
 
-Physical proximity attacks stemming from unencrypted BLE pairing on default HM-10 hardware are documented architectural trade-offs. Hardening guidance is detailed in repository documentation.
+Unencrypted BLE pairing on stock HM-10 modules is a known hardware constraint. Physical proximity controls or authenticated ESP32 bridges are required in untrusted RF environments.
 
 ## Reporting a Vulnerability
 
-Do not report security vulnerabilities through public GitHub issues or discussions.
+Do not open public GitHub issues for security vulnerabilities.
 
-Report vulnerabilities through one of the following private channels:
+Use one of these private channels:
 
-1. **GitHub Security Advisories (Preferred)**: Submit a private advisory report at [https://github.com/AtaCanYmc/RubberOtter/security/advisories/new](https://github.com/AtaCanYmc/RubberOtter/security/advisories/new).
-2. **Direct Email**: Send reports to `atacanymc@gmail.com` with the subject line `[SECURITY] RubberOtter Vulnerability Report`.
+1. **GitHub Security Advisories (Preferred):** https://github.com/AtaCanYmc/RubberOtter/security/advisories/new
+2. **Email:** `atacanymc@gmail.com` with subject `[SECURITY] RubberOtter Vulnerability Report`
 
-### Report Requirements
-
-Please include the following information in your report:
+Include:
 
 - Affected component and version.
-- Detailed reproduction steps, including raw byte sequences or Python proof-of-concept scripts.
-- Expected versus observed behavior.
-- Assessment of impact and exploitability.
+- Minimal reproduction steps, raw frame bytes, or Python proof-of-concept script.
+- Expected versus observed behavior and impact assessment.
 
 ## Response SLA
-
-Maintainers adhere to the following disclosure timeline:
 
 | Milestone | Target Window |
 | :--- | :--- |
 | Initial Acknowledgement | Within 48 hours |
-| Vulnerability Assessment and Triage | Within 5 business days |
+| Triage and Assessment | Within 5 business days |
 | Patch Development and Verification | Within 14 calendar days |
-| Coordinated Public Release | Upon release deployment via Release Please |
+| Coordinated Release | Next Release Please tag |

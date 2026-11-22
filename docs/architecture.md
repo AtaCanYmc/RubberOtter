@@ -1,60 +1,48 @@
-# 📐 Rubber Otter — System Architecture & Data Flow
+# RubberOtter System Architecture
 
-This document details the internal architecture, cross-cutting concerns, and data flows of the Rubber Otter ecosystem across all three packages: **Firmware**, **Python SDK**, and **Web PWA**.
+[Back to Repository Root](../README.md)
 
----
+This document describes the hardware boundaries, wire protocol flow, and component responsibilities across the three directories in this repository: `firmware/`, `site/`, and `python/`.
 
-## 🏛️ Package Interactions
+## End-to-End Data Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User / Automation
-    participant Client as Web PWA / Python SDK
-    participant BLE as HM-10 BLE Module
+    participant Client as RubberDeck PWA / Python SDK / MCP
+    participant BLE as HM-10 or ESP32 BLE Bridge
     participant MCU as ATmega32U4 Firmware
-    participant Target as Target Host PC (OS)
+    participant Host as Target Host PC
 
-    User->>Client: Request action (e.g. Type "Hello\n" or Click)
-    Client->>Client: Encode into Framed Binary (STX + LEN + CMD + XOR + ETX)
-    Client->>BLE: Send GATT write characteristic (0xFFE1)
-    BLE->>MCU: Transmit over Hardware Serial1 UART (9600 Baud)
-    MCU->>MCU: Ingest via 512-Byte Ring Buffer Interrupt
-    MCU->>MCU: PacketParser validates STX/ETX + XOR Checksum
-    MCU->>MCU: CommandExecutor maps to USB HID calls
-    MCU->>Target: Emulate Keyboard / Mouse HID via USB CDC
-    Target-->>User: Keystrokes / Mouse Cursor movement executed
-    MCU-->>BLE: (Optional) Send "ACK: OK\n" back over Serial1
-    BLE-->>Client: GATT notification with ACK
+    Client->>BLE: Write framed packet to GATT 0xFFE1
+    BLE->>MCU: Forward bytes over Serial1 UART (9600 baud)
+    MCU->>MCU: Buffer in 512-byte ring buffer
+    MCU->>MCU: Validate STX/VER/LEN/XOR/ETX (max 384 B payload)
+    MCU->>Host: Emit USB HID keyboard/mouse report
+    MCU-->>BLE: Send 6-byte ACK [0x02, 0x01, SEQ, OK, CODE, 0x03]
+    BLE-->>Client: Notify GATT 0xFFE1 with ACK
 ```
 
----
-
-## 🔍 Layer Responsibilities
+## Repository Components
 
 ### 1. Firmware (`firmware/`)
-- **Microcontroller**: Microchip ATmega32U4 running at 16MHz (5V logic).
-- **Subsystems**:
-  - `PacketParser`: State machine tracking STX (`0x02`), Length bytes, payload bytes, checksum validation, and ETX (`0x03`). Falls back smoothly to single-byte execution.
-  - `CommandExecutor`: Parses strings, handles command chaining (`&&` / `;`), extracts arguments.
-  - `InputHelpers`: Text unescaping (`\n`, `\t`, `\"`), key combinations with modifiers (`GUI`, `CTRL`, `ALT`, `SHIFT`), non-blocking mouse jiggler task polling.
-  - `MacroStore`: EEPROM read/write routines for slots `m0` through `m5`.
-  - `Hardware`: Pin assignments, baud rate configuration, vibration driver.
 
-### 2. Python SDK & CLI (`python/`)
-- **Core Package (`rubberotter`)**:
-  - `RubberOtter`: Synchronous client using Bleak or PySerial with context manager support.
-  - `AsyncRubberOtter`: Asynchronous `asyncio` client for event-driven systems.
-  - `cli.py`: Full-featured terminal interface.
-  - `dashboard.py`: Lightweight embedded HTTP server providing OtterDeck web UI.
+- **Target MCU:** ATmega32U4 at 16 MHz (`leonardo`, `leonardo_hid`, `pro_micro`, `pro_micro_hid` PlatformIO environments).
+- **PacketParser:** State machine parsing RubberOtter v1 framed packets (`<= 384 B` payload) with XOR checksum verification and single-byte fallback shortcuts (`0x11`..`0x85`).
+- **CommandExecutor:** Splits chained commands (`&&` and `;`) and dispatches HID keystrokes, mouse deltas, media controls, haptic pulses (Pin 2), and jiggler toggles.
+- **MacroStore:** Persists macro slots `m0`..`m5` in ATmega32U4 EEPROM.
 
-### 3. Web PWA (`web/`)
-- **Technology**: React 18, TypeScript, Tailwind CSS, Vite.
-- **Web Bluetooth & Web Serial**: Connects via `navigator.bluetooth` to HM-10 GATT service `0xFFE0` / characteristic `0xFFE1`, and `navigator.serial` for zero-install direct USB hardware flashing.
-- **Panels**: Media Remote, Presentation Remote, Security & Shortcuts, CS Buy / Custom Macro builder, Virtual Trackpad with multi-touch gestures, Hardware Flasher, Live Packet Terminal.
+### 2. Static Caterina Flasher Site (`site/`)
 
-### 4. Native Mobile Applications (`ios/`, `android/`)
-- **Framework**: Ionic Capacitor with standalone root native projects.
-- **iOS (`ios/`)**: Native Swift workspace with Swift Package Manager plugins, direct CoreBluetooth, and Apple Taptic Engine haptics.
-- **Android (`android/`)**: Native Gradle/Kotlin Android Studio project with Android Bluetooth LE and Vibrator services.
-- **Build Output**: Automated builds produce unified binaries in `dist/web/`, `dist/android/` (`.apk`), and `dist/ios/` (`.app`).
+- **Runtime:** Zero-build static HTML, CSS, and JavaScript deployed to GitHub Pages (`https://atacanymc.github.io/RubberOtter/`).
+- **Function:** Triggers the 1200 bps Caterina bootloader reset over the browser Web Serial API, streams firmware files, and provides an offline RubberOtter v1 packet simulator.
+
+### 3. Python SDK, CLI, and MCP Server (`python/`)
+
+- **Package:** `rubberotter` (Python 3.10+, distributed on PyPI and Homebrew `AtaCanYmc/tap/rubberotter`).
+- **Transports:** BLE GATT via `bleak` and USB CDC Serial via `pyserial`.
+- **Interfaces:** Synchronous (`RubberOtter`) and asynchronous (`AsyncRubberOtter`) clients, `rubberotter` / `otter-cli` terminal tools, and a stdio MCP server (`rubberotter mcp`).
+
+### 4. External Control Client (`RubberDeck`)
+
+Interactive browser and mobile (Capacitor 8 Android/iOS) control interfaces live in [AtaCanYmc/RubberDeck](https://github.com/AtaCanYmc/RubberDeck) (`https://atacanymc.github.io/RubberDeck/`). RubberDeck connects to both RubberOtter (`384 B` profile) and [RubberOrca](https://github.com/AtaCanYmc/RubberOrca) (`1024 B` ESP32-S3 profile).
