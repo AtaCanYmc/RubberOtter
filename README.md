@@ -7,6 +7,7 @@
 [![Firmware CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml)
 [![Python SDK CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml)
 [![Deploy Flasher](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
+[![PyPI](https://img.shields.io/pypi/v/rubberotter.svg)](https://pypi.org/project/rubberotter/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interface Device (HID) hardware platform. This repository is focused exclusively on PlatformIO firmware, the ATmega32U4 Caterina 1200 bps Web Serial Flasher, and the `rubberotter` Python SDK, CLI, and MCP server.
