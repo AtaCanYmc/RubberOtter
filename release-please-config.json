@@ -1,32 +1,28 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
-    "firmware": {
+    ".": {
       "release-type": "simple",
-      "package-name": "rubber-otter-firmware",
+      "package-name": "rubber-otter",
       "changelog-path": "CHANGELOG.md",
-      "component": "firmware",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "python/pyproject.toml",
+          "jsonpath": "$.project.version"
+        },
+        {
+          "type": "generic",
+          "path": "python/rubberotter/__init__.py"
+        }
+      ],
       "changelog-sections": [
         { "type": "feat", "section": "Features" },
         { "type": "fix", "section": "Bug Fixes" },
         { "type": "perf", "section": "Performance Improvements" },
         { "type": "refactor", "section": "Code Refactoring" },
         { "type": "docs", "section": "Documentation" },
-        { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
-      ]
-    },
-    "python": {
-      "release-type": "python",
-      "package-name": "rubberotter",
-      "changelog-path": "CHANGELOG.md",
-      "component": "python",
-      "changelog-sections": [
-        { "type": "feat", "section": "Features" },
-        { "type": "fix", "section": "Bug Fixes" },
-        { "type": "perf", "section": "Performance Improvements" },
-        { "type": "refactor", "section": "Code Refactoring" },
-        { "type": "docs", "section": "Documentation" },
-        { "type": "ci", "section": "Continuous Integration" },
+        { "type": "ci", "section": "Continuous Integration", "hidden": true },
         { "type": "chore", "section": "Miscellaneous Chores", "hidden": true }
       ]
     }

@@ -21,8 +21,8 @@ jobs:
       contents: write
       pull-requests: write
     outputs:
-      python_release_created: ${{ steps.release.outputs['python--release_created'] }}
-      python_tag_name: ${{ steps.release.outputs['python--tag_name'] }}
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v5
         id: release
@@ -30,9 +30,42 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  upload-firmware:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      - name: Build ATmega32U4 Firmware
+        working-directory: firmware
+        run: pio run
+
+      - name: Upload Firmware Assets to Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          HEX_FILES=$(find firmware/.pio/build -name 'firmware.hex')
+          if [ -n "$HEX_FILES" ]; then
+            gh release upload "$TAG_NAME" $HEX_FILES --clobber
+          fi
+
   publish-pypi:
     needs: release-please
-    if: ${{ needs.release-please.outputs.python_release_created == 'true' || (github.event_name == 'workflow_dispatch' && inputs.publish_pypi == true) }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' || (github.event_name == 'workflow_dispatch' && inputs.publish_pypi == true) }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -41,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.python_tag_name || github.ref }}
+          ref: ${{ needs.release-please.outputs.tag_name || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -68,8 +101,8 @@ jobs:
           packages-dir: python/dist/
 
       - name: Attach Python Dist to GitHub Release
-        if: ${{ needs.release-please.outputs.python_release_created == 'true' }}
+        if: ${{ needs.release-please.outputs.release_created == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ needs.release-please.outputs.python_tag_name }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
         run: gh release upload "$TAG_NAME" python/dist/* --clobber
