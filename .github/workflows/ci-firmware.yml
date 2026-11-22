@@ -13,6 +13,9 @@ on:
       - '.github/workflows/ci-firmware.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build Firmware (${{ matrix.env }})

@@ -29,10 +29,16 @@ def create_app():
         timeout = request.args.get("timeout", default=3.0, type=float)
         ble_target = request.args.get("target", default="Otter", type=str)
         res = scan_all(target_ble_name=ble_target, ble_timeout=timeout)
-        if res.get("ble_error"):
+        has_ble_error = bool(res.get("ble_error"))
+        if has_ble_error:
             app.logger.warning("BLE scan failed: %s", res["ble_error"])
-            res["ble_error"] = "BLE scan failed"
-        return jsonify(res)
+        payload = {
+            "serial_ports": res.get("serial_ports", []),
+            "ble_devices": res.get("ble_devices", []),
+        }
+        if has_ble_error:
+            payload["ble_error"] = "BLE scan failed"
+        return jsonify(payload)
 
     @app.route("/api/status", methods=["GET"])
     def api_status():
