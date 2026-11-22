@@ -7,7 +7,9 @@
 [![Firmware CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-firmware.yml)
 [![Python SDK CI](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/ci-python.yml)
 [![Deploy Flasher](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml/badge.svg)](https://github.com/AtaCanYmc/RubberOtter/actions/workflows/cd-github-pages.yml)
+[![Release](https://img.shields.io/github/v/release/AtaCanYmc/RubberOtter?include_prereleases&sort=semver)](https://github.com/AtaCanYmc/RubberOtter/releases)
 [![PyPI](https://img.shields.io/pypi/v/rubberotter.svg)](https://pypi.org/project/rubberotter/)
+[![Homebrew](https://img.shields.io/badge/Homebrew-AtaCanYmc%2Ftap%2Frubberotter-FBB040.svg)](https://github.com/AtaCanYmc/homebrew-tap)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interface Device (HID) hardware platform. This repository is focused exclusively on PlatformIO firmware, the ATmega32U4 Caterina 1200 bps Web Serial Flasher, and the `rubberotter` Python SDK, CLI, and MCP server.
@@ -44,9 +46,19 @@ Or flash directly from a Chromium-based browser using the Caterina 1200 bps Web 
 
 ### 2. Python SDK, CLI, and MCP Server (`python/`)
 
+Install via Homebrew (macOS / Linux):
+
+```bash
+brew install AtaCanYmc/tap/rubberotter
+```
+
+Or via PyPI:
+
 ```bash
 pip install rubberotter
 ```
+
+Prebuilt firmware `.hex` and Python wheel/sdist archives are also attached to [GitHub Releases](https://github.com/AtaCanYmc/RubberOtter/releases).
 
 Local development:
 
