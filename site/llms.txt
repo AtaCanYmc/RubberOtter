@@ -1,0 +1,22 @@
+# RubberOtter
+
+> Open-source ATmega32U4 + HM-10/ESP32 wireless USB HID hardware platform exposing keyboard, mouse, consumer control, and haptic feedback over BLE 5.0 GATT (Service 0xFFE0 / Characteristic 0xFFE1) and USB CDC Serial.
+
+## Highlights
+
+- **Supported Hardware:** SparkFun Pro Micro 5V/16MHz (`pro_micro`, `pro_micro_hid`) and Arduino Leonardo (`leonardo`, `leonardo_hid`) with HM-10 / BT05 BLE module and optional Pin 2 coin vibration motor.
+- **Web Serial Flasher:** Browser-based Caterina 1200 bps reset and firmware streaming utility at https://atacanymc.github.io/RubberOtter/.
+- **Protocol:** RubberOtter v1 framed `STX/ETX` XOR protocol (`<= 384 B` payload), 6-byte ACK responses, single-byte shortcuts (`0x11`..`0x85`), and `&&`/`;` command chaining.
+- **Control PWA:** Moved to the unified standalone control app [RubberDeck](https://atacanymc.github.io/RubberDeck/).
+- **Python Ecosystem (`pip install rubberotter`):** Synchronous (`RubberOtter`) and asynchronous (`AsyncRubberOtter`) SDK, CLI (`rubberotter`), stdio MCP server (`rubberotter mcp`), and AI tool registry.
+
+## Links
+
+- Web Serial Flasher: https://atacanymc.github.io/RubberOtter/
+- Control PWA (RubberDeck): https://atacanymc.github.io/RubberDeck/
+- Repository: https://github.com/AtaCanYmc/RubberOtter
+- Releases: https://github.com/AtaCanYmc/RubberOtter/releases
+- Architecture: https://github.com/AtaCanYmc/RubberOtter/blob/main/docs/architecture.md
+- Hardware Wiring: https://github.com/AtaCanYmc/RubberOtter/blob/main/docs/hardware-wiring.md
+- Wire Protocol: https://github.com/AtaCanYmc/RubberOtter/blob/main/docs/protocol-spec.md
+- MCP and AI Tools: https://github.com/AtaCanYmc/RubberOtter/blob/main/docs/MCP_AND_AI_TOOLS.md
