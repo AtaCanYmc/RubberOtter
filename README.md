@@ -1,6 +1,6 @@
-<p align="center">
-  <img src="docs/assets/banner.jpg" alt="RubberOtter Banner" width="100%" />
-</p>
+<div align="center">
+  <img src="assets/logo.png" alt="RubberOtter Logo" width="180" />
+</div>
 
 # RubberOtter
 
