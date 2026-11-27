@@ -6,22 +6,9 @@ This document describes the hardware boundaries, wire protocol flow, and compone
 
 ## End-to-End Data Flow
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Client as RubberDeck PWA / Python SDK / MCP
-    participant BLE as HM-10 or ESP32 BLE Bridge
-    participant MCU as ATmega32U4 Firmware
-    participant Host as Target Host PC
+![RubberOtter End-to-End Data Flow](assets/architecture-sequence.svg)
 
-    Client->>BLE: Write framed packet to GATT 0xFFE1
-    BLE->>MCU: Forward bytes over Serial1 UART (9600 baud)
-    MCU->>MCU: Buffer in 512-byte ring buffer
-    MCU->>MCU: Validate STX/VER/LEN/XOR/ETX (max 384 B payload)
-    MCU->>Host: Emit USB HID keyboard/mouse report
-    MCU-->>BLE: Send 6-byte ACK [0x02, 0x01, SEQ, OK, CODE, 0x03]
-    BLE-->>Client: Notify GATT 0xFFE1 with ACK
-```
+*[Interactive HTML](assets/architecture-sequence.html)*
 
 ## Repository Components
 

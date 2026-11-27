@@ -8,31 +8,9 @@ This allows any AI assistant, LLM desktop app, or autonomous agent to wirelessly
 
 ## 🛠️ Model Context Protocol (MCP) Setup
 
-```mermaid
-graph LR
-    subgraph Clients["AI Clients"]
-        CLAUDE["Claude Desktop"]
-        CURSOR["Cursor / Windsurf / Antigravity"]
-        AGENT["Autonomous LLM Agents"]
-    end
+![RubberOtter MCP Architecture](assets/mcp-architecture.svg)
 
-    subgraph MCP["Rubber Otter MCP Server (stdio)"]
-        SERVER["rubberotter.mcp.server<br/>JSON-RPC 2.0 Engine"]
-        TOOLS["13 Hardware AI Tools"]
-        SERVER --> TOOLS
-    end
-
-    subgraph Hardware["Rubber Otter HID Hardware"]
-        MCU["ATmega32U4 + HM-10 BLE"]
-        PC["Target Host PC"]
-        TOOLS --> MCU
-        MCU --> PC
-    end
-
-    CLAUDE -->|"MCP stdio"| SERVER
-    CURSOR -->|"MCP stdio"| SERVER
-    AGENT -->|"MCP stdio / Direct Tool Call"| SERVER
-```
+*[Interactive HTML](assets/mcp-architecture.html)*
 
 ### 1. Claude Desktop Integration
 
