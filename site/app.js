@@ -168,7 +168,26 @@
       await new Promise((resolve) => setTimeout(resolve, 200));
       await targetPort.close();
       setStatus("BOOTLOADER ACTIVE (8s WINDOW)", 0);
-      log("OK", "1200 bps reset pulse sent. Reconnect to the bootloader port within 8 seconds.");
+      log("OK", "1200 bps reset pulse sent. Scanning for Caterina bootloader port...");
+      let reconnected = false;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const ports = await navigator.serial.getPorts();
+        const candidate = ports.find((p) => p !== targetPort) || ports[0];
+        if (candidate) {
+          try {
+            await candidate.open({ baudRate: 57600 });
+            port = candidate;
+            reconnected = true;
+            setStatus("BOOTLOADER PORT READY", 0);
+            log("OK", "Auto-connected to Caterina bootloader port. Click Flash Firmware.");
+            break;
+          } catch (_) { /* port still enumerating */ }
+        }
+      }
+      if (!reconnected) {
+        log("WARN", "Auto-detect timed out. Recovery: 1) Double-tap RST pin to GND, 2) Click Connect USB Serial within 8s, 3) Select the new bootloader port.");
+      }
       refreshButtons();
     } catch (err) {
       log("ERROR", `Bootloader reset failed: ${err instanceof Error ? err.message : String(err)}`);
