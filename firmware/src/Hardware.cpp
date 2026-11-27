@@ -15,16 +15,20 @@ void initHardware() {
   pinMode(VIB_PIN, OUTPUT);
   digitalWrite(VIB_PIN, LOW);
 
+#ifndef BLE_UART_BAUD
+#define BLE_UART_BAUD 9600
+#endif
+
 #ifndef USE_SOFTSERIAL
   BLE_SERIAL = &Serial1;
 #else
   BLE_SERIAL = &softSerial;
-  softSerial.begin(9600);
+  softSerial.begin(BLE_UART_BAUD);
 #endif
 
-  // If hardware serial is used, we'll init it here at default HM-10 baud
+  // If hardware serial is used, init at configured bridge baud
 #ifndef USE_SOFTSERIAL
-  Serial1.begin(9600);
+  Serial1.begin(BLE_UART_BAUD);
 #endif
 
   // If a compile-time BLE_NAME is provided, attempt to configure HM-10 name on boot

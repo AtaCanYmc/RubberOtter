@@ -17,6 +17,22 @@ permissions:
   contents: read
 
 jobs:
+  test-native:
+    name: Host Unit Tests (native)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: firmware
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO
+        run: pip install -U platformio
+      - name: Run native unit tests
+        run: platformio test -e native
+
   build:
     name: Build Firmware (${{ matrix.env }})
     runs-on: ubuntu-latest

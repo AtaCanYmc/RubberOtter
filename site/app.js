@@ -190,26 +190,114 @@
     refreshButtons();
   });
 
+  function parseIntelHex(hexText) {
+    const chunks = [];
+    let maxAddr = 0;
+    let extAddr = 0;
+    for (const raw of hexText.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line.startsWith(":")) continue;
+      const len = parseInt(line.slice(1, 3), 16);
+      const addr = parseInt(line.slice(3, 7), 16);
+      const type = parseInt(line.slice(7, 9), 16);
+      if (type === 0x00) {
+        const fullAddr = extAddr + addr;
+        const data = new Uint8Array(len);
+        for (let i = 0; i < len; i++) data[i] = parseInt(line.slice(9 + i * 2, 11 + i * 2), 16);
+        chunks.push({ addr: fullAddr, data });
+        if (fullAddr + len > maxAddr) maxAddr = fullAddr + len;
+      } else if (type === 0x01) {
+        break;
+      } else if (type === 0x02) {
+        extAddr = parseInt(line.slice(9, 13), 16) << 4;
+      } else if (type === 0x04) {
+        extAddr = parseInt(line.slice(9, 13), 16) << 16;
+      }
+    }
+    const pageSize = 128;
+    const total = Math.ceil(maxAddr / pageSize) * pageSize;
+    const bin = new Uint8Array(total).fill(0xff);
+    for (const c of chunks) bin.set(c.data, c.addr);
+    return bin;
+  }
+
+  async function avr109Flash(serialPort, bin, onProgress) {
+    const writer = serialPort.writable.getWriter();
+    const reader = serialPort.readable ? serialPort.readable.getReader() : null;
+    const readByte = async () => {
+      if (!reader) return 0x0d;
+      const { value } = await reader.read();
+      return value && value.length ? value[0] : 0x0d;
+    };
+    try {
+      await writer.write(new Uint8Array([0x53])); // 'S' software ID
+      if (reader) await reader.read();
+      await writer.write(new Uint8Array([0x41, 0x00, 0x00])); // 'A' address 0x0000
+      await readByte();
+      const pageSize = 128;
+      for (let offset = 0; offset < bin.length; offset += pageSize) {
+        const page = bin.slice(offset, offset + pageSize);
+        const cmd = new Uint8Array(4 + page.length);
+        cmd[0] = 0x42; // 'B' write block
+        cmd[1] = 0x00;
+        cmd[2] = page.length;
+        cmd[3] = 0x46; // 'F' flash
+        cmd.set(page, 4);
+        await writer.write(cmd);
+        await readByte();
+        onProgress(Math.min(100, Math.round(((offset + page.length) / bin.length) * 100)));
+      }
+      await writer.write(new Uint8Array([0x45])); // 'E' exit bootloader
+      await readByte();
+    } finally {
+      writer.releaseLock();
+      if (reader) reader.releaseLock();
+    }
+  }
+
+  const fetchReleaseBtn = document.getElementById("fetchReleaseBtn");
+  if (fetchReleaseBtn) {
+    fetchReleaseBtn.addEventListener("click", async () => {
+      fetchReleaseBtn.disabled = true;
+      log("INFO", "Fetching latest release .hex from GitHub Releases...");
+      try {
+        const res = await fetch("https://api.github.com/repos/AtaCanYmc/RubberOtter/releases/latest");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const rel = await res.json();
+        const assets = Array.isArray(rel.assets) ? rel.assets : [];
+        const match = assets.find((a) => a.name.endsWith(".hex") && a.name.includes(selectedBoard))
+          || assets.find((a) => a.name.endsWith(".hex"));
+        if (!match) throw new Error("No .hex asset found in latest release.");
+        const hexRes = await fetch(match.browser_download_url);
+        if (!hexRes.ok) throw new Error(`Asset download HTTP ${hexRes.status}`);
+        const hexText = await hexRes.text();
+        firmwareBytes = parseIntelHex(hexText);
+        const kb = (firmwareBytes.length / 1024).toFixed(1);
+        fileHint.textContent = `Loaded ${match.name} (${kb} KB binary)`;
+        log("OK", `Fetched ${match.name} (${kb} KB).`);
+        refreshButtons();
+      } catch (err) {
+        log("ERROR", `Release fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        fetchReleaseBtn.disabled = false;
+      }
+    });
+  }
+
   flashBtn.addEventListener("click", async () => {
     if (!port || !firmwareBytes || !port.writable) return;
     flashBtn.disabled = true;
-    setStatus("WRITING FIRMWARE...", 5);
-    const writer = port.writable.getWriter();
+    setStatus("FLASHING AVR109...", 5);
     try {
-      const chunkSize = 256;
-      for (let offset = 0; offset < firmwareBytes.length; offset += chunkSize) {
-        const chunk = firmwareBytes.slice(offset, offset + chunkSize);
-        await writer.write(chunk);
-        const pct = Math.min(100, Math.round(((offset + chunk.length) / firmwareBytes.length) * 100));
-        setStatus(`WRITING ${pct}%`, pct);
-      }
-      log("OK", `Transmitted ${firmwareBytes.length} bytes to ${selectedBoard.toUpperCase()}.`);
+      const isHexText = firmwareBytes[0] === 0x3a; // ':'
+      const payload = isHexText ? parseIntelHex(new TextDecoder().decode(firmwareBytes)) : firmwareBytes;
+      await avr109Flash(port, payload, (pct) => setStatus(`FLASHING ${pct}%`, pct));
+      log("OK", `Flashed ${payload.length} bytes via AVR109 to ${selectedBoard.toUpperCase()}.`);
       setStatus("COMPLETE", 100);
     } catch (err) {
       log("ERROR", `Flash failed: ${err instanceof Error ? err.message : String(err)}`);
       setStatus("ERROR", 0);
     } finally {
-      writer.releaseLock();
       refreshButtons();
     }
   });
