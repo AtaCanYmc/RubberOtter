@@ -211,13 +211,17 @@ class RubberOtterMcpServer:
             "result": result
         }
 
-    def _error_response(self, msg_id: Any, code: int, message: str) -> Dict[str, Any]:
+    def _error_response(self, msg_id: Any, code: int, message: str, error_code: str = "ERR_MCP_INTERNAL", retryable: bool = False) -> Dict[str, Any]:
         return {
             "jsonrpc": "2.0",
             "id": msg_id,
             "error": {
                 "code": code,
-                "message": message
+                "message": message,
+                "data": {
+                    "error_code": error_code,
+                    "retryable": retryable,
+                },
             }
         }
 

@@ -304,6 +304,25 @@ def handle_mcp(args):
         pass
 
 
+def handle_doctor(args):
+    import platform, importlib.util, time
+    print(f"Python: {platform.python_version()}")
+    for pkg in ("serial", "bleak"):
+        print(f"Package {pkg}: {'ok' if importlib.util.find_spec(pkg) else 'missing'}")
+    try:
+        import serial.tools.list_ports
+        ports = [p.device for p in serial.tools.list_ports.comports()]
+        print(f"Serial ports ({len(ports)}): {', '.join(ports) if ports else 'none'}")
+    except Exception as ex:
+        print(f"Serial ports: error ({ex})")
+    if getattr(args, "ping", False):
+        t0 = time.perf_counter()
+        client = get_client(args)
+        client.connect()
+        dt_ms = (time.perf_counter() - t0) * 1000.0
+        print(f"Connect/ACK latency: {dt_ms:.1f} ms")
+
+
 def main():
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("--ble-address", "-b", help="Target Bluetooth LE (BLE) device MAC or UUID address")
@@ -372,6 +391,10 @@ def main():
     p_mcp.add_argument("--config-cursor", action="store_true", help="Print Cursor / Windsurf MCP configuration JSON snippet")
     p_mcp.add_argument("--list-tools", action="store_true", help="List all available AI & MCP tools")
 
+    # doctor
+    p_doctor = subparsers.add_parser("doctor", parents=[parent_parser], help="Check local environment, serial ports, and ACK latency")
+    p_doctor.add_argument("--ping", action="store_true", help="Measure live ACK round-trip latency on connected device")
+
     args = parser.parse_args()
 
     if not args.subcommand:
@@ -389,6 +412,7 @@ def main():
         "shell": handle_shell,
         "serve": handle_serve,
         "mcp": handle_mcp,
+        "doctor": handle_doctor,
     }
 
     handler = handlers.get(args.subcommand)

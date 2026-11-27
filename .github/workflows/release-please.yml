@@ -60,7 +60,8 @@ jobs:
         run: |
           HEX_FILES=$(find firmware/.pio/build -name 'firmware.hex')
           if [ -n "$HEX_FILES" ]; then
-            gh release upload "$TAG_NAME" $HEX_FILES --clobber
+            sha256sum $HEX_FILES > SHA256SUMS-firmware.txt
+            gh release upload "$TAG_NAME" $HEX_FILES SHA256SUMS-firmware.txt --clobber
           fi
 
   publish-pypi:

@@ -243,8 +243,11 @@
         cmd[2] = page.length;
         cmd[3] = 0x46; // 'F' flash
         cmd.set(page, 4);
+        const t0 = performance.now();
         await writer.write(cmd);
         await readByte();
+        const ackMs = (performance.now() - t0).toFixed(1);
+        if (offset === 0) log("INFO", `First page ACK latency: ${ackMs} ms`);
         onProgress(Math.min(100, Math.round(((offset + page.length) / bin.length) * 100)));
       }
       await writer.write(new Uint8Array([0x45])); // 'E' exit bootloader
