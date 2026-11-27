@@ -18,6 +18,10 @@ RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interf
 
 *[Interactive HTML](docs/assets/overview-architecture.html) · [Watch Launch Video (YouTube)](https://youtu.be/ODv8zLot6Ss)*
 
+| Wireless HID (ATmega32U4 + BLE) | Stealth BLE (Open Source) |
+| :---: | :---: |
+| ![Wireless HID](docs/assets/wireless-hid-banner.jpg) | ![Stealth BLE](docs/assets/stealth-ble-banner.jpg) |
+
 ## Contents
 
 - [Control PWA and Mobile App](#control-pwa-and-mobile-app-moved-to-rubberdeck)
