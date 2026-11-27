@@ -1,4 +1,6 @@
-# 🔌 Rubber Otter — Hardware Wiring & Schematics
+# Rubber Otter — Hardware Wiring & Schematics
+
+[Back to Repository Root](../README.md) · [Hardware BOM & 3D Enclosure](hardware-bom.md)
 
 This document describes the circuit design and wiring pinout for building a Rubber Otter HID device using an **ATmega32U4** board (SparkFun Pro Micro 5V/16MHz or Arduino Leonardo), **HM-10 / BT05 BLE Module**, and an optional **Vibration Motor**.
 
