@@ -24,6 +24,7 @@ RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interf
 - [Repository Layout](#repository-layout)
 - [Quick Start](#quick-start)
 - [Protocol Summary (RubberOtter v1)](#protocol-summary-rubberotter-v1)
+- [Documentation](#documentation)
 - [License](#license)
 
 ## Control PWA and Mobile App (Moved to RubberDeck)
@@ -87,6 +88,14 @@ make test
 - Framed packet: `[STX: 0x02] [VER: 0x01] [SEQ: 1B] [LEN_HI: 1B] [LEN_LO: 1B] [PAYLOAD: <= 384 B] [XOR: 1B] [ETX: 0x03]`
 - 6-byte ACK: `[0x02, 0x01, SEQ, OK, CODE, 0x03]` (`1`: invalid version/command, `2`: payload overflow, `3`: XOR mismatch)
 - Single-byte shortcuts: `0x11`..`0x85` and `&&` / `;` command chaining
+
+## Documentation
+
+- [System Architecture](docs/architecture.md)
+- [Hardware Wiring & Schematics](docs/hardware-wiring.md)
+- [Hardware BOM & 3D Enclosure](docs/hardware-bom.md)
+- [Protocol Specification (v1)](docs/protocol-spec.md)
+- [MCP & AI Agent Tools](docs/MCP_AND_AI_TOOLS.md)
 
 ## License
 
