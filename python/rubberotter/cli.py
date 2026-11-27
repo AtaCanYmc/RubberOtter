@@ -12,7 +12,7 @@ import sys
 import time
 
 from .client import RubberOtter, RubberOtterConnectionError
-from .scanner import scan_serial_ports, scan_ble_devices
+from .scanner import scan_ble_devices, scan_serial_ports
 
 
 class Colors:
@@ -38,7 +38,7 @@ def handle_scan(args):
 
     if args.json:
         old_stdout = sys.stdout
-        sys.stdout = open(os.devnull, "w")
+        sys.stdout = open(os.devnull, "w")  # noqa: SIM115 - closed in finally
 
     try:
         if args.mode in ["ble", "all"]:
@@ -305,7 +305,8 @@ def handle_mcp(args):
 
 
 def handle_doctor(args):
-    import platform, importlib.util, time
+    import importlib.util
+    import platform
     print(f"Python: {platform.python_version()}")
     for pkg in ("serial", "bleak"):
         print(f"Package {pkg}: {'ok' if importlib.util.find_spec(pkg) else 'missing'}")
@@ -313,14 +314,24 @@ def handle_doctor(args):
         import serial.tools.list_ports
         ports = [p.device for p in serial.tools.list_ports.comports()]
         print(f"Serial ports ({len(ports)}): {', '.join(ports) if ports else 'none'}")
-    except Exception as ex:
+    except Exception as ex:  # noqa: BLE001 - report port enumeration failures
         print(f"Serial ports: error ({ex})")
     if getattr(args, "ping", False):
         t0 = time.perf_counter()
-        client = get_client(args)
-        client.connect()
-        dt_ms = (time.perf_counter() - t0) * 1000.0
-        print(f"Connect/ACK latency: {dt_ms:.1f} ms")
+        client = RubberOtter(
+            port=args.port,
+            ble_address=args.ble_address,
+            ble_target=args.target,
+            baud=args.baud,
+            timeout=args.timeout,
+            retries=args.retries,
+        )
+        try:
+            client.connect()
+            dt_ms = (time.perf_counter() - t0) * 1000.0
+            print(f"Connect latency: {dt_ms:.1f} ms")
+        finally:
+            client.disconnect()
 
 
 def main():
@@ -392,8 +403,8 @@ def main():
     p_mcp.add_argument("--list-tools", action="store_true", help="List all available AI & MCP tools")
 
     # doctor
-    p_doctor = subparsers.add_parser("doctor", parents=[parent_parser], help="Check local environment, serial ports, and ACK latency")
-    p_doctor.add_argument("--ping", action="store_true", help="Measure live ACK round-trip latency on connected device")
+    p_doctor = subparsers.add_parser("doctor", parents=[parent_parser], help="Check local environment, serial ports, and connection latency")
+    p_doctor.add_argument("--ping", action="store_true", help="Measure connection latency to the device")
 
     args = parser.parse_args()
 

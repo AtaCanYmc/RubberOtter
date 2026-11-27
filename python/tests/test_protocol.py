@@ -3,7 +3,16 @@ Unit tests for RubberOtterPy protocol framing, XOR checksums, and ACK parser.
 """
 
 import unittest
-from rubberotter.protocol import STX, ETX, VERSION, PAYLOAD_MAX, build_frame, parse_ack, PayloadTooLargeError
+
+from rubberotter.protocol import (
+    ETX,
+    PAYLOAD_MAX,
+    STX,
+    VERSION,
+    PayloadTooLargeError,
+    build_frame,
+    parse_ack,
+)
 
 
 class TestProtocolModule(unittest.TestCase):

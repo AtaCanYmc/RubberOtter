@@ -3,9 +3,10 @@ Unit tests for RubberOtter Bluetooth LE (BLE) client and BLE-first connection ro
 """
 
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-from rubberotter.client import RubberOtter, BLERubberOtter, RubberOtterConnectionError
-from rubberotter.protocol import STX, ETX, VERSION
+from unittest.mock import patch
+
+from rubberotter.client import BLERubberOtter, RubberOtter, RubberOtterConnectionError
+from rubberotter.protocol import VERSION
 
 
 class TestBLEClient(unittest.TestCase):

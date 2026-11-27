@@ -10,9 +10,9 @@ import asyncio
 import json
 import logging
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from rubberotter.ai.tools import RubberOtterToolRegistry, ToolDefinition
+from rubberotter.ai.tools import RubberOtterToolRegistry
 from rubberotter.client import RubberOtter
 
 logger = logging.getLogger("rubberotter.mcp")
@@ -25,12 +25,12 @@ PROTOCOL_VERSION = "2024-11-05"
 class RubberOtterMcpServer:
     """Standard Model Context Protocol (MCP) Server for Rubber Otter."""
 
-    def __init__(self, client: Optional[RubberOtter] = None) -> None:
+    def __init__(self, client: RubberOtter | None = None) -> None:
         self.registry = RubberOtterToolRegistry(client=client)
         self._prompts = self._init_prompts()
         self._resources = self._init_resources()
 
-    def _init_prompts(self) -> Dict[str, Dict[str, Any]]:
+    def _init_prompts(self) -> dict[str, dict[str, Any]]:
         return {
             "automate_terminal_task": {
                 "name": "automate_terminal_task",
@@ -60,7 +60,7 @@ class RubberOtterMcpServer:
             }
         }
 
-    def _init_resources(self) -> Dict[str, Dict[str, Any]]:
+    def _init_resources(self) -> dict[str, dict[str, Any]]:
         return {
             "rubberotter://status": {
                 "uri": "rubberotter://status",
@@ -70,7 +70,7 @@ class RubberOtterMcpServer:
             }
         }
 
-    async def handle_request(self, message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def handle_request(self, message: dict[str, Any]) -> dict[str, Any] | None:
         """Processes a single JSON-RPC 2.0 message."""
         msg_id = message.get("id")
         method = message.get("method")
@@ -129,12 +129,12 @@ class RubberOtterMcpServer:
                         ],
                         "isError": False
                     })
-                except Exception as ex:
+                except Exception as ex:  # noqa: BLE001 - return tool failures to the client
                     return self._success_response(msg_id, {
                         "content": [
                             {
                                 "type": "text",
-                                "text": f"Error executing tool '{tool_name}': {str(ex)}"
+                                "text": f"Error executing tool '{tool_name}': {ex!s}"
                             }
                         ],
                         "isError": True
@@ -201,17 +201,17 @@ class RubberOtterMcpServer:
                 return self._error_response(msg_id, -32601, f"Method not found: {method}")
 
         except Exception as ex:
-            logger.exception("Error processing MCP message: %s", ex)
-            return self._error_response(msg_id, -32603, f"Internal error: {str(ex)}")
+            logger.exception("Error processing MCP message")
+            return self._error_response(msg_id, -32603, f"Internal error: {ex!s}")
 
-    def _success_response(self, msg_id: Any, result: Any) -> Dict[str, Any]:
+    def _success_response(self, msg_id: Any, result: Any) -> dict[str, Any]:
         return {
             "jsonrpc": "2.0",
             "id": msg_id,
             "result": result
         }
 
-    def _error_response(self, msg_id: Any, code: int, message: str, error_code: str = "ERR_MCP_INTERNAL", retryable: bool = False) -> Dict[str, Any]:
+    def _error_response(self, msg_id: Any, code: int, message: str, error_code: str = "ERR_MCP_INTERNAL", retryable: bool = False) -> dict[str, Any]:
         return {
             "jsonrpc": "2.0",
             "id": msg_id,
@@ -226,7 +226,7 @@ class RubberOtterMcpServer:
         }
 
 
-async def run_stdio_server(client: Optional[RubberOtter] = None) -> None:
+async def run_stdio_server(client: RubberOtter | None = None) -> None:
     """Runs the MCP server reading from standard input and writing to standard output."""
     server = RubberOtterMcpServer(client=client)
 
@@ -258,6 +258,6 @@ async def run_stdio_server(client: Optional[RubberOtter] = None) -> None:
                 sys.stdout.flush()
         except asyncio.CancelledError:
             break
-        except Exception as e:
-            logger.error("Unexpected error in stdio server: %s", e)
+        except Exception:  # boundary for the stdio server loop
+            logger.exception("Unexpected error in stdio server")
             break

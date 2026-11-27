@@ -49,12 +49,10 @@ PROTOCOL_SINGLE_BYTE_MAP = {
 
 class ProtocolError(Exception):
     """Base exception for Rubber Otter framing & protocol errors."""
-    pass
 
 
 class PayloadTooLargeError(ProtocolError):
     """Raised when command payload exceeds maximum allowed size."""
-    pass
 
 
 def build_frame(seq: int, payload: bytes) -> bytes:
@@ -89,19 +87,18 @@ def parse_ack(data: bytes):
     Returns dict if valid frame found, else None.
     """
     for i in range(len(data)):
-        if data[i] == STX and i + 6 <= len(data):
-            if data[i + 5] == ETX:
-                ver = data[i + 1]
-                seq = data[i + 2]
-                status = data[i + 3]
-                code = data[i + 4]
-                # Status 1 or 0 indicates response received; code 0 = success
-                success = (status == 1 or status == 0) and code == 0
-                return {
-                    "version": ver,
-                    "seq": seq,
-                    "status": status,
-                    "code": code,
-                    "success": success,
-                }
+        if data[i] == STX and i + 6 <= len(data) and data[i + 5] == ETX:
+            ver = data[i + 1]
+            seq = data[i + 2]
+            status = data[i + 3]
+            code = data[i + 4]
+            # Status 1 or 0 indicates response received; code 0 = success
+            success = (status == 1 or status == 0) and code == 0
+            return {
+                "version": ver,
+                "seq": seq,
+                "status": status,
+                "code": code,
+                "success": success,
+            }
     return None
