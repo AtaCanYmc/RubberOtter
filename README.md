@@ -18,6 +18,14 @@ RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interf
 
 *[Interactive HTML](docs/assets/overview-architecture.html)*
 
+## Contents
+
+- [Control PWA and Mobile App](#control-pwa-and-mobile-app-moved-to-rubberdeck)
+- [Repository Layout](#repository-layout)
+- [Quick Start](#quick-start)
+- [Protocol Summary (RubberOtter v1)](#protocol-summary-rubberotter-v1)
+- [License](#license)
+
 ## Control PWA and Mobile App (Moved to RubberDeck)
 
 The web control PWA and Capacitor 8 mobile apps (Android/iOS) have moved to the unified standalone repository **[RubberDeck](https://github.com/AtaCanYmc/RubberDeck)**, which controls both RubberOtter and [RubberOrca](https://github.com/AtaCanYmc/RubberOrca) from a single interface.
@@ -33,7 +41,8 @@ The web control PWA and Capacitor 8 mobile apps (Android/iOS) have moved to the 
 | [`firmware/`](firmware/) | Embedded C++ microcontroller firmware. | PlatformIO, Arduino, ATmega32U4, C++11 | [firmware/README.md](firmware/README.md) |
 | [`site/`](site/) | Standalone Caterina 1200 bps Web Serial Flasher. | Static HTML, CSS, Web Serial API | https://atacanymc.github.io/RubberOtter/ |
 | [`python/`](python/) | Client SDK, CLI, and MCP server (`rubberotter`). | Python 3.10+, Bleak, PySerial | [python/README.md](python/README.md) |
-| [`docs/`](docs/) | Architecture, hardware wiring, protocol, and MCP specs. | Technical specifications | [docs/protocol-spec.md](docs/protocol-spec.md) |
+| [`docs/`](docs/) | Architecture, hardware wiring, BOM, protocol, and MCP specs. | Technical specifications | [docs/hardware-bom.md](docs/hardware-bom.md) |
+| [`hardware/`](hardware/enclosure/) | 3D-printable enclosure STL files (`otter-top.stl`, `ro-bottom.stl`). | PLA / PETG | [docs/hardware-bom.md](docs/hardware-bom.md) |
 | [`.github/`](.github/) | CI/CD workflows for firmware, flasher, and Python. | GitHub Actions, Release Please | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 ## Quick Start
@@ -42,8 +51,9 @@ The web control PWA and Capacitor 8 mobile apps (Android/iOS) have moved to the 
 
 ```bash
 cd firmware
-platformio run
-platformio run --target upload
+platformio run -e pro_micro_hid
+platformio run -e pro_micro_hid --target upload
+platformio test -e native
 ```
 
 Or flash directly from a Chromium-based browser using the Caterina 1200 bps Web Serial Flasher at https://atacanymc.github.io/RubberOtter/.
