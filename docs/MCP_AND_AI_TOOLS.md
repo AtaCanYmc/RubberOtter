@@ -1,4 +1,4 @@
-# 🤖 Rubber Otter Model Context Protocol (MCP) & AI Agent Tools
+# Rubber Otter Model Context Protocol (MCP) & AI Agent Tools
 
 Rubber Otter includes native support for the **Model Context Protocol (MCP)** and modern **AI Agent Frameworks** (LangChain, CrewAI, OpenAI Function Calling, Anthropic Claude Tools).
 
@@ -6,7 +6,7 @@ This allows any AI assistant, LLM desktop app, or autonomous agent to wirelessly
 
 ---
 
-## 🛠️ Model Context Protocol (MCP) Setup
+## Model Context Protocol (MCP) Setup
 
 ![RubberOtter MCP Architecture](assets/mcp-architecture.svg)
 
@@ -45,7 +45,9 @@ Add the following to your `mcp.json` / MCP Server settings:
 
 ---
 
-## 🧰 Available MCP & AI Tools (13)
+## Available MCP & AI Tools (13)
+
+All JSON-RPC 2.0 error responses include `error.data.error_code` and `error.data.retryable` so autonomous agents can classify transient transport failures vs invalid parameters. Use `otter-cli doctor --ping` to verify local serial/BLE health and ACK latency.
 
 | Tool Name | Parameters | Description |
 | :--- | :--- | :--- |

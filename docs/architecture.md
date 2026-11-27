@@ -14,7 +14,7 @@ This document describes the hardware boundaries, wire protocol flow, and compone
 
 ### 1. Firmware (`firmware/`)
 
-- **Target MCU:** ATmega32U4 at 16 MHz (`leonardo`, `leonardo_hid`, `pro_micro`, `pro_micro_hid` PlatformIO environments).
+- **Target MCU:** ATmega32U4 at 16 MHz (`leonardo`, `leonardo_hid`, `pro_micro`, `pro_micro_hid`, `pro_micro_hid_esp32` at 115200 baud, plus `native` host unit tests).
 - **PacketParser:** State machine parsing RubberOtter v1 framed packets (`<= 384 B` payload) with XOR checksum verification and single-byte fallback shortcuts (`0x11`..`0x85`).
 - **CommandExecutor:** Splits chained commands (`&&` and `;`) and dispatches HID keystrokes, mouse deltas, media controls, haptic pulses (Pin 2), and jiggler toggles.
 - **MacroStore:** Persists macro slots `m0`..`m5` in ATmega32U4 EEPROM.
@@ -22,7 +22,7 @@ This document describes the hardware boundaries, wire protocol flow, and compone
 ### 2. Static Caterina Flasher Site (`site/`)
 
 - **Runtime:** Zero-build static HTML, CSS, and JavaScript deployed to GitHub Pages (`https://atacanymc.github.io/RubberOtter/`).
-- **Function:** Triggers the 1200 bps Caterina bootloader reset over the browser Web Serial API, streams firmware files, and provides an offline RubberOtter v1 packet simulator.
+- **Function:** Triggers the 1200 bps Caterina bootloader reset over the browser Web Serial API, streams Intel HEX firmware directly via AVR109, fetches `.hex` assets from GitHub Releases, logs page ACK latency, and provides an offline RubberOtter v1 packet simulator.
 
 ### 3. Python SDK, CLI, and MCP Server (`python/`)
 
