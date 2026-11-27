@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report a bug in firmware, Python SDK, CLI, MCP server, or Web Serial Flasher
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Firmware (ATmega32U4)
+        - Python SDK / CLI / MCP Server
+        - Caterina Web Serial Flasher (site/)
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Concise description of the unexpected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Command or action
+        2. Hardware / OS / Python version
+        3. Observed output
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
