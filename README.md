@@ -16,7 +16,7 @@ RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interf
 
 ![RubberOtter Platform Overview](docs/assets/overview-architecture.svg)
 
-*[Interactive HTML](docs/assets/overview-architecture.html)*
+*[Interactive HTML](docs/assets/overview-architecture.html) · [Watch Launch Video (YouTube)](https://youtu.be/ODv8zLot6Ss)*
 
 ## Contents
 
