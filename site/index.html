@@ -6,27 +6,62 @@
   <title>RubberOtter | ATmega32U4 Caterina 1200 bps Web Serial Flasher</title>
   <meta name="description" content="Open-source ATmega32U4 + HM-10/ESP32 USB HID firmware, browser Caterina 1200 bps Web Serial flasher, Python SDK, CLI, and MCP server." />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#f5f5f5" />
+  <meta name="theme-color" content="#080c0d" />
   <link rel="canonical" href="https://atacanymc.github.io/RubberOtter/" />
 
   <link rel="icon" type="image/svg+xml" href="./logo.svg" />
   <link rel="apple-touch-icon" href="./logo.svg" />
 
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="RubberOtter" />
+  <meta property="og:url" content="https://atacanymc.github.io/RubberOtter/" />
+  <meta property="og:title" content="RubberOtter | ATmega32U4 Caterina 1200 bps Web Serial Flasher" />
+  <meta property="og:description" content="Flash RubberOtter to ATmega32U4 Pro Micro or Leonardo straight from Chrome or Edge via 1200 bps Caterina Web Serial." />
+  <meta property="og:image" content="https://atacanymc.github.io/RubberOtter/logo.svg" />
+  <meta property="og:image:alt" content="RubberOtter stylized teal otter emblem" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="RubberOtter | ATmega32U4 Caterina 1200 bps Web Serial Flasher" />
+  <meta name="twitter:description" content="ATmega32U4 + HM-10/ESP32 USB HID firmware, browser Caterina Web Serial flasher, Python SDK, CLI, and MCP server." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "RubberOtter",
+    "url": "https://atacanymc.github.io/RubberOtter/",
+    "image": "https://atacanymc.github.io/RubberOtter/logo.svg",
+    "description": "Open-source ATmega32U4 + HM-10/ESP32 wireless USB HID hardware platform with Caterina 1200 bps Web Serial flasher, Python SDK, CLI, and stdio MCP server.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "ATmega32U4, macOS, Linux, Windows",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "codeRepository": "https://github.com/AtaCanYmc/RubberOtter",
+    "author": {
+      "@type": "Person",
+      "name": "AtaCanYmc",
+      "url": "https://github.com/AtaCanYmc"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="scroll-progress" aria-hidden="true"></div>
-
   <header class="topbar">
     <div class="container topbar-inner">
       <a href="#" class="brand">
         <img src="./logo.svg" alt="" width="24" height="24" class="brand-logo" aria-hidden="true" />
         <span class="brand-name">RUBBEROTTER</span>
-        <span class="mono tag" id="releaseTag">v1.4.0</span>
+        <span class="mono tag" id="releaseTag">v1.4.0</span><!-- x-release-please-version -->
       </a>
 
       <nav class="nav-links mono" aria-label="Primary">
@@ -34,250 +69,358 @@
         <a href="#architecture">02_WIRING</a>
         <a href="#simulator">03_SIMULATOR</a>
         <a href="#ecosystem">04_CLI/MCP</a>
-        <a href="#docs">05_DOCS</a>
-        <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer">CONTROL PWA</a>
-        <a href="https://github.com/AtaCanYmc/RubberOtter" target="_blank" rel="noopener noreferrer">GITHUB</a>
+        <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer" class="nav-ext">
+          CONTROL PWA
+        </a>
+        <a href="https://github.com/AtaCanYmc/RubberOtter" target="_blank" rel="noopener noreferrer" class="nav-ext">
+          GITHUB
+        </a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- HERO -->
+    <!-- HERO SECTION -->
     <section class="hero container">
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow mono">
-            <span>ATMEGA32U4</span>
-            <span aria-hidden="true">//</span>
-            <span>HM-10 BLE 5.0</span>
-            <span aria-hidden="true">//</span>
-            <span>CATERINA 1200 BPS</span>
-          </p>
+      <div class="hero-copy">
+        <p class="eyebrow mono">
+          <span>ATMEGA32U4</span>
+          <span class="sep" aria-hidden="true">//</span>
+          <span>HM-10 BLE 5.0</span>
+          <span class="sep" aria-hidden="true">//</span>
+          <span>CATERINA 1200 BPS</span>
+        </p>
 
-          <h1 class="hero-title">
-            Wireless HID on <span class="accent">ATmega32U4 silicon.</span>
-          </h1>
+        <h1 class="hero-title">
+          Wireless HID on<br />
+          <span class="accent">ATmega32U4 silicon.</span>
+        </h1>
 
-          <p class="hero-desc">
-            Hardware-only Web Serial flasher for RubberOtter boards (Pro Micro, Leonardo, and ESP32 bridges). Trigger the 1200 bps Caterina bootloader and stream firmware directly from Chromium. For live BLE/USB control, open <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer" class="inline-link">RubberDeck</a>.
-          </p>
+        <p class="hero-desc">
+          Hardware-only Web Serial flasher for RubberOtter boards (Pro Micro, Leonardo, and ESP32 bridges). Trigger the 1200 bps Caterina bootloader and stream firmware directly from Chromium. For live BLE/USB control, open <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer" class="inline-link">RubberDeck</a>.
+        </p>
 
-          <div class="board-selector mono" id="boardSelector" role="group" aria-label="Target RubberOtter Board">
-            <button type="button" class="board-btn active" aria-pressed="true" data-board="pro_micro" data-baud="57600" data-spec="ATmega32U4 Pro Micro (5V / 16MHz · 57600)">PRO MICRO</button>
-            <button type="button" class="board-btn" aria-pressed="false" data-board="leonardo" data-baud="57600" data-spec="Arduino Leonardo (ATmega32U4 · 57600)">LEONARDO</button>
-            <button type="button" class="board-btn" aria-pressed="false" data-board="esp32" data-baud="115200" data-spec="ESP32 BLE Bridge (115200 baud)">ESP32 BRIDGE</button>
-          </div>
-
-          <div class="hero-actions">
-            <a href="#flasher" class="btn btn-primary">
-              <span>OPEN WEB FLASHER</span>
-              <span class="mono btn-sub">WEB SERIAL</span>
-            </a>
-            <a href="https://github.com/AtaCanYmc/RubberOtter/releases" target="_blank" rel="noopener noreferrer" class="btn btn-ghost mono">RELEASES</a>
-          </div>
+        <div class="board-selector mono" id="boardSelector" role="group" aria-label="Target RubberOtter Board">
+          <button type="button" class="board-btn active" aria-pressed="true" data-board="pro_micro" data-baud="57600" data-spec="ATmega32U4 Pro Micro (5V / 16MHz · 57600)">
+            PRO MICRO
+          </button>
+          <button type="button" class="board-btn" aria-pressed="false" data-board="leonardo" data-baud="57600" data-spec="Arduino Leonardo (ATmega32U4 · 57600)">
+            LEONARDO
+          </button>
+          <button type="button" class="board-btn" aria-pressed="false" data-board="esp32" data-baud="115200" data-spec="ESP32 BLE Bridge (115200 baud)">
+            ESP32 BRIDGE
+          </button>
         </div>
 
-        <aside class="spec-card" aria-label="Hardware Specification">
-          <div class="spec-row">
-            <span class="spec-label">Target Board</span>
-            <span class="spec-val" id="boardSpec">ATmega32U4 Pro Micro (5V / 16MHz · 57600)</span>
+        <div class="hero-actions">
+          <a href="#flasher" class="btn btn-primary">
+            <span>OPEN WEB FLASHER</span>
+            <span class="mono btn-sub">WEB SERIAL</span>
+          </a>
+          <a href="https://github.com/AtaCanYmc/RubberOtter/releases" target="_blank" rel="noopener noreferrer" class="btn btn-ghost mono">
+            GET .HEX RELEASES
+          </a>
+        </div>
+
+        <div class="telemetry-strip mono">
+          <div>
+            <span class="label">RELEASE</span>
+            <span class="val" id="releaseMeta">Fetching GitHub...</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-label">Baud Rate</span>
-            <span class="spec-val" id="baudReadout">57600</span>
+          <div>
+            <span class="label">TARGET MCU</span>
+            <span class="val" id="boardSpec">ATmega32U4 Pro Micro (5V / 16MHz · 57600)</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-label">Protocol Frame</span>
-            <span class="spec-val">STX · VER · SEQ · LEN · PAYLOAD(≤384B) · XOR · ETX</span>
+          <div>
+            <span class="label">INTERFACE</span>
+            <span class="val">USB-HID + BLE 0xFFE0</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-label">GATT Service</span>
-            <span class="spec-val">0xFFE0 / 0xFFE1</span>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE HARDWARE WIRING BLUEPRINT -->
+      <div class="hero-visual">
+        <div class="pcb-frame" id="pcbCard">
+          <span class="corner tl" aria-hidden="true">+</span>
+          <span class="corner tr" aria-hidden="true">+</span>
+          <span class="corner bl" aria-hidden="true">+</span>
+          <span class="corner br" aria-hidden="true">+</span>
+
+          <div class="pcb-header mono">
+            <span>FIG 01 // OTTER TOPOLOGY</span>
+            <span id="hotspotStatus">INSPECT MODULE</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-label">Latest Release</span>
-            <span class="spec-val" id="releaseMeta">v1.4.0 · GitHub Releases</span>
+
+          <svg viewBox="0 0 380 460" width="380" height="460" class="pcb-svg" role="img" aria-label="RubberOtter ATmega32U4 and HM-10 Wiring Diagram">
+            <rect x="64" y="28" width="252" height="404" rx="14" class="pcb-board" />
+            <circle cx="86" cy="50" r="7" class="pcb-hole" />
+            <circle cx="294" cy="50" r="7" class="pcb-hole" />
+            <circle cx="86" cy="410" r="7" class="pcb-hole" />
+            <circle cx="294" cy="410" r="7" class="pcb-hole" />
+
+            <g class="pcb-pins">
+              <rect x="76" y="100" width="14" height="260" rx="2" />
+              <rect x="290" y="100" width="14" height="260" rx="2" />
+            </g>
+
+            <g class="pcb-traces">
+              <path d="M165 92 L165 154" />
+              <path d="M215 92 L215 112" />
+              <path d="M215 144 L215 154" />
+              <path d="M190 278 L190 390" />
+              <path d="M250 218 L290 218" />
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="HM-10 BLE Module" data-name="HM-10 / BT05 BLE" data-detail="BLE GATT Service 0xFFE0 / Char 0xFFE1 · TX -> Pin 0 (RX1) direct, 3.3V VCC">
+              <rect x="122" y="38" width="136" height="52" rx="4" class="pcb-module" />
+              <path d="M140 74 L140 50 L158 50 L158 68 L176 68 L176 50 L194 50 L194 68 L212 68 L212 50 L230 50 L230 74" class="antenna-trace" />
+              <text x="190" y="102" text-anchor="middle" class="pcb-label">HM-10 // BLE 0xFFE0</text>
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="5V to 3.3V Voltage Divider" data-name="1K / 2K DIVIDER" data-detail="Steps ATmega32U4 5V TX1 (Pin 1) down to 3.3V before HM-10 RX to prevent IC damage">
+              <rect x="194" y="112" width="42" height="32" rx="3" class="pcb-btn" />
+              <text x="215" y="131" text-anchor="middle" class="pcb-label accent-text">1K/2K</text>
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="ATmega32U4 Microcontroller" data-name="ATMEGA32U4 MCU" data-detail="Pro Micro / Leonardo 16MHz · Native USB HID + Caterina 1200 bps Bootloader (57600 baud)">
+              <rect x="124" y="156" width="132" height="122" rx="6" class="pcb-chip" />
+              <rect x="134" y="166" width="112" height="102" rx="3" class="pcb-chip-inner" />
+              <text x="190" y="212" text-anchor="middle" class="pcb-chip-title">ATmega32U4</text>
+              <text x="190" y="230" text-anchor="middle" class="pcb-chip-sub">PRO MICRO // OTTER</text>
+              <circle cx="144" cy="176" r="3" class="pin-one" />
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="Haptic Vibration Motor" data-name="HAPTIC MOTOR (PIN 2)" data-detail="Pin 2 GPIO -> 2N2222 NPN / MOSFET driver -> Coin vibration motor (vibrate <ms>)">
+              <rect x="116" y="308" width="54" height="34" rx="17" class="pcb-btn" />
+              <circle cx="143" cy="325" r="8" class="pcb-btn-cap" />
+              <text x="143" y="356" text-anchor="middle" class="pcb-label">VIB PIN 2</text>
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="RX and TX Status LEDs" data-name="STATUS LEDS" data-detail="Built-in Pin 17 (RXLED) and Pin 30 (TXLED) pulse on framed protocol traffic">
+              <rect x="216" y="312" width="46" height="26" rx="3" class="pcb-btn" />
+              <circle cx="230" cy="325" r="4" class="pin-one" />
+              <circle cx="248" cy="325" r="4" class="pcb-btn-cap" />
+              <text x="239" y="356" text-anchor="middle" class="pcb-label">RX / TX LED</text>
+            </g>
+
+            <g class="hotspot" tabindex="0" role="button" aria-label="Micro USB HID Port" data-name="MICRO USB HID" data-detail="Emulated Keyboard, Mouse, and Consumer Control HID + Caterina 1200 bps Reset">
+              <rect x="155" y="390" width="70" height="44" rx="6" class="pcb-usb" />
+              <rect x="167" y="402" width="46" height="16" rx="8" class="pcb-usb-inner" />
+              <text x="190" y="380" text-anchor="middle" class="pcb-label accent-text">USB HID PORT</text>
+            </g>
+          </svg>
+
+          <div class="pcb-footer mono" id="hotspotDetail" aria-live="polite">
+            Hover or focus a hardware block to inspect signal path.
           </div>
-        </aside>
+        </div>
       </div>
     </section>
 
-    <!-- 01_FLASHER -->
+    <!-- LIVE WEB SERIAL FLASHER WORKBENCH -->
     <section class="section container" id="flasher">
       <div class="section-head">
-        <div>
-          <p class="section-num">01 // WEB SERIAL FLASHER</p>
-          <h2 class="section-title">Caterina 1200 bps Firmware Flasher</h2>
-        </div>
-        <p class="section-lead">Connect your ATmega32U4 over USB, trigger the 1200 bps bootloader reset, and stream a compiled <code>.hex</code> binary directly from the browser.</p>
+        <span class="mono section-index">01 // WEB SERIAL FLASHER</span>
+        <h2>Caterina 1200 bps flashing workbench.</h2>
       </div>
 
-      <div class="flasher-shell">
-        <div id="unsupportedBanner" class="banner-warn" hidden>
-          Web Serial API is not available in this browser. Open this page in Chrome, Edge, or Brave on desktop.
-        </div>
+      <div id="unsupportedBanner" class="browser-warn mono" role="alert" hidden>
+        Web Serial API is unavailable in this browser. Use Chrome, Edge, or Opera on desktop over HTTPS or localhost.
+      </div>
 
-        <div class="flasher-grid">
-          <div class="control-group">
-            <div class="control-row">
-              <button type="button" id="connectBtn" class="btn btn-primary">CONNECT SERIAL</button>
-              <button type="button" id="disconnectBtn" class="btn btn-ghost" disabled>DISCONNECT</button>
-              <button type="button" id="bootloaderBtn" class="btn btn-ghost" disabled>1200 BPS RESET</button>
+      <div class="workbench-container">
+        <div class="workbench-grid">
+          <div class="panel-card stack">
+            <div class="panel-head mono">
+              <span>FIRMWARE &amp; PORT CONTROL</span>
+              <span id="baudReadout" class="accent">57600 BAUD</span>
             </div>
 
-            <label class="file-drop">
-              <span class="mono" style="font-size: 0.78rem; font-weight: 600;">SELECT FIRMWARE (.HEX)</span>
-              <input type="file" id="firmwareFile" accept=".hex,.bin" />
-              <span id="fileHint" class="mono" style="font-size: 0.75rem; color: var(--color-muted);">No firmware file selected.</span>
-            </label>
-
-            <div class="control-row">
-              <button type="button" id="flashBtn" class="btn btn-primary" disabled>FLASH FIRMWARE</button>
-              <button type="button" id="clearLogBtn" class="btn btn-ghost">CLEAR LOG</button>
+            <div class="field">
+              <label for="firmwareFile" class="mono field-label">FIRMWARE IMAGE (.HEX / .BIN)</label>
+              <input type="file" id="firmwareFile" accept=".hex,.bin" class="file-input mono" />
+              <span class="mono field-hint" id="fileHint">No firmware loaded. Select a .hex release image.</span>
             </div>
 
-            <div class="progress-wrap">
-              <div class="progress-meta">
-                <span id="statusLine">Idle · Waiting for serial port</span>
+            <div class="workbench-actions">
+              <button type="button" id="connectBtn" class="btn btn-primary">Connect USB Serial</button>
+              <button type="button" id="disconnectBtn" class="btn btn-ghost" hidden>Disconnect</button>
+              <button type="button" id="bootloaderBtn" class="btn btn-ghost mono">1200 bps Caterina Reset</button>
+              <button type="button" id="flashBtn" class="btn btn-primary mono" disabled>Flash Firmware</button>
+            </div>
+
+            <div class="progress-block">
+              <div class="progress-meta mono">
+                <span id="statusLine">IDLE</span>
                 <span id="progressPct">0%</span>
               </div>
-              <div class="progress-track" id="progressTrack" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-wrap" role="progressbar" aria-label="Firmware upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack">
                 <div class="progress-bar" id="progressBar"></div>
               </div>
             </div>
           </div>
 
-          <pre class="console-box" id="logOutput" aria-live="polite">[rubberotter] Web Serial flasher ready.</pre>
+          <div class="panel-card serial-panel">
+            <div class="term-bar mono">
+              <span>SERIAL CONSOLE // WEB SERIAL</span>
+              <button type="button" id="clearLogBtn" class="btn-inline mono">CLEAR LOG</button>
+            </div>
+            <pre id="logOutput" class="term-output mono" tabindex="0" aria-live="polite"></pre>
+          </div>
         </div>
       </div>
+
+      <ol class="steps-grid">
+        <li class="step-card">
+          <div class="step-num mono">STEP 01</div>
+          <h3>Load Firmware Image</h3>
+          <p>
+            Download <code>RubberOtter-pro_micro.hex</code> or <code>RubberOtter-leonardo.hex</code> from GitHub Releases and load it above.
+          </p>
+          <div class="step-meta mono">FORMAT: INTEL HEX / BIN</div>
+        </li>
+
+        <li class="step-card">
+          <div class="step-num mono">STEP 02</div>
+          <h3>Trigger 1200 bps Reset</h3>
+          <p>
+            Click <strong>1200 bps Caterina Reset</strong> to pulse the port and open the 8-second ATmega32U4 bootloader window.
+          </p>
+          <div class="step-meta mono">WINDOW: 8 SECONDS // CATERINA</div>
+        </li>
+
+        <li class="step-card">
+          <div class="step-num mono">STEP 03</div>
+          <h3>Connect &amp; Stream</h3>
+          <p>
+            Click <strong>Connect USB Serial</strong>, pick the bootloader port at <code>57600</code> baud, and click <strong>Flash Firmware</strong>.
+          </p>
+          <div class="step-meta mono">MODE: USB HID + BLE READY</div>
+        </li>
+      </ol>
     </section>
 
-    <!-- 02_WIRING -->
+    <!-- HARDWARE ARCHITECTURE & WIRING -->
     <section class="section container" id="architecture">
       <div class="section-head">
-        <div>
-          <p class="section-num">02 // HARDWARE TOPOLOGY</p>
-          <h2 class="section-title">Pinout &amp; Level-Shifting Hotspots</h2>
-        </div>
-        <p class="section-lead">Inspect each hardware subsystem. ATmega32U4 TX1 outputs 5V logic and requires a 1kΩ / 2kΩ voltage divider before reaching the HM-10 RX pin.</p>
+        <span class="mono section-index">02 // HARDWARE &amp; WIRING</span>
+        <h2>Dual-chip HID with 3.3V BLE isolation.</h2>
       </div>
 
-      <div class="pcb-layout">
-        <div class="pcb-card" id="pcbCard">
-          <div>
-            <p class="mono" style="font-size: 0.72rem; letter-spacing: 0.12em; opacity: 0.7;">INTERACTIVE SUBSYSTEMS</p>
-            <p id="hotspotStatus" class="mono" style="margin-top: 0.5rem; font-size: 0.9rem;">Select a subsystem below to inspect pinout and voltage levels.</p>
-          </div>
-          <div class="hotspot-row">
-            <button type="button" class="hotspot" data-part="mcu" aria-pressed="false">ATmega32U4 MCU</button>
-            <button type="button" class="hotspot" data-part="ble" aria-pressed="false">HM-10 BLE</button>
-            <button type="button" class="hotspot" data-part="divider" aria-pressed="false">5V→3.3V Divider</button>
-            <button type="button" class="hotspot" data-part="haptic" aria-pressed="false">Haptic Motor</button>
-          </div>
-        </div>
+      <div class="specs-container">
+        <div class="specs-grid">
+          <article class="spec-card span-2">
+            <span class="mono card-kicker">PINOUT &amp; LOGIC LEVEL</span>
+            <h3>ATmega32U4 to HM-10 UART Bridge</h3>
+            <p>
+              Connect HM-10 <code>TX</code> directly to Pro Micro <code>Pin 0 (RX1)</code>. Route 5V <code>Pin 1 (TX1)</code> through a <code>1kΩ / 2kΩ</code> resistor voltage divider before HM-10 <code>RX</code> to protect the 3.3V BLE receiver IC.
+            </p>
+          </article>
 
-        <div class="hotspot-detail-card">
-          <p class="mono" style="font-size: 0.72rem; letter-spacing: 0.12em; color: var(--color-accent); margin-bottom: 0.5rem;">SPECIFICATION</p>
-          <p id="hotspotDetail" style="font-size: 0.92rem; color: var(--color-muted);">
-            Pro Micro / Leonardo (5V, 16 MHz) communicates with the HM-10 BLE module over Serial1 UART at 9600 baud and emulates a native USB HID keyboard and mouse.
-          </p>
+          <article class="spec-card">
+            <span class="mono card-kicker">WIRE PROTOCOL</span>
+            <div class="big-stat mono">384<span class="unit">BYTES</span></div>
+            <p>Max framed payload per RubberOtter v1 <code>STX/ETX</code> XOR packet with 6-byte ACK replies.</p>
+          </article>
+
+          <article class="spec-card">
+            <span class="mono card-kicker">HAPTIC FEEDBACK</span>
+            <h3>Pin 2 Vibration Driver</h3>
+            <p>Active-HIGH GPIO pulse on <code>Pin 2</code> drives a coin vibration motor via 2N2222 NPN or MOSFET for tactile confirmation.</p>
+          </article>
+
+          <article class="spec-card span-2">
+            <span class="mono card-kicker">SEPARATION OF CONCERNS</span>
+            <h3>Dedicated Flasher, Unified Control PWA</h3>
+            <p>
+              This page handles ATmega32U4 firmware flashing only. Use <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer" class="inline-link">RubberDeck</a> for live BLE 5.0 and USB CDC control, or install <code>pip install rubberotter</code> for Python SDK, CLI, and MCP automation.
+            </p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- 03_SIMULATOR -->
+    <!-- INTERACTIVE HID PAYLOAD SIMULATOR -->
     <section class="section container" id="simulator">
       <div class="section-head">
-        <div>
-          <p class="section-num">03 // WIRE PROTOCOL</p>
-          <h2 class="section-title">RubberOtter v1 Packet Simulator</h2>
-        </div>
-        <p class="section-lead">Preview framed hex packets, XOR checksums, and expected 6-byte ACK responses offline.</p>
+        <span class="mono section-index">03 // LIVE PAYLOAD SIMULATOR</span>
+        <h2>Preview RubberOtter v1 wire frames.</h2>
       </div>
 
-      <div class="tab-strip" id="simPresets" role="tablist" aria-label="Protocol Presets">
-        <button type="button" class="tab-btn" role="tab" aria-selected="true" data-preset="type">TYPE STRING</button>
-        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-preset="mouse">MOUSE DELTA</button>
-        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-preset="haptic">HAPTIC PULSE</button>
-      </div>
+      <div class="sim-container">
+        <div class="sim-shell">
+          <div class="sim-controls">
+            <div class="mono sim-label">SELECT PAYLOAD PRESET</div>
+            <div class="tablist mono" id="simPresets" role="tablist" aria-label="Simulator Presets">
+              <button type="button" class="tab-btn mono" role="tab" aria-selected="true" data-preset="chain">CHAIN_DEPLOY.otter</button>
+              <button type="button" class="tab-btn mono" role="tab" aria-selected="false" data-preset="haptic">HAPTIC_MACRO.otter</button>
+              <button type="button" class="tab-btn mono" role="tab" aria-selected="false" data-preset="jiggler">JIGGLER_MOUSE.otter</button>
+            </div>
 
-      <div class="flasher-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-        <div>
-          <pre class="code-panel" id="simCode">02 01 01 00 0B 74 79 70 65 20 68 65 6C 6C 6F 0A 1E 03</pre>
-          <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 1rem;">
-            <button type="button" id="runSimBtn" class="btn btn-primary">SIMULATE FRAME</button>
-            <span id="simState" class="mono" style="font-size: 0.78rem; color: var(--color-muted);">Ready</span>
+            <pre class="sim-code mono" id="simCode" tabindex="0"></pre>
+
+            <button type="button" class="btn btn-primary mono" id="runSimBtn">
+              <span>EXECUTE SIMULATION</span>
+            </button>
+          </div>
+
+          <div class="sim-terminal">
+            <div class="term-bar mono">
+              <span>VIRTUAL HOST // ATMEGA32U4 HID</span>
+              <span id="simState" class="accent">IDLE</span>
+            </div>
+            <div class="term-output mono" id="termOutput" aria-live="polite">
+              <div class="dim">// Waiting for BLE 0xFFE1 frame...</div>
+            </div>
           </div>
         </div>
-        <pre class="console-box" id="termOutput">[sim] Select a preset and click SIMULATE FRAME.</pre>
       </div>
     </section>
 
-    <!-- 04_CLI/MCP -->
+    <!-- CLI, MCP & PYTHON SDK -->
     <section class="section container" id="ecosystem">
       <div class="section-head">
-        <div>
-          <p class="section-num">04 // PYTHON SDK · CLI · MCP</p>
-          <h2 class="section-title">Programmatic &amp; AI Agent Control</h2>
+        <span class="mono section-index">04 // CLI, MCP &amp; PYTHON SDK</span>
+        <h2>Control from terminal, Python, or AI agents.</h2>
+      </div>
+
+      <div class="code-shell">
+        <div class="code-tabs-bar">
+          <div class="tablist mono" id="usageTabs" role="tablist" aria-label="Client Interface">
+            <button type="button" class="tab-btn mono" role="tab" aria-selected="true" data-usage="cli">CLI // rubberotter</button>
+            <button type="button" class="tab-btn mono" role="tab" aria-selected="false" data-usage="mcp">MCP // rubberotter mcp</button>
+            <button type="button" class="tab-btn mono" role="tab" aria-selected="false" data-usage="sdk">PYTHON SDK</button>
+          </div>
+          <span class="copy-wrap">
+            <button type="button" class="copy-btn mono" id="copyUsageBtn" command="--copy" commandfor="usageCode">COPY</button>
+            <span class="copy-tip mono" role="status"></span>
+          </span>
         </div>
-        <p class="section-lead">Install via Homebrew or PyPI to script HID automation or expose 13 hardware tools over stdio MCP.</p>
-      </div>
 
-      <div class="tab-strip" id="usageTabs" role="tablist" aria-label="Usage Modes">
-        <button type="button" class="tab-btn" role="tab" aria-selected="true" data-tab="cli">CLI</button>
-        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="sdk">PYTHON SDK</button>
-        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-tab="mcp">MCP SERVER</button>
-      </div>
+        <pre class="sim-code mono usage-code" id="usageCode" tabindex="0"></pre>
 
-      <pre class="code-panel" id="usageCode">brew install AtaCanYmc/tap/rubberotter
-rubberotter type "hello world" --enter</pre>
-      <p id="usageMeta" class="mono" style="margin-top: 0.65rem; font-size: 0.78rem; color: var(--color-muted);">Requires Python 3.10+ · Supports BLE GATT and USB CDC Serial.</p>
-    </section>
-
-    <!-- 05_DOCS -->
-    <section class="section container" id="docs">
-      <div class="section-head">
-        <div>
-          <p class="section-num">05 // ARCHITECTURE &amp; SPECS</p>
-          <h2 class="section-title">Technical Diagrams &amp; Documentation</h2>
+        <div class="usage-meta mono" id="usageMeta">
+          Install via <code>brew install AtaCanYmc/tap/rubberotter</code> or <code>pip install rubberotter</code>. Supports BLE 0xFFE0 via Bleak and USB CDC via PySerial.
         </div>
-        <p class="section-lead">Interactive HTML and vector SVG schematics for system topology, wire protocol, hardware wiring, and MCP integration.</p>
-      </div>
-
-      <div class="docs-grid">
-        <a class="doc-card" href="../docs/assets/overview-architecture.html" target="_blank" rel="noopener noreferrer">
-          <span class="mono" style="font-size: 0.72rem; color: var(--color-accent);">ARCHITECTURE</span>
-          <span class="doc-card-title">Platform Overview</span>
-          <span class="doc-card-desc">Control interfaces, BLE/Serial bridge, ATmega32U4 firmware, and Host PC.</span>
-        </a>
-        <a class="doc-card" href="../docs/assets/architecture-sequence.html" target="_blank" rel="noopener noreferrer">
-          <span class="mono" style="font-size: 0.72rem; color: var(--color-accent);">SEQUENCE</span>
-          <span class="doc-card-title">End-to-End Wire Protocol</span>
-          <span class="doc-card-desc">GATT 0xFFE1 write, 512B ring buffer, XOR validation, HID report, and 6-byte ACK.</span>
-        </a>
-        <a class="doc-card" href="../docs/assets/hardware-wiring.html" target="_blank" rel="noopener noreferrer">
-          <span class="mono" style="font-size: 0.72rem; color: var(--color-accent);">SCHEMATIC</span>
-          <span class="doc-card-title">Hardware Wiring &amp; Level Shifting</span>
-          <span class="doc-card-desc">ATmega32U4 pinout, 1kΩ/2kΩ voltage divider, HM-10 BLE, and haptic driver.</span>
-        </a>
-        <a class="doc-card" href="../docs/assets/mcp-architecture.html" target="_blank" rel="noopener noreferrer">
-          <span class="mono" style="font-size: 0.72rem; color: var(--color-accent);">AI / MCP</span>
-          <span class="doc-card-title">MCP &amp; AI Agent Integration</span>
-          <span class="doc-card-desc">Claude Desktop, Cursor, and autonomous agents driving 13 hardware tools.</span>
-        </a>
       </div>
     </section>
   </main>
 
-  <footer class="footer container">
-    <div class="footer-inner">
-      <span>RubberOtter · Apache-2.0 License</span>
-      <span>
-        <a href="https://github.com/AtaCanYmc/RubberOtter" target="_blank" rel="noopener noreferrer">GitHub</a> ·
-        <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer">RubberDeck PWA</a>
-      </span>
+  <footer class="footer container mono">
+    <div>RUBBEROTTER // ATMEGA32U4 HID HARDWARE PLATFORM</div>
+    <div class="footer-links">
+      <a href="https://github.com/AtaCanYmc/RubberOtter" target="_blank" rel="noopener noreferrer">REPOSITORY</a>
+      <a href="https://github.com/AtaCanYmc/RubberOtter/releases" target="_blank" rel="noopener noreferrer">RELEASES</a>
+      <a href="https://pypi.org/project/rubberotter/" target="_blank" rel="noopener noreferrer">PYPI</a>
+      <a href="https://github.com/AtaCanYmc/homebrew-tap" target="_blank" rel="noopener noreferrer">HOMEBREW</a>
+      <a href="https://atacanymc.github.io/RubberDeck/" target="_blank" rel="noopener noreferrer">RUBBERDECK</a>
+      <a href="./llms.txt">LLMS.TXT</a>
     </div>
   </footer>
+
+  <noscript>
+    <p class="container mono browser-warn">JavaScript is required for Web Serial flashing and the live simulator. Flash via PlatformIO: platformio run --target upload</p>
+  </noscript>
 
   <script src="./app.js" defer></script>
 </body>
