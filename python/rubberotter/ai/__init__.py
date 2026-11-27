@@ -1,11 +1,11 @@
 """Rubber Otter AI Agent Tool Integrations & Exporters."""
 
 from rubberotter.ai.tools import (
-    ToolDefinition,
     RubberOtterToolRegistry,
+    ToolDefinition,
 )
 
 __all__ = [
-    "ToolDefinition",
     "RubberOtterToolRegistry",
+    "ToolDefinition",
 ]

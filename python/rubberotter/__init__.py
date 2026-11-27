@@ -3,28 +3,28 @@ Rubber Otter Python SDK Package
 Comprehensive library for discovering, controlling, and managing Rubber Otter microcontrollers.
 """
 
-from .protocol import build_frame, parse_ack, ProtocolError, PayloadTooLargeError
-from .scanner import scan_serial_ports, scan_ble_devices, scan_all
-from .client import RubberOtter, AsyncRubberOtter, RubberOtterConnectionError
 from .ai.tools import RubberOtterToolRegistry, ToolDefinition
+from .client import AsyncRubberOtter, RubberOtter, RubberOtterConnectionError
 from .mcp.server import RubberOtterMcpServer, run_stdio_server
+from .protocol import PayloadTooLargeError, ProtocolError, build_frame, parse_ack
+from .scanner import scan_all, scan_ble_devices, scan_serial_ports
 
-__version__ = "1.4.0"  # x-release-please-version
+__version__ = "1.5.0"  # x-release-please-version
 __author__ = "Rubber Otter Developer"
 
 __all__ = [
-    "RubberOtter",
     "AsyncRubberOtter",
-    "RubberOtterConnectionError",
-    "scan_serial_ports",
-    "scan_ble_devices",
-    "scan_all",
-    "build_frame",
-    "parse_ack",
-    "ProtocolError",
     "PayloadTooLargeError",
+    "ProtocolError",
+    "RubberOtter",
+    "RubberOtterConnectionError",
+    "RubberOtterMcpServer",
     "RubberOtterToolRegistry",
     "ToolDefinition",
-    "RubberOtterMcpServer",
+    "build_frame",
+    "parse_ack",
     "run_stdio_server",
+    "scan_all",
+    "scan_ble_devices",
+    "scan_serial_ports",
 ]

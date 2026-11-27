@@ -4,10 +4,11 @@ Provides complete HTTP REST API for discovering, connecting, and controlling Rub
 """
 
 import os
-from flask import Flask, jsonify, request, render_template
 
-from ..client import RubberOtter, RubberOtterConnectionError
-from ..scanner import scan_serial_ports, scan_ble_devices, scan_all
+from flask import Flask, jsonify, render_template, request
+
+from ..client import RubberOtter
+from ..scanner import scan_all
 
 # Global active client instance
 active_otter = None
@@ -42,7 +43,6 @@ def create_app():
 
     @app.route("/api/status", methods=["GET"])
     def api_status():
-        global active_otter, active_target
         connected = False
         if active_otter:
             connected = True
@@ -66,7 +66,7 @@ def create_app():
         if active_otter:
             try:
                 active_otter.disconnect()
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 - disconnect is best-effort
                 pass
 
         try:
@@ -98,7 +98,7 @@ def create_app():
         if active_otter:
             try:
                 active_otter.disconnect()
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 - disconnect is best-effort
                 pass
         active_otter = None
         active_target = None

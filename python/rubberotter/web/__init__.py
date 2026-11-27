@@ -3,6 +3,6 @@ Rubber Otter Web Application Package
 Provides embedded Web Dashboard and REST API server.
 """
 
-from .server import run_server, create_app
+from .server import create_app, run_server
 
-__all__ = ["run_server", "create_app"]
+__all__ = ["create_app", "run_server"]

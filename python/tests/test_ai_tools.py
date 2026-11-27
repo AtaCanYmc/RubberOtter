@@ -1,10 +1,10 @@
 """Tests for Rubber Otter AI Tool Registry and Schema Exporters."""
 
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from rubberotter.ai.tools import RubberOtterToolRegistry, ToolDefinition
-from rubberotter.protocol import KEY_ENTER, KEY_GUI_L, KEY_F5
+from rubberotter.ai.tools import RubberOtterToolRegistry
+from rubberotter.protocol import KEY_ENTER, KEY_F5
 
 
 class TestAiTools(unittest.TestCase):

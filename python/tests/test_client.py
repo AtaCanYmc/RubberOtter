@@ -4,8 +4,9 @@ Unit tests for RubberOtter Python client SDK and inline functions.
 
 import unittest
 from unittest.mock import MagicMock, patch
-from rubberotter.client import RubberOtter, AsyncRubberOtter
-from rubberotter.protocol import STX, ETX, VERSION
+
+from rubberotter.client import RubberOtter
+from rubberotter.protocol import ETX, STX, VERSION
 
 
 class TestClientSDK(unittest.TestCase):

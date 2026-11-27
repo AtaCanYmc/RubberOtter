@@ -47,7 +47,7 @@ Add the following to your `mcp.json` / MCP Server settings:
 
 ## Available MCP & AI Tools (13)
 
-All JSON-RPC 2.0 error responses include `error.data.error_code` and `error.data.retryable` so autonomous agents can classify transient transport failures vs invalid parameters. Use `otter-cli doctor --ping` to verify local serial/BLE health and ACK latency.
+All JSON-RPC 2.0 error responses include `error.data.error_code` and `error.data.retryable` so autonomous agents can classify transient transport failures vs invalid parameters. Use `otter-cli doctor --ping` to verify local serial/BLE health and connection latency.
 
 | Tool Name | Parameters | Description |
 | :--- | :--- | :--- |

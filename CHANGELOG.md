@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.5.0](https://github.com/AtaCanYmc/RubberOtter/compare/rubber-otter-v1.4.0...rubber-otter-v1.5.0) (2026-11-27)
+
+
+### Features
+
+* add AVR109 HEX flasher, release fetch, UART baud preset, and native tests ([578234b](https://github.com/AtaCanYmc/RubberOtter/commit/578234b84d0a6b5f538e64b6e0567669b00547a5))
+* add otter-cli doctor, ACK latency telemetry, SHA256SUMS, and structured MCP errors ([a9a9918](https://github.com/AtaCanYmc/RubberOtter/commit/a9a99188a59dc1bd810b73881e56d873516f18a0))
+* **firmware:** add selectable non-US HID keymap translation tables ([cd6a755](https://github.com/AtaCanYmc/RubberOtter/commit/cd6a7551eeede9087dcda32094ffe70f05b8d22a))
+* **site:** add auto Caterina port detection and recovery guide ([c37da4e](https://github.com/AtaCanYmc/RubberOtter/commit/c37da4e709a5fce56a36847ca2ba66e6e691549a))
+* **site:** embed YouTube launch video ([9a5a706](https://github.com/AtaCanYmc/RubberOtter/commit/9a5a70617825327380ecc68fc0820d572517c76d))
+* **site:** redesign GitHub Pages flasher and docs with editorial UI ([62c768f](https://github.com/AtaCanYmc/RubberOtter/commit/62c768fb28832fc66398459bccf7d0b3e4f7ac58))
+
+
+### Documentation
+
+* add Homebrew badge and installation instructions to README ([c67565d](https://github.com/AtaCanYmc/RubberOtter/commit/c67565d518d82597b6c659ea2aef4ab94baff153))
+* add platform overview diagram to README ([9cb71ea](https://github.com/AtaCanYmc/RubberOtter/commit/9cb71eac779b95a938163e88eb83abf5ad49e689))
+* add repository governance templates and site README ([cc1a6de](https://github.com/AtaCanYmc/RubberOtter/commit/cc1a6de46a8b92f93c1263529c09460ab0ae62f8))
+* add Wireless HID and Stealth BLE hardware banners ([1106c30](https://github.com/AtaCanYmc/RubberOtter/commit/1106c309dbe48a1ec81a82152c95dc12f099308f))
+* align ROADMAP, CONTRIBUTING, SECURITY, and architecture with v1.4.0 split ([0cd2da1](https://github.com/AtaCanYmc/RubberOtter/commit/0cd2da13eb4188e4aa6c7b25c3053ce4da094672))
+* **hardware:** add BOM and 3D enclosure STL files ([b8a0987](https://github.com/AtaCanYmc/RubberOtter/commit/b8a0987a4dbb26bd3b9949601bb0e8f1d2fababb))
+* link all technical docs in README ([b944375](https://github.com/AtaCanYmc/RubberOtter/commit/b9443756cddd578b8a60b9c49111702e75952298))
+* link hardware BOM from hardware-wiring.md and clean heading ([433cece](https://github.com/AtaCanYmc/RubberOtter/commit/433cece5fa27bff61ba5b81b9f55dea3f643a2df))
+* **site:** add Homebrew install command, PyPI links, and v1.4.0 version tag ([ce27eb1](https://github.com/AtaCanYmc/RubberOtter/commit/ce27eb1d210a54253cbc3813f9db69f0efcd7a1c))
+* **site:** embed YouTube launch video in README and GitHub Pages ([ee8c43b](https://github.com/AtaCanYmc/RubberOtter/commit/ee8c43b3b985d1adbfdcb6fe0889bbf9640cb6d2))
+* update architecture and MCP docs for v1.5-v1.6 features ([eabb005](https://github.com/AtaCanYmc/RubberOtter/commit/eabb005729236ae790a86cac27d95b0faf6e69f0))
+* upgrade Mermaid diagrams to editorial HTML and SVG ([f62e928](https://github.com/AtaCanYmc/RubberOtter/commit/f62e92825c0bde5cd154dba9f3b79555689cc08f))
+* upgrade README with TOC, hardware BOM/STL links, and test commands ([bdd28c1](https://github.com/AtaCanYmc/RubberOtter/commit/bdd28c1603252c09339b90c3befc67f979d4685f))
+* upgrade ROADMAP.md with structured product milestones ([f388149](https://github.com/AtaCanYmc/RubberOtter/commit/f388149e56c857694eadcf189bae00feedc5c640))
+
 ## [1.4.0](https://github.com/AtaCanYmc/RubberOtter/compare/rubber-otter-v1.3.0...rubber-otter-v1.4.0) (2026-11-22)
 
 

@@ -6,8 +6,6 @@ Scans connected USB CDC Serial ports and nearby Bluetooth Low Energy (BLE) devic
 import asyncio
 import concurrent.futures
 import glob
-import os
-import sys
 
 # Known USB Vendor/Product IDs for ATmega32U4 microcontrollers
 KNOWN_VID_PID = {
@@ -60,9 +58,7 @@ def scan_serial_ports(quiet: bool = False):
             is_candidate = False
             board_name = KNOWN_VID_PID.get(vid_pid_str, "")
 
-            if board_name:
-                is_candidate = True
-            elif any(
+            if board_name or any(
                 kw in (device + desc + hwid).lower()
                 for kw in ["usbmodem", "usbserial", "leonardo", "promicro", "atmega32u4", "arduino"]
             ):
@@ -141,7 +137,7 @@ def scan_ble_devices(target_name: str = "Otter", timeout: float = 5.0):
     """Synchronous wrapper for BLE scanning."""
     try:
         return _run_async(scan_ble_devices_async(target_name=target_name, timeout=timeout))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report discovery failures
         return {"error": str(e), "devices": []}
 
 
@@ -165,7 +161,7 @@ def auto_detect_ble_device(target_name: str = "Otter", timeout: float = 3.0):
     """
     try:
         return _run_async(auto_detect_ble_device_async(target_name=target_name, timeout=timeout))
-    except Exception:
+    except Exception:  # noqa: BLE001 - discovery failure means no device
         return None
 
 

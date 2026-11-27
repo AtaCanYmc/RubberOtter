@@ -4,7 +4,8 @@ Unit tests for RubberOtter Web Dashboard REST API endpoints.
 
 import json
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from rubberotter.web.server import create_app
 
 

@@ -6,12 +6,18 @@ OpenAI Function Calling, Anthropic Claude Tools, and LangChain/CrewAI agent fram
 
 from __future__ import annotations
 
-import inspect
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
 
 from rubberotter.client import RubberOtter
-from rubberotter.protocol import PROTOCOL_SINGLE_BYTE_MAP, KEY_ENTER, KEY_GUI_L, KEY_LEFT_ARROW, KEY_RIGHT_ARROW, KEY_F5
+from rubberotter.protocol import (
+    KEY_ENTER,
+    KEY_F5,
+    KEY_GUI_L,
+    KEY_LEFT_ARROW,
+    KEY_RIGHT_ARROW,
+)
 
 
 @dataclass
@@ -19,11 +25,11 @@ class ToolDefinition:
     """Descriptor for an AI-invocable tool."""
     name: str
     description: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     handler: Callable[..., Any]
-    required: List[str] = field(default_factory=list)
+    required: list[str] = field(default_factory=list)
 
-    def to_mcp_tool(self) -> Dict[str, Any]:
+    def to_mcp_tool(self) -> dict[str, Any]:
         """Export tool description in Model Context Protocol (MCP) format."""
         return {
             "name": self.name,
@@ -35,7 +41,7 @@ class ToolDefinition:
             }
         }
 
-    def to_openai_tool(self) -> Dict[str, Any]:
+    def to_openai_tool(self) -> dict[str, Any]:
         """Export tool description in OpenAI function calling format."""
         return {
             "type": "function",
@@ -50,7 +56,7 @@ class ToolDefinition:
             }
         }
 
-    def to_anthropic_tool(self) -> Dict[str, Any]:
+    def to_anthropic_tool(self) -> dict[str, Any]:
         """Export tool description in Anthropic Claude tool format."""
         return {
             "name": self.name,
@@ -66,9 +72,9 @@ class ToolDefinition:
 class RubberOtterToolRegistry:
     """Registry of AI tools that execute commands on Rubber Otter hardware."""
 
-    def __init__(self, client: Optional[RubberOtter] = None) -> None:
+    def __init__(self, client: RubberOtter | None = None) -> None:
         self._client = client
-        self._tools: Dict[str, ToolDefinition] = {}
+        self._tools: dict[str, ToolDefinition] = {}
         self._register_default_tools()
 
     @property
@@ -83,13 +89,13 @@ class RubberOtterToolRegistry:
     def register(self, tool: ToolDefinition) -> None:
         self._tools[tool.name] = tool
 
-    def get_tool(self, name: str) -> Optional[ToolDefinition]:
+    def get_tool(self, name: str) -> ToolDefinition | None:
         return self._tools.get(name)
 
-    def list_tools(self) -> List[ToolDefinition]:
+    def list_tools(self) -> list[ToolDefinition]:
         return list(self._tools.values())
 
-    def execute(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
+    def execute(self, tool_name: str, arguments: dict[str, Any]) -> Any:
         tool = self.get_tool(tool_name)
         if not tool:
             raise ValueError(f"Unknown tool: {tool_name}")
@@ -286,7 +292,7 @@ class RubberOtterToolRegistry:
 
     # --- Tool Execution Handlers ---
 
-    def _tool_type(self, text: str, auto_enter: bool = False) -> Dict[str, Any]:
+    def _tool_type(self, text: str, auto_enter: bool = False) -> dict[str, Any]:
         self.client.type(text)
         if auto_enter:
             self.client.press_key(KEY_ENTER)
@@ -298,7 +304,7 @@ class RubberOtterToolRegistry:
             "message": f"Successfully typed {len(text)} characters to target PC."
         }
 
-    def _tool_key_combo(self, key: str) -> Dict[str, Any]:
+    def _tool_key_combo(self, key: str) -> dict[str, Any]:
         key_map = {
             "enter": KEY_ENTER,
             "return": KEY_ENTER,
@@ -322,7 +328,7 @@ class RubberOtterToolRegistry:
             "message": f"Successfully sent key '{key}' to target PC."
         }
 
-    def _tool_mouse_move(self, dx: int, dy: int) -> Dict[str, Any]:
+    def _tool_mouse_move(self, dx: int, dy: int) -> dict[str, Any]:
         dx_clamped = max(-127, min(127, int(dx)))
         dy_clamped = max(-127, min(127, int(dy)))
         self.client.mouse_move(dx_clamped, dy_clamped)
@@ -334,7 +340,7 @@ class RubberOtterToolRegistry:
             "message": f"Mouse moved relative dx={dx_clamped}, dy={dy_clamped}."
         }
 
-    def _tool_mouse_click(self, button: str = "left") -> Dict[str, Any]:
+    def _tool_mouse_click(self, button: str = "left") -> dict[str, Any]:
         btn = button.lower()
         if btn == "right":
             self.client.mouse_right_click()
@@ -349,7 +355,7 @@ class RubberOtterToolRegistry:
             "message": f"Executed {btn} mouse click."
         }
 
-    def _tool_mouse_scroll(self, direction: str, steps: int = 1) -> Dict[str, Any]:
+    def _tool_mouse_scroll(self, direction: str, steps: int = 1) -> dict[str, Any]:
         d = direction.lower()
         count = max(1, min(20, int(steps)))
         for _ in range(count):
@@ -365,7 +371,7 @@ class RubberOtterToolRegistry:
             "message": f"Scrolled mouse wheel {d} by {count} steps."
         }
 
-    def _tool_media(self, action: str) -> Dict[str, Any]:
+    def _tool_media(self, action: str) -> dict[str, Any]:
         act = action.lower()
         if act == "play_pause":
             self.client.media_play_pause()
@@ -388,7 +394,7 @@ class RubberOtterToolRegistry:
             "message": f"Executed media command: {act}."
         }
 
-    def _tool_presenter(self, action: str) -> Dict[str, Any]:
+    def _tool_presenter(self, action: str) -> dict[str, Any]:
         act = action.lower()
         if act == "next_slide":
             self.client.pres_next_slide()
@@ -407,7 +413,7 @@ class RubberOtterToolRegistry:
             "message": f"Executed presenter command: {act}."
         }
 
-    def _tool_lock(self) -> Dict[str, Any]:
+    def _tool_lock(self) -> dict[str, Any]:
         self.client.sec_lock()
         return {
             "success": True,
@@ -415,7 +421,7 @@ class RubberOtterToolRegistry:
             "message": "Sent workstation lock command."
         }
 
-    def _tool_jiggler(self) -> Dict[str, Any]:
+    def _tool_jiggler(self) -> dict[str, Any]:
         self.client.jiggler_toggle()
         return {
             "success": True,
@@ -423,7 +429,7 @@ class RubberOtterToolRegistry:
             "message": "Toggled non-blocking periodic mouse jiggler."
         }
 
-    def _tool_vibrate(self, duration_ms: int = 100) -> Dict[str, Any]:
+    def _tool_vibrate(self, duration_ms: int = 100) -> dict[str, Any]:
         self.client.vibrate(duration_ms)
         return {
             "success": True,
@@ -432,7 +438,7 @@ class RubberOtterToolRegistry:
             "message": f"Triggered {duration_ms}ms hardware vibration pulse."
         }
 
-    def _tool_macro(self, macro_name: str) -> Dict[str, Any]:
+    def _tool_macro(self, macro_name: str) -> dict[str, Any]:
         m = macro_name.lower().strip()
         if m in ("cs_buy", "cs", "0x41"):
             self.client.game_cs_buy()
@@ -452,7 +458,7 @@ class RubberOtterToolRegistry:
             "message": f"Executed macro '{macro_name}'."
         }
 
-    def _tool_scan(self, timeout: float = 3.0) -> Dict[str, Any]:
+    def _tool_scan(self, timeout: float = 3.0) -> dict[str, Any]:
         from rubberotter.scanner import scan_ble_devices
         devices = scan_ble_devices(timeout=timeout)
         return {
@@ -470,7 +476,7 @@ class RubberOtterToolRegistry:
             ]
         }
 
-    def _tool_status(self) -> Dict[str, Any]:
+    def _tool_status(self) -> dict[str, Any]:
         client = self.client
         is_conn = bool(client.is_connected)
         port = str(client.port) if client.port is not None else None
