@@ -14,6 +14,10 @@
 
 RubberOtter is an open-source ATmega32U4 + HM-10/ESP32 wireless USB Human Interface Device (HID) hardware platform. This repository is focused exclusively on PlatformIO firmware, the ATmega32U4 Caterina 1200 bps Web Serial Flasher, and the `rubberotter` Python SDK, CLI, and MCP server.
 
+![RubberOtter Platform Overview](docs/assets/overview-architecture.svg)
+
+*[Interactive HTML](docs/assets/overview-architecture.html)*
+
 ## Control PWA and Mobile App (Moved to RubberDeck)
 
 The web control PWA and Capacitor 8 mobile apps (Android/iOS) have moved to the unified standalone repository **[RubberDeck](https://github.com/AtaCanYmc/RubberDeck)**, which controls both RubberOtter and [RubberOrca](https://github.com/AtaCanYmc/RubberOrca) from a single interface.
