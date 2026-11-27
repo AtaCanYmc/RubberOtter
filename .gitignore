@@ -117,3 +117,6 @@ dist/
 **/ios/DerivedData/
 *.ipa
 *.xcarchive
+brag-output/
+brag-output-*/
+SHA256SUMS-*.txt
