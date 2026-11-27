@@ -1,6 +1,7 @@
 #include <unity.h>
 #include <stdint.h>
 #include <string.h>
+#include "../../src/Keymaps.h"
 
 static uint8_t calc_xor(const uint8_t* data, size_t len) {
     uint8_t x = 0;
@@ -52,9 +53,17 @@ void test_command_executor_chaining(void) {
     TEST_ASSERT_EQUAL_STRING("delay 50", cmds[2]);
 }
 
+void test_keymap_translation(void) {
+    TEST_ASSERT_EQUAL_CHAR('/', translateKeymapChar('-', KEYMAP_LAYOUT_TR_Q));
+    TEST_ASSERT_EQUAL_CHAR('z', translateKeymapChar('y', KEYMAP_LAYOUT_DE));
+    TEST_ASSERT_EQUAL_CHAR('@', translateKeymapChar('"', KEYMAP_LAYOUT_UK));
+    TEST_ASSERT_EQUAL_CHAR('-', translateKeymapChar('-', KEYMAP_LAYOUT_US));
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_packet_parser_xor_and_framing);
     RUN_TEST(test_command_executor_chaining);
+    RUN_TEST(test_keymap_translation);
     return UNITY_END();
 }
