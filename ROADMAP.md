@@ -38,6 +38,8 @@ Delivered milestones and planned technical work for RubberOtter (`ATmega32U4` + 
 - Live serial telemetry & ACK latency inspector in `site/` and `otter-cli doctor`.
 - Prebuilt signed binaries and reproducible firmware checksums (`SHA256SUMS`) on every release.
 - MCP tool schema validation and structured error codes for autonomous AI agent retries.
+- Hardware Bill of Materials (BOM) and 3D-printable enclosure (`.stl`) for Pro Micro + HM-10 + haptic motor.
+- Live hardware demo GIF/video and GitHub social preview in `README.md`.
 
 ### v2.0.0: Protocol Hardening & Internationalization
 - Optional authenticated session layer for BLE frames on bridge modules with sufficient RAM.

@@ -82,7 +82,8 @@ jobs:
 
       - name: Show firmware size
         run: |
-          platformio run -e ${{ matrix.env }} -t size || true
+          echo "### Firmware Size (${{ matrix.env }})" >> "$GITHUB_STEP_SUMMARY"
+          platformio run -e ${{ matrix.env }} -t size | tee -a "$GITHUB_STEP_SUMMARY" || true
 
       - name: Upload compiled firmware artifact
         if: success()
